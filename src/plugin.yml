@@ -1,0 +1,15 @@
+name:  xpShop
+version:  0.1
+description:  Player can buy xp
+author:  ibhh
+website: http://www.ibhh.de
+
+main: me.ibhh.xpShop.xpShop
+
+commands:
+  xpShopxp:
+    description: player gets xp for money.
+    usage: /xpShopxp <xp>
+  xpShopmoney:
+    description: player gets xp for money.
+    usage: /xpShopmoney <money> 
