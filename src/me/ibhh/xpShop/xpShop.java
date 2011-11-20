@@ -17,7 +17,7 @@ public class xpShop extends JavaPlugin {
 
 	
 	public iConomy iConomy = null;
-	protected FileConfiguration config;
+	private FileConfiguration config;
 	
 	@Override
 	public void onDisable() {
@@ -25,6 +25,19 @@ public class xpShop extends JavaPlugin {
 		System.out.println("[xpShop] disabled!");
 		
 	}
+	
+    public void loadConfig(){
+        config.addDefault("language", "de");
+        config.addDefault("command.error.toomanyarguments.de", "Dieser Befehl darf nur eine Zahl enthalten!");
+        config.addDefault("command.error.toomanyarguments.en", "This command has only one number!");
+        config.addDefault("permission.error.de", "Houston, Wir haben ein Problem :) Diesen Befehl darfst Du nicht verwenden!");
+        config.addDefault("permission.error.en", "Houston, we have a problem! You can't use this command!");
+        config.addDefault("permission.notfound.de", "PermissionsEx plugin nicht gefunden!");
+        config.addDefault("permission.notfound.en", "PermissionsEx not found!");
+        config.options().copyDefaults(true);
+        saveConfig();
+    }
+
 
 	@Override
 	public void onEnable() {
@@ -36,22 +49,45 @@ public class xpShop extends JavaPlugin {
 		
 		try {
 				config = getConfig();
+				loadConfig();
+				/*
+				File configfile = new File("plugins" + File.separator + "xpShop" + File.separator + "config.yml");
+				configfile.mkdir();
+				if(!config.contains("language"))
+				{config.set("language", "de");}
+				if(!config.contains("command.error.toomanyarguments.de"))
+				{config.set("command.error.toomanyarguments.de", "Dieser Befehl darf nur eine Zahl enthalten!");}
+				if(!config.contains("command.error.toomanyarguments.en"))
+				{config.set("command.error.toomanyarguments.en", "This command has only one number!");}
+				if(!config.contains("permission.error.de"))
+				{config.set("permission.error.de", "Houston, Wir haben ein Problem :) Diesen Befehl darfst Du nicht verwenden!");}
+				if(!config.contains("permission.error.en"))
+				{config.set("permission.error.en", "Houston, we have a problem! You can't use this command!");}
+				if(!config.contains("permission.notfound.de"))
+				{config.set("permission.notfound.de", "PermissionsEx plugin nicht gefunden!");}
+				if(!config.contains("permission.notfound.en"))
+				{config.set("permission.notfound.en", "PermissionsEx not found!");}
+				*/
+	
+				saveConfig();
 				System.out.println("[xpShop] Config file found!");		
+				
 		}
 		catch (Exception e)
 		{
-			System.out.println("[xpShop] could not be enabled: Exception occured while seaching config file.");
-			createconfig();
 			e.printStackTrace();
 		} 
 		System.out.println("[xpShop] Config file found!");	
 		System.out.println("[xpShop] successfully enabled!");
-		
-
-
-		
-
+		}
+	
+	
+	public void onReload() {
+		onEnable();
 	}
+		
+
+	
 		
 	
 
@@ -101,28 +137,6 @@ public class xpShop extends JavaPlugin {
 		return succeed;
 		
 	}
-	private void createconfig() {
-
-			try {
-				getConfig().addDefault("language", "de");
-				getConfig().addDefault("command.error.toomanyarguments.de", "Dieser Befehl darf nur eine Zahl enthalten!");
-				getConfig().addDefault("command.error.toomanyarguments.en", "This command has only one number!");
-				getConfig().addDefault("permission.error.de", "Houston, Wir haben ein Problem :) Diesen Befehl darfst Du nicht verwenden!");
-				getConfig().addDefault("permission.error.en", "Houston, we have a problem! You can't use this command!");
-				getConfig().addDefault("permission.notfound.de", "PermissionsEx plugin nicht gefunden!");
-				getConfig().addDefault("permission.notfound.en", "PermissionsEx not found!");
-				//getConfig().options().copyDefaults(true);
-				this.saveConfig();
-				System.out.println("[xpShop] Config file created!");
-				}
-			catch (Exception e1)
-				{
-				System.out.println("[xpShop] Config file could not be created: Exception occured while creating config file.");
-				return;
-				}
-			
-	}
-
 
   }
 
