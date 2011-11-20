@@ -1,5 +1,6 @@
 package me.ibhh.xpShop;
 
+
 import org.bukkit.event.Listener;
 import org.bukkit.event.server.PluginDisableEvent;
 import org.bukkit.event.server.PluginEnableEvent;
@@ -8,6 +9,7 @@ import org.bukkit.plugin.Plugin;
 import com.iCo6.*;
 
 public class server implements Listener {
+
 	    private xpShop plugin;
 
 	    public server(xpShop plugin) {
@@ -20,6 +22,9 @@ public class server implements Listener {
 	            if (event.getPlugin().getDescription().getName().equals("iConomy")) {
 	                plugin.iConomy = null;
 	                System.out.println("[xpShop] un-hooked from iConomy.");
+	            } else {
+	            	
+	            	System.out.println("[xpShop] Error: can't un-hooked from iConomy.");
 	            }
 	        }
 	    }
@@ -33,7 +38,11 @@ public class server implements Listener {
 	                if (iConomy.isEnabled() && iConomy.getClass().getName().equals("com.iConomy.iConomy")) {
 	                    plugin.iConomy = (iConomy)iConomy;
 	                    System.out.println("[xpShop] hooked into iConomy.");
+	                } else {
+	                	
+	                	System.out.println("[xpShop] Error: can't hooked into iConomy.");
 	                }
+	               
 	            }
 	        }
 	    }

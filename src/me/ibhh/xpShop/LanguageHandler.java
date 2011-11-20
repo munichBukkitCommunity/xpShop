@@ -26,14 +26,14 @@ defaultLang.loadFromString(
 "ERR_NO_WORLDGUARD: 'Error: WorldGuard was not found.'\n" +
 "LOG_EXPIRED_HOTEL: 'Hotel $0 was rent by $1 and just expired'");
 } catch (InvalidConfigurationException e) {
-outputConsole(Level.SEVERE, "[SimpleRegionMarket] Error: Internal language error!!");
+outputConsole(Level.SEVERE, "[xpShop] Error: Internal language error!!");
 return false;
 }
 
 try {
 defaultLang.save(defaultLangFile);
 } catch (IOException e) {
-outputConsole(Level.SEVERE, "[SimpleRegionMarket] Could not save default language 'en.yml'.");
+outputConsole(Level.SEVERE, "[xpShop] Could not save default language 'en.yml'.");
 }
 
 File choosenLangFile = new File(lang + ".yml");
@@ -82,7 +82,7 @@ return string;
 }
 
 public static void outputConsole(Level level, String string) {
-Bukkit.getLogger().log(level, "[SimpleRegionMarket] " + string);
+Bukkit.getLogger().log(level, "[xpShop] " + string);
 }
 
 public static void langOutputConsole(String id, Level level, ArrayList<String> args) {
@@ -90,14 +90,14 @@ outputConsole(level, parseLanguageString(id, args));
 }
 
 public static void outputDebug(Player p, String id, ArrayList<String> args) {
-p.sendMessage(ChatColor.WHITE + "[" + ChatColor.DARK_BLUE + "SRM" + ChatColor.WHITE + "] " + ChatColor.YELLOW + parseLanguageString(id, args));
+p.sendMessage(ChatColor.WHITE + "[" + ChatColor.DARK_BLUE + "xpShop" + ChatColor.WHITE + "] " + ChatColor.YELLOW + parseLanguageString(id, args));
 }
 
 public static void outputError(Player p, String id, ArrayList<String> args) {
-p.sendMessage(ChatColor.WHITE + "[" + ChatColor.DARK_BLUE + "SRM" + ChatColor.WHITE + "] " + ChatColor.RED + parseLanguageString(id, args));
+p.sendMessage(ChatColor.WHITE + "[" + ChatColor.DARK_BLUE + "xpShop" + ChatColor.WHITE + "] " + ChatColor.RED + parseLanguageString(id, args));
 }
 
 public static void outputString(Player p, String string) {
-p.sendMessage(ChatColor.WHITE + "[" + ChatColor.DARK_BLUE + "SRM" + ChatColor.WHITE + "] " + ChatColor.YELLOW + string);
+p.sendMessage(ChatColor.WHITE + "[" + ChatColor.DARK_BLUE + "xpShop" + ChatColor.WHITE + "] " + ChatColor.YELLOW + string);
 }
 }
