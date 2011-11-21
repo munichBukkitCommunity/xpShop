@@ -1,14 +1,26 @@
 language: en
 command:
   error:
+    noargs0:
+      de: Kein buy oder sell vorhanden!
+      en: No buy or sell found!
     toomanyarguments:
       de: Dieser Befehl darf nur eine Zahl enthalten!
       en: This command has only one number!
-permission:
+  success:
+    moneytoxp:
+      de: Du hast " + money + " in " + TOTALXP + " XP umgewandelt.
+      en: You changed " + money + " in " + TOTALXP + " XP.
+    xptomoney:
+      de: Du hast " + TOTALXP + " XP in " + money + "  umgewandelt.
+      en: You changed " + TOTALXP + " XP in " + money + ".
+permissions:
   error:
-    de: Houston, Wir haben ein Problem :) Diesen Befehl darfst Du nicht verwenden!
-    en: Houston, we have a problem! You can't use this command!
-permission:
+    de: Houston Wir haben ein Problem! Diesen Befehl darfst Du nicht verwenden!
+    en: Houston we have a problem! You can't use this command!
+permissions:
   notfound:
     de: PermissionsEx plugin nicht gefunden!
     en: PermissionsEx not found!
+moneytoxp: 1
+xptomoney: 1
