@@ -1,0 +1,14 @@
+language: en
+command:
+  error:
+    toomanyarguments:
+      de: Dieser Befehl darf nur eine Zahl enthalten!
+      en: This command has only one number!
+permission:
+  error:
+    de: Houston, Wir haben ein Problem :) Diesen Befehl darfst Du nicht verwenden!
+    en: Houston, we have a problem! You can't use this command!
+permission:
+  notfound:
+    de: PermissionsEx plugin nicht gefunden!
+    en: PermissionsEx not found!
