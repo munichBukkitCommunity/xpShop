@@ -16,6 +16,7 @@ public class xpShop extends JavaPlugin {
 
 	
 	public iConomy iConomy = null;
+	public String ActionxpShop = null;
 	
 	@Override
 	public void onDisable() {
@@ -80,44 +81,65 @@ public class xpShop extends JavaPlugin {
 			    if(permissions.has(player, "xpShop.buy")){
 			    	
 			    	if (cmd.getName().equalsIgnoreCase("xpShop")) {
+			    		try
+			    	    {
+			    	      ActionxpShop = args[0].toLowerCase();
+			    	    } catch (Exception e) {
+			    	      ActionxpShop = null;
+			    	    }
+
+			    	    }
 			    		if (args.length == 2) {
-			    			if (args[1] == null)
+			    			if (ActionxpShop.equalsIgnoreCase("buy") || ActionxpShop.equalsIgnoreCase("sell"))
 			    			{
-			    				player.sendMessage(ChatColor.GRAY + "[xpShop]" + ChatColor.RED + (getConfig().getString("command.error.fewargs." + getConfig().getString("language"))));
-			    				return false;
-			    			}
-			    			if (args[0] == "buy" || args[0] == "sell")
-			    			{
-			    				if (args[0] == "buy")
+			    				if (ActionxpShop == "buy" && ActionxpShop != null)
 			    				{
 			    					int XPint = player.getExperience();
 			    					int money = 0;
 			    					try {
+			    						if (Tools.isInteger(args[1]) && args[1] != null)
+			    						{
 			    						money = Integer.parseInt (args[1]);
+			    						}
+			    						
 			    					} catch (Exception E){
+			    						E.printStackTrace();
+			    						player.sendMessage(ChatColor.GRAY + "[xpShop]" + ChatColor.RED + (getConfig().getString("command.error.noint." + getConfig().getString("language"))));
 			    						return false;
 			    					}
-			    					int TOTALXP = XPint + (money * getConfig().getInt("moneytoxp"));
-			    					player.setExperience(TOTALXP);
-			    					player.saveData();
-			    					player.sendMessage(ChatColor.GRAY + "[xpShop]" + ChatColor.RED + (getConfig().getString("command.success.moneytoxp." + getConfig().getString("language"))));
-			    				}
+			    					try {
+			    						int TOTALXP = XPint + (money * getConfig().getInt("moneytoxp"));
+			    						player.setExperience(TOTALXP);
+			    						player.sendMessage(ChatColor.GRAY + "[xpShop]" + ChatColor.RED + (getConfig().getString("command.success.moneytoxp." + getConfig().getString("language"))));
+			    					} catch (Exception e1) {
+			    						e1.printStackTrace();
+			    						player.sendMessage(ChatColor.GRAY + "[xpShop]" + ChatColor.RED + (getConfig().getString("command.error.else." + getConfig().getString("language"))));
+			    					}
+			    					}
 			    				
-			    				if (args[0] == "sell")
+			    				if (args[1] == "sell")
 			    				{
 			    					int XPint = player.getExperience();
 			    					int xp = 0;
 			    					try {
 			    						xp = Integer.parseInt (args[1]);
-			    					} catch (Exception E){
+			    					} catch (Exception E2){
+			    						E2.printStackTrace();
+			    						player.sendMessage(ChatColor.GRAY + "[xpShop]" + ChatColor.RED + (getConfig().getString("command.error.noint." + getConfig().getString("language"))));
 			    					return false;
 			    					}
-			    					int TOTALXP = XPint + (xp * getConfig().getInt("xptomoney"));
-			    					player.setExperience(TOTALXP);
-			    					player.saveData();
-			    					player.sendMessage(ChatColor.GRAY + "[xpShop]" + ChatColor.RED + (getConfig().getString("command.success.xptomoney." + getConfig().getString("language"))));
+			    					try {
+			    						int TOTALXP = XPint + (xp * getConfig().getInt("xptomoney"));
+			    						player.setExperience(TOTALXP);
+			    						player.sendMessage(ChatColor.GRAY + "[xpShop]" + ChatColor.RED + (getConfig().getString("command.success.xptomoney." + getConfig().getString("language"))));
+		    						} catch (Exception e3) {
+		    						e3.printStackTrace();
+		    						player.sendMessage(ChatColor.GRAY + "[xpShop]" + ChatColor.RED + (getConfig().getString("command.error.else." + getConfig().getString("language"))));
+		    					}
+			    					
 			    				}
 			    			}
+			    		
 			    			else
 			    			{
 			    				player.sendMessage(ChatColor.GRAY + "[xpShop]" + ChatColor.RED + (getConfig().getString("command.error.noargs0." + getConfig().getString("language"))));
@@ -139,18 +161,19 @@ public class xpShop extends JavaPlugin {
 			    }
 			} else {		//kein PermissionsEx
 			   Logger.getLogger("Minecraft").warning((getConfig().getString("permissions.notfound." + getConfig().getString("language"))));
+			   return false;
 			}
+		
 			
 		succeed = true;
 		return succeed;	
-		} else {
 			
-		return false;
+
 		}
 		
 
 		
 	}
 
-  }
+
 
