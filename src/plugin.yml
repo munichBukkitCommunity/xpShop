@@ -9,7 +9,7 @@ main: me.ibhh.xpShop.xpShop
 commands:
   xpShop:
     description: player gets xp for money.
-    usage: /xpShop buy <xp> or /xpShop sell <money>
+    usage: /xpShop buy <xp|money>
 permissions:
   xpShop.*:
     description: Gives access to all xpShop commands
