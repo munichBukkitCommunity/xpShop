@@ -17,15 +17,12 @@ command:
       de: Zu wenig Argumente!
       en: Few arguments!
   success:
-    moneytoxp:
-      de: Du hast Money in XP umgewandelt.
-      en: You changed money into XP.
-    moneytoxpalt:
+    buy:
       de: Du hast "+ money +" in "+ TOTALXP +" XP umgewandelt.
       en: You changed "+ money +" into "+ TOTALXP +" XP.
-    xptomoney:
+    sell:
       de: Du hast "+ TOTALXP +" XP in "+ money +"  umgewandelt.
-      en: You changed "+ TOTALXP +" XP in "+ money +".
+      en: You changed "+ TOTALXP +" XP into "+ money +".
 permissions:
   error:
     de: Houston Wir haben ein Problem! Diesen Befehl darfst Du nicht verwenden!
