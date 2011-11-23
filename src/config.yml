@@ -7,6 +7,9 @@ command:
     toomanyarguments:
       de: Dieser Befehl darf nur eine Zahl enthalten!
       en: This command has only one number!
+    fewargs:
+      de: Zu wenig Argumente!
+      en: Few arguments!
   success:
     moneytoxp:
       de: Du hast " + money + " in " + TOTALXP + " XP umgewandelt.

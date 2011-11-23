@@ -81,6 +81,11 @@ public class xpShop extends JavaPlugin {
 			    	
 			    	if (cmd.getName().equalsIgnoreCase("xpShopxp")) {
 			    		if (args.length == 1) {
+			    			if (args[1] == null)
+			    			{
+			    				player.sendMessage(ChatColor.GRAY + "[xpShop]" + ChatColor.RED + (getConfig().getString("command.error.fewargs." + getConfig().getString("language"))));
+			    				return false;
+			    			}
 			    			if (args[0] == "buy" || args[0] == "sell")
 			    			{
 			    				if (args[0] == "buy")

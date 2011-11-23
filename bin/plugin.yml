@@ -7,9 +7,18 @@ website: http://www.ibhh.de
 main: me.ibhh.xpShop.xpShop
 
 commands:
-  xpShopxp:
+  xpShop:
     description: player gets xp for money.
-    usage: /xpShopxp <xp>
-  xpShopmoney:
-    description: player gets xp for money.
-    usage: /xpShopmoney <money> 
+    usage: /xpShop buy <xp> or /xpShop sell <money>
+permissions:
+  xpShop.*:
+    description: Gives access to all xpShop commands
+    children:
+      xpShop.buy: true
+      xpShop.sell: true
+  xpShop.buy:
+    description: Allows you to buy xp.
+    default: true
+  xpShop.sell:
+    description: Allows you to sell xp.
+    default: true
