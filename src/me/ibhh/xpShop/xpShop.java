@@ -79,8 +79,8 @@ public class xpShop extends JavaPlugin {
 			    // Permission check
 			    if(permissions.has(player, "xpShop.buy")){
 			    	
-			    	if (cmd.getName().equalsIgnoreCase("xpShopxp")) {
-			    		if (args.length == 1) {
+			    	if (cmd.getName().equalsIgnoreCase("xpShop")) {
+			    		if (args.length == 2) {
 			    			if (args[1] == null)
 			    			{
 			    				player.sendMessage(ChatColor.GRAY + "[xpShop]" + ChatColor.RED + (getConfig().getString("command.error.fewargs." + getConfig().getString("language"))));
