@@ -17,6 +17,9 @@ public class xpShop extends JavaPlugin {
 	
 	public iConomy iConomy = null;
 	public String ActionxpShop = "";
+	public int XPint;
+	public int money = 0;
+	public int xp = 0;
 	
 	@Override
 	public void onDisable() {
@@ -77,30 +80,41 @@ public class xpShop extends JavaPlugin {
 				if(permissions.has(player, "xpShop.buy") || permissions.has(player, "xpShop.sell"))
 				{
 						ActionxpShop = args[0];	//.toLowerCase();
-//					try
-//					{
-//					} catch (Exception e) 
-//					{
-//						e.printStackTrace();
-//						player.sendMessage(ChatColor.GRAY + "[xpShop]" + ChatColor.RED + (getConfig().getString("command.error.else." + getConfig().getString("language"))));
-//					}
+					try
+					{
+					} catch (Exception e) 
+					{
+						e.printStackTrace();
+						player.sendMessage(ChatColor.GRAY + "[xpShop]" + ChatColor.RED + (getConfig().getString("command.error.else." + getConfig().getString("language"))));
+					}
 					if (args.length == 2) 
 					{	
+						player.sendMessage(label+ ";" + args[0] + ";" + args[1] + ";" + ActionxpShop);
 						if(permissions.has(player, "xpShop." + ActionxpShop))
 						{
 							player.sendMessage(label+ ";" + args[0] + ";" + args[1] + ";" + ActionxpShop);
-							if (ActionxpShop == "buy" ||  ActionxpShop == "sell")
-							{
-								int XPint = player.getExperience();
-								int money = 0;
-								int xp = 0;
+//							if (ActionxpShop == "buy" ||  ActionxpShop == "sell")
+//							{
+								try
+								{
+									player.sendMessage(label+ ";" + args[0] + ";" + args[1] + ";" + ActionxpShop);
+									XPint = player.getTotalExperience();
+								}
+								catch (Exception e3)
+								{
+									e3.printStackTrace();
+									player.sendMessage(ChatColor.GRAY + "[xpShop]" + ChatColor.RED + (getConfig().getString("command.error.else." + getConfig().getString("language"))));
+
+								}
 								try {
 									if (ActionxpShop == "buy")
 									{
 										try {
 											if (Tools.isInteger(args[1]) && args[1] != null)
 											{
+												player.sendMessage(label+ ";" + args[0] + ";" + args[1] + ";" + ActionxpShop);
 												money = Integer.parseInt (args[1]);
+												player.sendMessage(label+ ";" + args[0] + ";" + args[1] + ";" + ActionxpShop + ";" + money);
 											}
 
 										} catch (Exception E){
@@ -108,8 +122,11 @@ public class xpShop extends JavaPlugin {
 											player.sendMessage(ChatColor.GRAY + "[xpShop]" + ChatColor.RED + (getConfig().getString("command.error.noint." + getConfig().getString("language"))));
 											return false;
 										}
+										player.sendMessage(label+ ";" + args[0] + ";" + args[1] + ";" + ActionxpShop + ";" + money);
 										TOTALXP = XPint + (money * getConfig().getInt("buy"));
+										player.sendMessage(label+ ";" + args[0] + ";" + args[1] + ";" + ActionxpShop + ";" + money);
 										player.setExperience(TOTALXP);
+										player.sendMessage(label+ ";" + args[0] + ";" + args[1] + ";" + ActionxpShop + ";" + money + ";" + TOTALXP);
 										player.sendMessage(ChatColor.GRAY + "[xpShop]" + ChatColor.RED + (getConfig().getString("command.success." + ActionxpShop + "." + getConfig().getString("language"))));
 									}
 									else if (ActionxpShop == "sell")
@@ -138,12 +155,12 @@ public class xpShop extends JavaPlugin {
 									player.sendMessage(ChatColor.GRAY + "[xpShop]" + ChatColor.RED + (getConfig().getString("command.error.else." + getConfig().getString("language"))));
 								}
 
-							}	//if (ActionxpShop == "buy" ||  ActionxpShop == "sell")
-							else	
-							{
-								player.sendMessage(ChatColor.GRAY + "[xpShop]" + ChatColor.RED + (getConfig().getString("command.error.noargs0." + getConfig().getString("language"))));
-								return false;
-							}
+//							}	//if (ActionxpShop == "buy" ||  ActionxpShop == "sell")
+//							else	
+//							{
+//								player.sendMessage(ChatColor.GRAY + "[xpShop]" + ChatColor.RED + (getConfig().getString("command.error.noargs0." + getConfig().getString("language"))));
+//								return false;
+//							}
 						}	//if(permissions.has(player, "xpShop." + ActionxpShop))
 						else
 						{
