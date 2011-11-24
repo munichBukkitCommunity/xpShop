@@ -120,6 +120,7 @@ public class xpShop extends JavaPlugin {
 										TOTALXP = XPint + (money * (getConfig().getInt("moneytoxp")));
 										player.sendMessage(label+ ";" + XPint + ";" + args[1] + ";" + ActionxpShop + ";" + money);
 										player.setExperience(TOTALXP);
+										player.saveData();
 										player.sendMessage(label+ ";" + args[0] + ";" + args[1] + ";" + ActionxpShop + ";" + money + ";" + TOTALXP);
 										player.sendMessage(ChatColor.GRAY + "[xpShop]" + ChatColor.RED + (getConfig().getString("command.success." + ActionxpShop + "." + getConfig().getString("language"))));
 									}
@@ -136,6 +137,7 @@ public class xpShop extends JavaPlugin {
 											TOTALXP = XPint - (xp * (getConfig().getInt("xptomoney")));
 											player.sendMessage(label+ ";" + XPint + ";" + args[1] + ";" + ActionxpShop + ";" + money);
 											player.setExperience(TOTALXP);
+											player.saveData();
 											player.sendMessage(label+ ";" + args[0] + ";" + args[1] + ";" + ActionxpShop + ";" + money + ";" + TOTALXP);
 											player.sendMessage(ChatColor.GRAY + "[xpShop]" + ChatColor.RED + (getConfig().getString("command.success." + ActionxpShop + "." + getConfig().getString("language"))));
 									}	//if (ActionxpShop == "sell")
