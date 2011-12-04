@@ -18,11 +18,23 @@ command:
       en: Few arguments!
   success:
     buy:
-      de: Du hast "+ money +" in "+ TOTALXP +" XP umgewandelt.
-      en: You changed "+ money +" into "+ TOTALXP +" XP.
+      de:
+        1: Du hast 
+        2: Money in 
+        3: XP umgewandelt. 
+      en:
+        1: You changed 
+        2: money into 
+        3: XP. 
     sell:
-      de: Du hast "+ TOTALXP +" XP in "+ money +"  umgewandelt.
-      en: You changed "+ TOTALXP +" XP into "+ money +".
+      de:
+        1: Du hast 
+        2: XP in 
+        3: Money umgewandelt. 
+      en:
+        1: You changed 
+        2: XP into 
+        3: money. 
 permissions:
   error:
     de: Houston Wir haben ein Problem! Diesen Befehl darfst Du nicht verwenden!
@@ -31,5 +43,5 @@ permissions:
   notfound:
     de: PermissionsEx plugin nicht gefunden!
     en: PermissionsEx not found!
-moneytoxp: 1
-xptomoney: 1
+moneytoxp: 1.00
+xptomoney: 1.00
