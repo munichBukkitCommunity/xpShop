@@ -1,6 +1,12 @@
 language: en
 command:
   error:
+    notenoughmoney:
+      de: Du hast nicht genügend Geld!
+      en: Not enough money!
+    notenoughxp:
+      de: Du hast nicht genügend XP!
+      en: Not enough XP!
     else:
       de: Unbekannter Error!
       en: Error!
