@@ -8,12 +8,11 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
-
-import com.iCo6.system.Account;
-import com.iCo6.system.Accounts;
+import com.nijikokun.register.payment.Methods;
 
 import ru.tehkode.permissions.PermissionManager;
 import ru.tehkode.permissions.bukkit.PermissionsEx;
+import com.iConomy.*;
 
 public class xpShop extends JavaPlugin {
 
@@ -24,6 +23,7 @@ public class xpShop extends JavaPlugin {
 	public double getmoney;
 	public int xp = 0;
 	int SubstractedXP;
+	public iConomy iConomy = null;
 
 	@Override
 	public void onDisable() {
@@ -74,6 +74,7 @@ public class xpShop extends JavaPlugin {
 		{
 			if (cmd.getName().equalsIgnoreCase("xpShop")) 
 			{
+				ActionxpShop = args[0];
 				Player player = (Player) sender;
 				if(Bukkit.getServer().getPluginManager().isPluginEnabled("PermissionsEx"))
 				{
@@ -81,152 +82,47 @@ public class xpShop extends JavaPlugin {
 					// Permission check
 					if(permissions.has(player, "xpShop.buy") || permissions.has(player, "xpShop.sell"))
 					{		
-						try
-						{
-							ActionxpShop = args[0];	//.toLowerCase();
-						} catch (Exception e) 
-						{
-							e.printStackTrace();
-							player.sendMessage(ChatColor.GRAY + "[xpShop]" + ChatColor.RED + (getConfig().getString("command.error.else." + getConfig().getString("language"))));
-						}
 						if (args.length == 2) 
 						{	
-							if(permissions.has(player, "xpShop." + ActionxpShop))
+							if (args[0].equals("buy") ||  args[0].equals("sell"))
 							{
-								if (ActionxpShop.equals("buy") ||  ActionxpShop.equals("sell"))
+								if (args[0].equals("buy"))
 								{
-									try {
-										if (ActionxpShop.equals("buy"))
-										{
-											try {
-												money = Integer.parseInt (args[1]);
-											} catch (Exception E){
-												E.printStackTrace();
-												player.sendMessage(ChatColor.GRAY + "[xpShop]" + ChatColor.RED + (getConfig().getString("command.error.noint." + getConfig().getString("language"))));
-												return false;
-											}
-											double TOTALXPDOUBLE = (money * (getConfig().getDouble("moneytoxp")));						
-											int TOTALXP = (int) TOTALXPDOUBLE; 
-											String playerAccount = player.getName();
-											Account account = new Accounts().get(playerAccount);
-											Double Balance = new Accounts().get(playerAccount).getHoldings().getBalance();
-											if (Balance >= money)
-											{
-												try
-												{
-													player.giveExp(TOTALXP);
-													player.sendMessage(ChatColor.GRAY + "[xpShop]" + ChatColor.RED + (getConfig().getString("command.success." + ActionxpShop + "." + getConfig().getString("language") + ".1")) + " " + money + " " + (getConfig().getString("command.success." + ActionxpShop + "." + getConfig().getString("language") + ".2")) + " " + TOTALXP + " " + (getConfig().getString("command.success." + ActionxpShop + "." + getConfig().getString("language") + ".3")));
-												}
-												catch (NumberFormatException ex) 
-												{
-													player.sendMessage("Invalid exp count: " + args[1]);
-												}
-												player.saveData();
-												Double BalanceEnd = Balance - money;
-												account.getHoldings().setBalance(BalanceEnd);
-											}	//if (Balance >= money)
-											else
-											{
-												player.sendMessage(ChatColor.GRAY + "[xpShop]" + ChatColor.RED + (getConfig().getString("command.error.notenoughmoney." + getConfig().getString("language"))));
-											}
-										}
-										else if (ActionxpShop.equals("sell"))
-										{
-											try {
-												xp = Integer.parseInt (args[1]);
-											} catch (Exception E){
-												E.printStackTrace();
-												return false;
-											}
-											if (xp == 0)
-											{
-												return false;
-											}
-											String playerAccount = player.getName();
-											Account account = new Accounts().get(playerAccount);
-												if(player.getLevel() <= 0 && player.getExp() <= 0.01)
-												{
-													player.sendMessage(ChatColor.GRAY + "[xpShop]" + ChatColor.RED + (getConfig().getString("command.error.notenoughxp." + getConfig().getString("language"))));
-												}
-												else
-												{
-													try
-													{	
-														if(SubstractedXP != 0)
-														{
-															SubstractedXP = 0;
-														}
-														addmoney = xp * (getConfig().getDouble("xptomoney"));
-														getmoney = (getConfig().getDouble("xptomoney"));
-														while(SubstractedXP < xp)
-														{	
-															if(player.getExp() <= 0)
-															{
-																try
-																{
-																	int level = player.getLevel();
-																	level = level - 1;
-																	player.setLevel(level);
-																	player.setExp( (float) 0.999999);
-																	Double Balance = new Accounts().get(playerAccount).getHoldings().getBalance();
-																	Double BalanceEnd = Balance + getmoney;
-																	account.getHoldings().setBalance(BalanceEnd);
-																}
-																catch (Exception E)
-																{
-																	E.printStackTrace();
-																	player.sendMessage(ChatColor.GRAY + "[xpShop]" + ChatColor.RED + (getConfig().getString("command.error.else." + getConfig().getString("language"))));
-																	return false;
-																}
-															}
-															else
-															{	
-																SubstractedXP();
-																player.giveExp(-1);
-																Double Balance = new Accounts().get(playerAccount).getHoldings().getBalance();
-																Double BalanceEnd = Balance + getmoney;
-																account.getHoldings().setBalance(BalanceEnd);
-															}
-														}	//while(SubstractedXP > TOTALXP)
-													}
-													catch (NumberFormatException ex) 
-													{
-														player.sendMessage("Invalid exp count: " + args[1]);
-														return false;
-													}
-													player.saveData();
-												}
-											player.sendMessage(ChatColor.GRAY + "[xpShop]" + ChatColor.RED + (getConfig().getString("command.success." + ActionxpShop + "." + getConfig().getString("language") + ".1")) + " " + xp + " " + (getConfig().getString("command.success." + ActionxpShop + "." + getConfig().getString("language") + ".2")) + " " + addmoney + " " + (getConfig().getString("command.success." + ActionxpShop + "." + getConfig().getString("language") + ".3")));
-										}	//if (ActionxpShop == "sell")
-									} // try
-									catch (Exception e1) 
-									{
-										e1.printStackTrace();
-										player.sendMessage(ChatColor.GRAY + "[xpShop]" + ChatColor.RED + (getConfig().getString("command.error.else." + getConfig().getString("language"))));
-									}
 
-								}	//if (ActionxpShop == "buy" ||  ActionxpShop == "sell")
-								else	
-								{
-									player.sendMessage(ChatColor.GRAY + "[xpShop]" + ChatColor.RED + (getConfig().getString("command.error.noargs0." + getConfig().getString("language"))));
-									return false;
+									if(permissions.has(player, "xpShop.buy"))
+									{
+										buy(sender, args);
+									}
+									else
+									{
+										player.sendMessage(ChatColor.GRAY + "[xpShop]" + ChatColor.RED + (getConfig().getString("permissions.error." + getConfig().getString("language"))));
+										return false;
+									}
 								}
-							}	//if(permissions.has(player, "xpShop." + ActionxpShop))
-							else
-							{
-								player.sendMessage(ChatColor.GRAY + "[xpShop]" + ChatColor.RED + (getConfig().getString("permissions.error." + getConfig().getString("language"))));
-								return false;
+								if (args[0].equals("sell"))
+								{
+
+									if(permissions.has(player, "xpShop.sell"))
+									{
+										sell(sender, args);
+									}
+									else
+									{
+										player.sendMessage(ChatColor.GRAY + "[xpShop]" + ChatColor.RED + (getConfig().getString("permissions.error." + getConfig().getString("language"))));
+										return false;
+									}
+								}
 							}
-						}	//if (args.length == 2)
-						else 
+						}	//if (ActionxpShop == "buy" ||  ActionxpShop == "sell")
+						else	
 						{
-							player.sendMessage(ChatColor.GRAY + "[xpShop]" + ChatColor.RED + (getConfig().getString("command.error.toomanyarguments." + getConfig().getString("language"))));
+							player.sendMessage(ChatColor.GRAY + "[xpShop]" + ChatColor.RED + (getConfig().getString("command.error.noargs0." + getConfig().getString("language"))));
 							return false;
 						}
-					}	//if(permissions.has(player, "xpShop.buy") || permissions.has(player, "xpShop.sell"))
+					}	//if (args.length == 2)
 					else 
 					{
-						player.sendMessage(ChatColor.GRAY + "[xpShop]" + ChatColor.RED + (getConfig().getString("permissions.error." + getConfig().getString("language"))));
+						player.sendMessage(ChatColor.GRAY + "[xpShop]" + ChatColor.RED + (getConfig().getString("command.error.toomanyarguments." + getConfig().getString("language"))));
 						return false;
 					}
 				}	//if(Bukkit.getServer().getPluginManager().isPluginEnabled("PermissionsEx"))
@@ -239,10 +135,127 @@ public class xpShop extends JavaPlugin {
 		}	//if (sender instanceof Player) 
 		return true;
 	}	//public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args)
+
 	public int SubstractedXP()
 	{
 		SubstractedXP = SubstractedXP + 1;
 		return SubstractedXP;
+	}
+
+	public boolean buy(CommandSender sender, String[] args)
+	{
+		Player player = (Player) sender;
+
+		if(Bukkit.getServer().getPluginManager().isPluginEnabled("iConomy"))
+		{
+			try {
+				money = Integer.parseInt (args[1]);
+			} catch (Exception E){
+				E.printStackTrace();
+				player.sendMessage(ChatColor.GRAY + "[xpShop]" + ChatColor.RED + (getConfig().getString("command.error.noint." + getConfig().getString("language"))));
+				return false;
+			}
+			double TOTALXPDOUBLE = (money * (getConfig().getDouble("moneytoxp")));						
+			int TOTALXP = (int) TOTALXPDOUBLE; 
+			String playerAccount = player.getName();
+			Double Balance = Methods.getMethod().getAccount(player.getName()).balance();
+			if (Balance >= money)
+			{
+				try
+				{
+					player.giveExp(TOTALXP);
+					player.sendMessage(ChatColor.GRAY + "[xpShop]" + ChatColor.RED + (getConfig().getString("command.success." + ActionxpShop + "." + getConfig().getString("language") + ".1")) + " " + money + " " + (getConfig().getString("command.success." + ActionxpShop + "." + getConfig().getString("language") + ".2")) + " " + TOTALXP + " " + (getConfig().getString("command.success." + ActionxpShop + "." + getConfig().getString("language") + ".3")));
+				}
+				catch (NumberFormatException ex) 
+				{
+					player.sendMessage("Invalid exp count: " + args[1]);
+				}
+				player.saveData();
+				Double BalanceEnd = money;
+				Methods.getMethod().getAccount(playerAccount).subtract(BalanceEnd);
+			}	//if (Balance >= money)
+			else
+			{
+				player.sendMessage(ChatColor.GRAY + "[xpShop]" + ChatColor.RED + (getConfig().getString("command.error.notenoughmoney." + getConfig().getString("language"))));
+			}
+		}
+		else
+		{
+			player.sendMessage(ChatColor.GRAY + "[xpShop]" + ChatColor.RED + (getConfig().getString("iConomy5.error." + getConfig().getString("language"))));
+		}
+		return false;
+	}
+
+	public boolean sell(CommandSender sender, String[] args)
+	{
+		Player player = (Player) sender;
+
+		if(Bukkit.getServer().getPluginManager().isPluginEnabled("iConomy"))
+		{
+			try {
+				xp = Integer.parseInt (args[1]);
+			} catch (Exception E){
+				E.printStackTrace();
+				return false;
+			}
+			if (xp == 0)
+			{
+				return false;
+			}
+			String playerAccount = player.getName();
+			if(player.getLevel() <= 0 && player.getExp() <= 0.01)
+			{
+				player.sendMessage(ChatColor.GRAY + "[xpShop]" + ChatColor.RED + (getConfig().getString("command.error.notenoughxp." + getConfig().getString("language"))));
+			}
+			else
+			{
+				try
+				{	
+					if(SubstractedXP != 0)
+					{
+						SubstractedXP = 0;
+					}
+					getmoney = (getConfig().getDouble("xptomoney"));
+					while(SubstractedXP < xp || (player.getLevel() == 0 && player.getExp() <= 2))
+					{	
+						if(player.getExp() <= 0)
+						{
+							try
+							{
+								int level = player.getLevel();
+								level = level - 1;
+								player.setLevel(level);
+								player.setExp( (float) 0.999999);
+								Double Balanceadd = getmoney;
+								Methods.getMethod().getAccount(playerAccount).add(Balanceadd);
+							}
+							catch (Exception E)
+							{
+								E.printStackTrace();
+								player.sendMessage(ChatColor.GRAY + "[xpShop]" + ChatColor.RED + (getConfig().getString("command.error.else." + getConfig().getString("language"))));
+								return false;
+							}
+						}
+						else
+						{	
+							SubstractedXP();
+							player.giveExp(-1);
+							Double Balanceadd = getmoney;
+							Methods.getMethod().getAccount(playerAccount).add(Balanceadd);
+						}
+					}	//while(SubstractedXP > TOTALXP)
+				}
+				catch (NumberFormatException ex) 
+				{
+					player.sendMessage("Invalid exp count: " + args[1]);
+					return false;
+				}
+				player.saveData();
+			}
+			addmoney = SubstractedXP * (getConfig().getDouble("xptomoney"));
+			player.sendMessage(ChatColor.GRAY + "[xpShop]" + ChatColor.RED + (getConfig().getString("command.success." + ActionxpShop + "." + getConfig().getString("language") + ".1")) + " " + xp + " " + (getConfig().getString("command.success." + ActionxpShop + "." + getConfig().getString("language") + ".2")) + " " + addmoney + " " + (getConfig().getString("command.success." + ActionxpShop + "." + getConfig().getString("language") + ".3")));
+		}
+		return false;
 	}
 }
 

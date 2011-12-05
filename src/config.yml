@@ -45,9 +45,12 @@ permissions:
   error:
     de: Houston Wir haben ein Problem! Diesen Befehl darfst Du nicht verwenden!
     en: Houston we have a problem! You can't use this command!
-permissions:
   notfound:
     de: PermissionsEx plugin nicht gefunden!
     en: PermissionsEx not found!
 moneytoxp: 1.00
 xptomoney: 1.00
+iConomy5:
+  error:
+    de: Kein iConomy5 gefunden!
+    en: No iConomy5 found!
