@@ -203,9 +203,10 @@ public class xpShop extends JavaPlugin {
 				return false;
 			}
 			String playerAccount = player.getName();
-			if(player.getLevel() <= 0 && player.getExp() <= 0.01)
+			if(player.getLevel() + player.getExp() <= 0.20)
 			{
 				player.sendMessage(ChatColor.GRAY + "[xpShop]" + ChatColor.RED + (getConfig().getString("command.error.notenoughxp." + getConfig().getString("language"))));
+				return false;
 			}
 			else
 			{
@@ -216,7 +217,7 @@ public class xpShop extends JavaPlugin {
 						SubstractedXP = 0;
 					}
 					getmoney = (getConfig().getDouble("xptomoney"));
-					while(SubstractedXP < xp || (player.getLevel() == 0 && player.getExp() <= 2))
+					while(SubstractedXP < xp || player.getLevel() + player.getExp() >= 0.20)
 					{	
 						if(player.getExp() <= 0)
 						{
@@ -254,6 +255,10 @@ public class xpShop extends JavaPlugin {
 			}
 			addmoney = SubstractedXP * (getConfig().getDouble("xptomoney"));
 			player.sendMessage(ChatColor.GRAY + "[xpShop]" + ChatColor.RED + (getConfig().getString("command.success." + ActionxpShop + "." + getConfig().getString("language") + ".1")) + " " + xp + " " + (getConfig().getString("command.success." + ActionxpShop + "." + getConfig().getString("language") + ".2")) + " " + addmoney + " " + (getConfig().getString("command.success." + ActionxpShop + "." + getConfig().getString("language") + ".3")));
+		}
+		else
+		{
+			player.sendMessage(ChatColor.GRAY + "[xpShop]" + ChatColor.RED + (getConfig().getString("iConomy5.error." + getConfig().getString("language"))));
 		}
 		return false;
 	}
