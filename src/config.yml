@@ -22,6 +22,9 @@ command:
     fewargs:
       de: Zu wenig Argumente!
       en: Few arguments!
+    noplayer:
+      de: Du bist kein Player!
+      en: You are no player!
   success:
     buy:
       de:
@@ -50,6 +53,7 @@ permissions:
     en: PermissionsEx not found!
 moneytoxp: 1.00
 xptomoney: 1.00
+iConomy: 6
 iConomy5:
   error:
     de: Kein iConomy5 gefunden!
