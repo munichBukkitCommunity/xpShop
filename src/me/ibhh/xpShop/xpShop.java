@@ -19,6 +19,8 @@ public class xpShop extends JavaPlugin {
 
 	private String ActionxpShop;
 	private double balance;
+	private int buy;
+	private int sell;
 	private double addmoney;
 	private double getmoney;
 	private int SubstractedXP;
@@ -87,12 +89,12 @@ public class xpShop extends JavaPlugin {
 							{
 								if (args[0].equals("buy"))
 								{
-									int buy = Integer.parseInt(args[1]);
+									buy = Integer.parseInt(args[1]);
 									buy(sender, buy);
 								}
 								if (args[0].equals("sell"))
 								{
-									int sell = Integer.parseInt(args[1]);
+									sell = Integer.parseInt(args[1]);
 									sell(sender, sell);
 								}
 							}
@@ -163,7 +165,6 @@ public class xpShop extends JavaPlugin {
 	public boolean sell(CommandSender sender, int sellamount)
 	{
 		Player player = (Player) sender;
-
 		if(Bukkit.getServer().getPluginManager().isPluginEnabled("iConomy"))
 		{
 			if (sellamount == 0)
@@ -184,12 +185,13 @@ public class xpShop extends JavaPlugin {
 						SubstractedXP = 0;
 					}
 					getmoney = (getConfig().getDouble("xptomoney"));
-					while(SubstractedXP < sellamount || player.getLevel() + player.getExp() >= 0.20)
+					while((SubstractedXP < sellamount) || ((player.getLevel() + player.getExp() >= 0.20) && (SubstractedXP < sellamount)))
 					{	
 						if(player.getExp() <= 0)
 						{
 							try
 							{
+								SubstractedXP();
 								int level = player.getLevel();
 								level = level - 1;
 								player.setLevel(level);
@@ -205,9 +207,9 @@ public class xpShop extends JavaPlugin {
 						}
 						else
 						{	
-							SubstractedXP();
 							player.giveExp(-1);
 							addmoney56(getmoney, player);
+							SubstractedXP();
 						}
 					}	//while(SubstractedXP > TOTALXP)
 				}
@@ -293,6 +295,7 @@ public class xpShop extends JavaPlugin {
 			com.iCo6.system.Account account = new Accounts().get(player.getName());
 			account.getHoldings().subtract(amountsubstract);
 		}
+		return;
 	}
 	public void addmoney56(double amountadd, Player player)
 	{
@@ -305,6 +308,7 @@ public class xpShop extends JavaPlugin {
 			com.iCo6.system.Account account = new Accounts().get(player.getName());
 			account.getHoldings().add(amountadd);
 		}
+		return;
 	}
 	public void set0()
 	{
@@ -313,6 +317,8 @@ public class xpShop extends JavaPlugin {
 		addmoney = 0;
 		getmoney = 0;
 		SubstractedXP = 0;
+		buy = 0;
+		sell = 0;
 	}
 }
 
