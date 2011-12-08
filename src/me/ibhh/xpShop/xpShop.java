@@ -19,10 +19,8 @@ public class xpShop extends JavaPlugin {
 
 	private String ActionxpShop;
 	private double balance;
-	private double money = 0;
 	private double addmoney;
 	private double getmoney;
-	private int xp = 0;
 	private int SubstractedXP;
 	public iConomy iConomy = null;
 	public int iConomyversion = 0;
@@ -60,7 +58,7 @@ public class xpShop extends JavaPlugin {
 		{
 			e.printStackTrace();
 		} 	
-		System.out.println("[xpShop] successfully enabled!");
+		System.out.println("[xpShop]Version: " + getDescription().getVersion() + " successfully enabled!");
 	}
 
 
@@ -72,6 +70,7 @@ public class xpShop extends JavaPlugin {
 	@Override
 	public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) 
 	{
+		set0();
 		if (sender instanceof Player) 
 		{
 			if (cmd.getName().equalsIgnoreCase("xpShop")) 
@@ -88,11 +87,13 @@ public class xpShop extends JavaPlugin {
 							{
 								if (args[0].equals("buy"))
 								{
-									buy(sender, args);
+									int buy = Integer.parseInt(args[1]);
+									buy(sender, buy);
 								}
 								if (args[0].equals("sell"))
 								{
-									sell(sender, args);
+									int sell = Integer.parseInt(args[1]);
+									sell(sender, sell);
 								}
 							}
 						}	//if (ActionxpShop == "buy" ||  ActionxpShop == "sell")
@@ -115,6 +116,7 @@ public class xpShop extends JavaPlugin {
 				}	
 			}	//if (cmd.getName().equalsIgnoreCase("xpShop"))
 		}	//if (sender instanceof Player) 
+		set0();
 		return true;
 	}	//public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args)
 
@@ -124,34 +126,27 @@ public class xpShop extends JavaPlugin {
 		return SubstractedXP;
 	}
 
-	public boolean buy(CommandSender sender, String[] args)
+	public boolean buy(CommandSender sender, int buyamount)
 	{
 		Player player = (Player) sender;
 
 		if(Bukkit.getServer().getPluginManager().isPluginEnabled("iConomy"))
 		{
-			try {
-				money = Integer.parseInt (args[1]);
-			} catch (Exception E){
-				E.printStackTrace();
-				player.sendMessage(ChatColor.GRAY + "[xpShop]" + ChatColor.RED + (getConfig().getString("command.error.noint." + getConfig().getString("language"))));
-				return false;
-			}
-			double TOTALXPDOUBLE = (money * (getConfig().getDouble("moneytoxp")));						
+			double TOTALXPDOUBLE = (buyamount * (getConfig().getDouble("moneytoxp")));						
 			int TOTALXP = (int) TOTALXPDOUBLE; 
-			if(getBalance56(player) >= money)
+			if(getBalance56(player) >= buyamount)
 			{
 				try
 				{
 					player.giveExp(TOTALXP);
-					player.sendMessage(ChatColor.GRAY + "[xpShop]" + ChatColor.RED + (getConfig().getString("command.success." + ActionxpShop + "." + getConfig().getString("language") + ".1")) + " " + money + " " + (getConfig().getString("command.success." + ActionxpShop + "." + getConfig().getString("language") + ".2")) + " " + TOTALXP + " " + (getConfig().getString("command.success." + ActionxpShop + "." + getConfig().getString("language") + ".3")));
+					player.sendMessage(ChatColor.GRAY + "[xpShop]" + ChatColor.RED + (getConfig().getString("command.success." + ActionxpShop + "." + getConfig().getString("language") + ".1")) + " " + buyamount + " " + (getConfig().getString("command.success." + ActionxpShop + "." + getConfig().getString("language") + ".2")) + " " + TOTALXP + " " + (getConfig().getString("command.success." + ActionxpShop + "." + getConfig().getString("language") + ".3")));
 				}
 				catch (NumberFormatException ex) 
 				{
-					player.sendMessage("Invalid exp count: " + args[1]);
+					player.sendMessage("Invalid exp count: " + buyamount);
 				}
 				player.saveData();
-				substractmoney56(money, player);
+				substractmoney56(buyamount, player);
 			}	//if (Balance >= money)
 			else
 			{
@@ -165,19 +160,13 @@ public class xpShop extends JavaPlugin {
 		return false;
 	}
 
-	public boolean sell(CommandSender sender, String[] args)
+	public boolean sell(CommandSender sender, int sellamount)
 	{
 		Player player = (Player) sender;
 
 		if(Bukkit.getServer().getPluginManager().isPluginEnabled("iConomy"))
 		{
-			try {
-				xp = Integer.parseInt (args[1]);
-			} catch (Exception E){
-				E.printStackTrace();
-				return false;
-			}
-			if (xp == 0)
+			if (sellamount == 0)
 			{
 				return false;
 			}
@@ -195,7 +184,7 @@ public class xpShop extends JavaPlugin {
 						SubstractedXP = 0;
 					}
 					getmoney = (getConfig().getDouble("xptomoney"));
-					while(SubstractedXP < xp || player.getLevel() + player.getExp() >= 0.20)
+					while(SubstractedXP < sellamount || player.getLevel() + player.getExp() >= 0.20)
 					{	
 						if(player.getExp() <= 0)
 						{
@@ -224,7 +213,7 @@ public class xpShop extends JavaPlugin {
 				}
 				catch (NumberFormatException ex) 
 				{
-					player.sendMessage("Invalid exp count: " + args[1]);
+					player.sendMessage("Invalid exp count: " + sellamount);
 					return false;
 				}
 				player.saveData();
@@ -293,29 +282,37 @@ public class xpShop extends JavaPlugin {
 		}
 		return balance;
 	}
-	public void substractmoney56(double amount, Player player)
+	public void substractmoney56(double amountsubstract, Player player)
 	{
 		if(iConomyversion == 5)
 		{
-			Methods.getMethod().getAccount(player.getName()).subtract(amount);
+			Methods.getMethod().getAccount(player.getName()).subtract(amountsubstract);
 		}
 		else if(iConomyversion == 6)
 		{	
 			com.iCo6.system.Account account = new Accounts().get(player.getName());
-			account.getHoldings().subtract(amount);
+			account.getHoldings().subtract(amountsubstract);
 		}
 	}
-	public void addmoney56(double amount, Player player)
+	public void addmoney56(double amountadd, Player player)
 	{
 		if(iConomyversion == 5)
 		{
-			Methods.getMethod().getAccount(player.getName()).add(amount);
+			Methods.getMethod().getAccount(player.getName()).add(amountadd);
 		}
 		else if(iConomyversion == 6)
 		{	
 			com.iCo6.system.Account account = new Accounts().get(player.getName());
-			account.getHoldings().add(amount);
+			account.getHoldings().add(amountadd);
 		}
+	}
+	public void set0()
+	{
+		ActionxpShop = "0";
+		balance = 0;
+		addmoney = 0;
+		getmoney = 0;
+		SubstractedXP = 0;
 	}
 }
 
