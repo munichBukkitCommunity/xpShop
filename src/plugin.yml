@@ -16,9 +16,17 @@ permissions:
     children:
       xpShop.buy: true
       xpShop.sell: true
+      xpShop.buylevel: true
+      xpShop.selllevel: true
   xpShop.buy:
     description: Allows you to buy xp.
     default: true
   xpShop.sell:
     description: Allows you to sell xp.
+    default: true
+  xpShop.buylevel:
+    description: Allows you to buy level.
+    default: true
+  xpShop.selllevel:
+    description: Allows you to sell level.
     default: true
