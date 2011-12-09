@@ -12,13 +12,14 @@ import ru.tehkode.permissions.PermissionManager;
 import ru.tehkode.permissions.bukkit.PermissionsEx;
 import com.iCo6.system.Accounts;
 import com.iConomy.*;
-import com.nijikokun.register.payment.Methods;
+import com.iConomy.system.Holdings;
 
 public class xpShop extends JavaPlugin {
 
 
 	private String ActionxpShop;
-	private double balance;
+	private Holdings balance5;
+	private Double balance;
 	private int buy;
 	private int sell;
 	private int buylevel;
@@ -292,11 +293,25 @@ public class xpShop extends JavaPlugin {
 		}
 		return iConomyversion;
 	}
-	public double getBalance56(Player player)
+	@SuppressWarnings("static-access")
+	public Double getBalance56(Player player)
 	{
+		String name = player.toString();
 		if(iConomyversion == 5)
 		{
-			balance = Methods.getMethod().getAccount(player.getName()).balance();
+			try
+			{	
+				iConomy.hasAccount(name);
+				balance5 = iConomy.getAccount(name).getHoldings();
+			}
+			catch (Exception E)
+			{
+				System.out.println("[xpShop]" + ChatColor.RED + "No Account!");
+				balance5 = null;
+				return balance;
+			}
+			balance = (double) balance5.balance();
+			return balance;
 		}
 		else if(iConomyversion == 6)
 		{
@@ -304,11 +319,13 @@ public class xpShop extends JavaPlugin {
 		}
 		return balance;
 	}
+	@SuppressWarnings("static-access")
 	public void substractmoney56(double amountsubstract, Player player)
 	{
+		String name = player.toString();
 		if(iConomyversion == 5)
 		{
-			Methods.getMethod().getAccount(player.getName()).subtract(amountsubstract);
+			iConomy.getAccount(name).getHoldings().subtract(amountsubstract);
 		}
 		else if(iConomyversion == 6)
 		{	
@@ -317,11 +334,13 @@ public class xpShop extends JavaPlugin {
 		}
 		return;
 	}
+	@SuppressWarnings("static-access")
 	public void addmoney56(double amountadd, Player player)
 	{
+		String name = player.toString();
 		if(iConomyversion == 5)
 		{
-			Methods.getMethod().getAccount(player.getName()).add(amountadd);
+			iConomy.getAccount(name).getHoldings().add(amountadd);
 		}
 		else if(iConomyversion == 6)
 		{	
@@ -333,7 +352,6 @@ public class xpShop extends JavaPlugin {
 	public void set0()
 	{
 		ActionxpShop = "0";
-		balance = 0;
 		addmoney = 0;
 		getmoney = 0;
 		SubstractedXP = 0;
