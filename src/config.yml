@@ -44,6 +44,24 @@ command:
         1: You changed 
         2: XP into 
         3: money. 
+    buylevel:
+      de:
+        1: Du hast 
+        2: Money in 
+        3: XP umgewandelt. 
+      en:
+        1: You changed 
+        2: money into 
+        3: XP. 
+    selllevel:
+      de:
+        1: Du hast 
+        2: XP in 
+        3: Money umgewandelt. 
+      en:
+        1: You changed 
+        2: XP into 
+        3: money. 
 permissions:
   error:
     de: Houston Wir haben ein Problem! Diesen Befehl darfst Du nicht verwenden!
@@ -54,7 +72,7 @@ permissions:
 moneytoxp: 1.00
 xptomoney: 1.00
 iConomy: 6
-iConomy5:
+iConomy:
   error:
-    de: Kein iConomy5 gefunden!
-    en: No iConomy5 found!
+    de: Kein iConomy5 oder 6 oder Register gefunden!
+    en: No iConomy5 or 6 or Register found!
