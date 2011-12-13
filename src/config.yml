@@ -71,8 +71,15 @@ permissions:
     en: PermissionsEx not found!
 moneytoxp: 1.00
 xptomoney: 1.00
-iConomy: 6
 iConomy:
   error:
     de: Kein iConomy5 oder 6 oder Register gefunden!
     en: No iConomy5 or 6 or Register found!
+help: 
+  buy:
+    de: Wandelt Geld in XP um.
+    en: Changes money into XP.
+  sell:
+    de: Wandelt XP in Geld um.
+    en: Changes XP into money.
+moneyplugin: 5
