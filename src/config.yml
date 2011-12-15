@@ -79,7 +79,13 @@ help:
   buy:
     de: Wandelt Geld in XP um.
     en: Changes money into XP.
+  buylevel:
+    de: Wandelt Geld in Level um.
+    en: Changes money into level.
   sell:
     de: Wandelt XP in Geld um.
     en: Changes XP into money.
+  selllevel:
+    de: Wandelt Level in Geld um.
+    en: Changes level into money.
 moneyplugin: 5
