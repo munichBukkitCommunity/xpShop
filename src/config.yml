@@ -89,3 +89,7 @@ help:
     de: Wandelt Level in Geld um.
     en: Changes level into money.
 moneyplugin: 5
+info:
+  prefix:
+    de: Info (nicht ausgefuehrt)
+    en: Info (not performed)
