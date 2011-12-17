@@ -88,6 +88,9 @@ help:
   selllevel:
     de: Wandelt Level in Geld um.
     en: Changes level into money.
+  info:
+    de: Zeigt infos zu einer Action, die nicht ausgeführt wurde.
+    en: Shows infos to an action, wich is not performed.
 moneyplugin: 5
 info:
   prefix:
