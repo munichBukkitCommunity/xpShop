@@ -1,13 +1,18 @@
 package me.ibhh.xpShop;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.URL;
+import java.net.URLConnection;
 import java.util.logging.Logger;
-
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
+
 import ru.tehkode.permissions.PermissionManager;
 import ru.tehkode.permissions.bukkit.PermissionsEx;
 import com.iCo6.system.Accounts;
@@ -31,6 +36,7 @@ public class xpShop extends JavaPlugin {
 	private int SubstractedXP;
 	public iConomy iConomy = null;
 	public int iConomyversion = 0;
+	public float Version = 0;
 
 	@Override
 	public void onDisable() {
@@ -38,15 +44,59 @@ public class xpShop extends JavaPlugin {
 		System.out.println("[xpShop] disabled!");
 
 	}
+public float aktuelleVersion()
+{
+	try
+	{
+		Version = Float.parseFloat(getDescription().getVersion());
+	}
+	catch(Exception e)
+	{
+		System.out.println("[xpShop]Could not parse version in float");
+	}
+	return Version;
+}
 
+public float getNewVersion(String url)
+{
+	float rt2 = 0;
+	String zeile;
+	
+	try {
+	URL myConnection = new URL(url);
+	URLConnection connectMe = myConnection.openConnection();
+	          
+	InputStreamReader lineReader = new InputStreamReader(connectMe.getInputStream());
+	//BufferedReader buffer = new BufferedReader(lineReader);
+	BufferedReader br = new BufferedReader(new BufferedReader(lineReader));
+			zeile = br.readLine();
+	rt2 = Float.parseFloat(zeile);
+	} catch(IOException ioe) {
+		ioe.printStackTrace();
+		System.out.println("[xpShop]Exception: IOException!");
+		return -1;
+	} catch (Exception e) {
+		e.printStackTrace();
+		System.out.println("[xpShop]Exception: Exception!");
+		return 0;
+	}
+	return rt2;
+}
 
-
+public boolean UpdateAvailable(String url, float currVersion) {
+	boolean a = false;
+	if(getNewVersion(url) > currVersion)
+	{
+		a = true;
+	}
+	return a;
+}
 
 
 	@Override
 	public void onEnable()
 	{
-
+		aktuelleVersion();
 		iConomyversion();
 		//this.getServer().getPluginManager().registerEvent(Type.PLUGIN_ENABLE, new server(this), Priority.Monitor, this);
 		//this.getServer().getPluginManager().registerEvent(Type.PLUGIN_DISABLE, new server(this), Priority.Monitor, this);
@@ -61,7 +111,18 @@ public class xpShop extends JavaPlugin {
 		{
 			e.printStackTrace();
 		}
-		System.out.println("[xpShop]Version: " + getDescription().getVersion() + " successfully enabled!");
+		System.out.println("[xpShop]Version: " + Version + " successfully enabled!");
+
+		String URL = "http://ibhh.de:80/aktuelleversion.html";
+		if((UpdateAvailable(URL, Version) == true))
+		{
+			System.out.println("[xpShop]New version: " + getNewVersion(URL) + " found!");
+			System.out.println("[xpShop]******************************************");
+			System.out.println("[xpShop]*********** Please update!!!! ************");
+			System.out.println("[xpShop] http://ibhh.de/xpShop.jar");
+			System.out.println("[xpShop]******************************************");
+			
+		}
 	}
 
 
@@ -295,9 +356,20 @@ public class xpShop extends JavaPlugin {
 			if (sender instanceof Player)
 			{
 				Player player = (Player) sender;
-				PermissionManager permissions = PermissionsEx.getPermissionManager();
-				// Permission check
-				if(permissions.has(player, "xpShop." + action))
+				if(Bukkit.getServer().getPluginManager().isPluginEnabled("PermissionsEx")){
+				    PermissionManager permissions = PermissionsEx.getPermissionManager();
+
+				    // Permission check
+				    if(permissions.has(player, "xpShop." + action)){
+				    // yay!
+				    	return true;
+				    } else {
+				    // houston, we have a problem :)
+				    	return false;
+				    }
+				} else {
+				   Logger.getLogger("Minecraft").warning("PermissionsEx plugin are not found.");
+				if(player.hasPermission("xpShop." + action))
 				{
 					return true;
 				} //if(permissions.has(player, "xpShop." + action))
@@ -306,12 +378,14 @@ public class xpShop extends JavaPlugin {
 					player.sendMessage(ChatColor.GRAY + "[xpShop]" + ChatColor.RED + (getConfig().getString("permissions.error." + getConfig().getString("language"))));
 					return false;
 				}
+				}
 			} //if (sender instanceof Player)
 			else
 			{
 				System.out.println("[xpShop]" + (getConfig().getString("command.error.noplayer" + getConfig().getString("language"))));
 				return false;
 			}
+
 		} //public boolean checkpermissions(CommandSender sender, String action)
 		public int iConomyversion()
 		{
