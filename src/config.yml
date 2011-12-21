@@ -89,7 +89,7 @@ help:
     de: Wandelt Level in Geld um.
     en: Changes level into money.
   info:
-    de: Zeigt infos zu einer Action, die nicht ausgeführt wurde.
+    de: Zeigt infos zu einer Action, die nicht ausgefuehrt wurde.
     en: Shows infos to an action, wich is not performed.
 moneyplugin: 5
 info:
