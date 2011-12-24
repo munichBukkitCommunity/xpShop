@@ -5,11 +5,19 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URL;
 import java.net.URLConnection;
+
+//import net.milkbowl.vault.Vault;
+//import net.milkbowl.vault.economy.Economy;
+//import net.milkbowl.vault.economy.EconomyResponse;
+
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+
+//import org.bukkit.plugin.Plugin;
+//import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import ru.tehkode.permissions.PermissionManager;
@@ -21,6 +29,7 @@ import com.iConomy.system.Holdings;
 import com.nijikokun.register.payment.Methods;
 
 public class xpShop extends JavaPlugin {
+
 
 
 	private String ActionxpShop;
@@ -36,13 +45,34 @@ public class xpShop extends JavaPlugin {
 	public iConomy iConomy = null;
 	public int iConomyversion = 0;
 	public float Version = 0;
-
+	//	private Vault vault;
+	//    public static Economy economy;
+	//
+	//    private Boolean setupEconomy()
+	//    {
+	//        RegisteredServiceProvider<Economy> economyProvider = getServer().getServicesManager().getRegistration(net.milkbowl.vault.economy.Economy.class);
+	//        if (economyProvider != null) {
+	//            economy = economyProvider.getProvider();
+	//        }
+	//
+	//        return (economy != null);
+	//    }
 	@Override
 	public void onDisable() {
 
 		System.out.println("[xpShop] disabled!");
 
 	}
+	public void autoUpdate()
+	{
+
+			try {
+				Update.autoDownload("http://ibhh.de/xpShop.jar", getDataFolder().toString());
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+	}
+	
 	public float aktuelleVersion()
 	{
 		try
@@ -90,13 +120,29 @@ public class xpShop extends JavaPlugin {
 		}
 		return a;
 	}
-
-
 	@Override
 	public void onEnable()
 	{
 		aktuelleVersion();
 		iConomyversion();
+		System.out.println(getDataFolder());
+		//        Plugin x = this.getServer().getPluginManager().getPlugin("Vault");
+		//        if(x != null & x instanceof Vault) {
+		//            vault = (Vault) x;
+		//            System.out.println("[xpShop] hooked into Vault.");
+		//        } else {
+		//            /**
+		//             * Throw error & disable because we have Vault set as a dependency, you could give a download link
+		//             * or even download it for the user.  This is all up to you as a developer to decide the best option
+		//             * for your users!  For our example, we assume that our audience (developers) can find the Vault
+		//             * plugin and properly install it.  It's usually a bad idea however.
+		//             */
+		//        	if(iConomyversion == 2)
+		//        	{
+		//        	System.out.println("[xpShop] Vault was NOT found! Disabling plugin. Please check the config.yml");
+		//            getPluginLoader().disablePlugin(this);
+		//        	}
+		//        }
 		//this.getServer().getPluginManager().registerEvent(Type.PLUGIN_ENABLE, new server(this), Priority.Monitor, this);
 		//this.getServer().getPluginManager().registerEvent(Type.PLUGIN_DISABLE, new server(this), Priority.Monitor, this);
 		try
@@ -118,9 +164,16 @@ public class xpShop extends JavaPlugin {
 			System.out.println("[xpShop]New version: " + getNewVersion(URL) + " found!");
 			System.out.println("[xpShop]******************************************");
 			System.out.println("[xpShop]*********** Please update!!!! ************");
-			System.out.println("[xpShop] http://ibhh.de/xpShop.jar");
+			System.out.println("[xpShop]* http://ibhh.de/xpShop.jar *");
 			System.out.println("[xpShop]******************************************");
-
+			if(getConfig().getBoolean("autodownload") == true)
+			{
+				autoUpdate();
+			}
+			else
+			{
+				System.out.println("[xpShop] Please type [xpShop download] to download manual! ");
+			}
 		}
 	}
 
@@ -138,74 +191,79 @@ public class xpShop extends JavaPlugin {
 			Player player = (Player) sender;
 			if (cmd.getName().equalsIgnoreCase("xpShop"))
 			{		
-					if(args.length >= 1)
+				if(args.length >= 1)
+				{
+					ActionxpShop = args[0];
+					if(checkpermissions(sender, args[0]) == true)
 					{
-						ActionxpShop = args[0];
-						if(checkpermissions(sender, args[0]) == true)
+						if(args.length == 3)
 						{
-							if(args.length == 3)
+							ActionxpShop = args[0];
+							if (args[0].equalsIgnoreCase("info")) 
 							{
-								ActionxpShop = args[0];
-								if (args[0].equalsIgnoreCase("info")) 
-								{
-									info(player, args);
-									return true;
-								}
+								info(player, args);
+								return true;
 							}
-							else
-								if (args.length == 2)
+						}
+						else
+							if (args.length == 2)
+							{
+
+
+								if (args[0].equals("help"))
 								{
-
-
-									if (args[0].equals("help"))
+									help(player, args);
+								}
+								else
+									if (args[0].equals("buy"))
 									{
-										help(player, args);
+										buy = Integer.parseInt (args[1]);
+										buy(player, buy, true, false);
 									}
 									else
-										if (args[0].equals("buy"))
+										if (args[0].equals("sell"))
 										{
-											buy = Integer.parseInt (args[1]);
-											buy(player, buy, true, false);
+											sell = Integer.parseInt(args[1]);
+											sell(player, sell, true, false);
 										}
 										else
-											if (args[0].equals("sell"))
+											if (args[0].equals("buylevel"))
 											{
-												sell = Integer.parseInt(args[1]);
-												sell(player, sell, true, false);
+												buylevel = Integer.parseInt(args[1]);
+												buylevel(player, buylevel, true);
 											}
 											else
-												if (args[0].equals("buylevel"))
+												if (args[0].equals("selllevel"))
 												{
-													buylevel = Integer.parseInt(args[1]);
-													buylevel(player, buylevel, true);
+													selllevel = Integer.parseInt(args[1]);
+													selllevel(player, selllevel, true);
 												}
 												else
-													if (args[0].equals("selllevel"))
-													{
-														selllevel = Integer.parseInt(args[1]);
-														selllevel(player, selllevel, true);
-													}
-													else
-													{
-														help(player, args);
-														return false;
-													}
-								}
-						} //if(checkpermissions(sender, args[0]))
-						else
-						{
-							player.sendMessage(ChatColor.GRAY + "[xpShop]" + ChatColor.RED + (getConfig().getString("permissions.error." + getConfig().getString("language"))));
-							return false;
-						}
-					} //if (args.length == 2)
-					else
-					{
-						player.sendMessage(ChatColor.GRAY + "[xpShop]" + ChatColor.RED + (getConfig().getString("command.error.toomanyarguments." + getConfig().getString("language"))));
-						help(player, args);
-						return false;
-					}
+												{
+													help(player, args);
+													return false;
+												}
+							}
+					} //if(checkpermissions(sender, args[0]))
+				} //if (args.length == 2)
+				else
+				{
+					player.sendMessage(ChatColor.GRAY + "[xpShop]" + ChatColor.RED + (getConfig().getString("command.error.toomanyarguments." + getConfig().getString("language"))));
+					help(player, args);
+					return false;
+				}
 			} //if (cmd.getName().equalsIgnoreCase("xpShop"))
 		} //if (sender instanceof Player)
+		if (cmd.getName().equalsIgnoreCase("xpShop"))
+		{		
+			if(args.length == 1)
+			{
+				if (args[0].equals("download"))
+				{
+					autoUpdate();
+				}
+			}
+		}
 		set0();
 		return true;
 	} //public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args)
@@ -221,6 +279,11 @@ public class xpShop extends JavaPlugin {
 		Player player = (Player) sender;
 		double TOTALXPDOUBLE = (buyamount * (getConfig().getDouble("moneytoxp")));
 		int TOTALXP = (int) TOTALXPDOUBLE;
+		if(buyamount <= 0)
+		{
+			player.sendMessage(ChatColor.GRAY + "[xpShop]" + ChatColor.RED + "Invalid Amount!");
+			return false;
+		}
 		if(getBalance156(player) > buyamount)
 		{
 			try
@@ -348,10 +411,13 @@ public class xpShop extends JavaPlugin {
 		if (sender instanceof Player)
 		{
 			Player player = (Player) sender;
+			if(!Bukkit.getServer().getPluginManager().isPluginEnabled("PermissionsEx"))
+			{
 			if(player.hasPermission("xpShop." + action))
 			{
 				return true;
 			} //if(permissions.has(player, "xpShop." + action))
+			}
 			else
 			{
 				if(Bukkit.getServer().getPluginManager().isPluginEnabled("PermissionsEx"))
@@ -362,7 +428,9 @@ public class xpShop extends JavaPlugin {
 					if(permissions.has(player, "xpShop." + action)){
 						// yay!
 						return true;
-					} else {
+					} 
+					else 
+					{
 						// houston, we have a problem :)
 						player.sendMessage(ChatColor.GRAY + "[xpShop]" + ChatColor.RED + (getConfig().getString("permissions.error." + getConfig().getString("language"))));
 						return false;
@@ -371,24 +439,16 @@ public class xpShop extends JavaPlugin {
 				else 
 				{
 					System.out.println("PermissionsEx plugin are not found.");
-					if(player.hasPermission("xpShop." + action))
-					{
-						return true;
-					} //if(permissions.has(player, "xpShop." + action))
-					else
-					{
-						player.sendMessage(ChatColor.GRAY + "[xpShop]" + ChatColor.RED + (getConfig().getString("permissions.error." + getConfig().getString("language"))));
-						return false;
-					}
+					return false;
 				}
 			}
-
 		} //if (sender instanceof Player)
 		else
 		{
 			System.out.println("[xpShop]" + (getConfig().getString("command.error.noplayer" + getConfig().getString("language"))));
 			return false;
 		}
+		return false;
 
 	} //public boolean checkpermissions(CommandSender sender, String action)
 	public int iConomyversion()
@@ -441,6 +501,16 @@ public class xpShop extends JavaPlugin {
 		{
 			balance = Methods.getMethod().getAccount(player.getName()).balance();
 		}
+		//		else if(iConomyversion == 2)
+		//		{
+		//            player.sendMessage(String.format("You have %s", vault.getEconomy().format(vault.getEconomy().getBalance(player.getName()).amount)));
+		//            EconomyResponse r = vault.getEconomy().depositPlayer(player.getName(), 1.05);
+		//            if(r.transactionSuccess()) {
+		//                player.sendMessage(String.format("You were given %s and now have %s", vault.getEconomy().format(r.amount), vault.getEconomy().format(r.balance)));
+		//            } else {
+		//                player.sendMessage(String.format("An error occured: %s", r.errorMessage));
+		//            }
+		//		}
 		return balance;
 	}
 	private Account getAccount5(String name) {

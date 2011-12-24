@@ -1,4 +1,6 @@
 language: en
+moneyplugin: 5
+autodownload: true
 command:
   error:
     notenoughmoney:
@@ -91,7 +93,6 @@ help:
   info:
     de: Zeigt infos zu einer Action, die nicht ausgefuehrt wurde.
     en: Shows infos to an action, wich is not performed.
-moneyplugin: 5
 info:
   prefix:
     de: Info (nicht ausgefuehrt)
