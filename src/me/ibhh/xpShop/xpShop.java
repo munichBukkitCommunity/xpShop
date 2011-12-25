@@ -46,7 +46,7 @@ public class xpShop extends JavaPlugin {
 	private int selllevel;
 	private double addmoney;
 	private double getmoney;
-	private int SubstractedXP;
+	public int SubstractedXP;
 	public iConomy iConomy = null;
 	public int iConomyversion = 0;
 	public float Version = 0;
@@ -270,22 +270,21 @@ public class xpShop extends JavaPlugin {
 									return false;
 								}	
 							}
-//							else
-//								if (args[0].equalsIgnoreCase("send")) 
-//								{
-//									if(!Tools.isInteger(args[1]) && Tools.isInteger(args[2]))
-//									{
-//										int xp = Integer.parseInt (args[2]);
-//										sentxp(sender, xp, args[1], args);
-//										player.sendMessage("send reached");
-//										return true;
-//									}
-//									else
-//									{
-//										player.sendMessage(ChatColor.GRAY + "[xpShop]" + ChatColor.RED + (getConfig().getString("command.error.noint." + getConfig().getString("language"))));
-//										return false;
-//									}	
-//								}
+							else
+								if (args[0].equalsIgnoreCase("send")) 
+								{
+									if(!Tools.isInteger(args[1]) && Tools.isInteger(args[2]))
+									{
+										int xp = Integer.parseInt (args[2]);
+										sentxp(sender, xp, args[1], args);
+										return true;
+									}
+									else
+									{
+										player.sendMessage(ChatColor.GRAY + "[xpShop]" + ChatColor.RED + (getConfig().getString("command.error.noint." + getConfig().getString("language"))));
+										return false;
+									}	
+								}
 						}
 						else
 							if (args.length == 2)
@@ -407,33 +406,49 @@ public class xpShop extends JavaPlugin {
 		return SubstractedXP;
 	}
 
-	public static Player getPlayer(CommandSender sender, String empfaenger) {
+	protected static boolean isConsole(CommandSender sender) {
+		return !(sender instanceof Player);
+	}
 
-		List<Player> players = sender.getServer().matchPlayer(empfaenger);
-		sender.sendMessage("getplayer reached");
+	public static Player getPlayer(CommandSender sender, String[] args, int index) {
+		if (args.length > index) {
+			List<Player> players = sender.getServer().matchPlayer(args[index]);
 
-		if (players.isEmpty()) {
-			sender.sendMessage("Could not find player with the name: " + empfaenger);
+			if (players.isEmpty()) {
+				sender.sendMessage("Could not find player with the name: " + args[index]);
+				return null;
+			}
+			return (Player)players.get(0);
+		}
+
+		if (isConsole(sender)) {
 			return null;
 		}
-		return (Player)players.get(0);
-
+		return (Player)sender;
 	}
 
 	public void sentxp(CommandSender sender, int giveamount, String empfaenger, String[] args)
 	{
 		Player player = (Player) sender;
-		if(getPlayer(sender, empfaenger).hasPlayedBefore())
+		if(getPlayer(sender, args, 1).hasPlayedBefore())
 		{
-			Player empfaenger1 = (Player) getPlayer(sender, empfaenger);
-			sell(sender, giveamount, false, "sentxp");
-			buy(empfaenger1, giveamount, false, "sentxp");
-			player.sendMessage(ChatColor.GRAY + "[xpShop]" + ChatColor.RED + String.format(getConfig().getString("command.success." + "sentxp" + "." + getConfig().getString("language") + ".1"), giveamount, empfaenger1.getName()));
-
+			Player empfaenger1 = (Player) getPlayer(sender, args, 1);
+			sell(sender, giveamount, false, "sentxp");	//Trys to substract amount, else stop.
+			buy(empfaenger1, SubstractedXP, false, "sentxp");	//Gives other player XP wich were substracted.
+			try
+			{
+				player.sendMessage(ChatColor.GRAY + "[xpShop]" + ChatColor.RED + (getConfig().getString("command.success." + "sentxp" + "." + getConfig().getString("language") + ".1")) + " " + SubstractedXP + " " + (getConfig().getString("command.success." + "sentxp" + "." + getConfig().getString("language") + ".2")) + " " + args[1] + " " + (getConfig().getString("command.success." + "sentxp" + "." + getConfig().getString("language") + ".3")));
+				empfaenger1.sendMessage(ChatColor.GRAY + "[xpShop]" + ChatColor.RED + (getConfig().getString("command.success." + "recievedxp" + "." + getConfig().getString("language") + ".1")) + " " + SubstractedXP + " " + (getConfig().getString("command.success." + "recievedxp" + "." + getConfig().getString("language") + ".2")) + " " + args[1] + " " + (getConfig().getString("command.success." + "recievedxp" + "." + getConfig().getString("language") + ".3")));
+			}
+			catch (NullPointerException e)
+			{
+				player.sendMessage("Error!");
+			}
 		}
 		else
 		{
 			player.sendMessage(ChatColor.GRAY + "[xpShop]" + ChatColor.RED + "Player doesnt exist!");
+			player.sendMessage(ChatColor.GRAY + "[xpShop]" + ChatColor.RED + "Player may should leave and join the game.");
 		}
 
 	}
@@ -451,7 +466,10 @@ public class xpShop extends JavaPlugin {
 		int TOTALXP = (int) TOTALXPDOUBLE;
 		if(buyamount <= 0)
 		{
+			if(!von.equals("sentxp"))
+			{
 			player.sendMessage(ChatColor.GRAY + "[xpShop]" + ChatColor.RED + "Invalid Amount!");
+			}
 			return false;
 		}
 		if(getBalance156(player) > buyamount)
@@ -491,17 +509,19 @@ public class xpShop extends JavaPlugin {
 	 * @param sender, amount, moneyactive = true if you want that player have to buy XP, false if there is an info what that would cost.
 	 * @return true if no error occurred.
 	 */
-	public boolean sell(CommandSender sender, int sellamount, boolean moneyactive, String von)
+	public int sell(CommandSender sender, int sellamount, boolean moneyactive, String von)
 	{
 		Player player = (Player) sender;
 		if (sellamount == 0)
 		{
-			return false;
+			SubstractedXP = 0;
+			return SubstractedXP;
 		}
 		if(player.getLevel() + player.getExp() <= 0.20)
 		{
 			player.sendMessage(ChatColor.GRAY + "[xpShop]" + ChatColor.RED + (getConfig().getString("command.error.notenoughxp." + getConfig().getString("language"))));
-			return false;
+			SubstractedXP = 0;
+			return SubstractedXP;
 		}
 		else
 		{
@@ -549,7 +569,7 @@ public class xpShop extends JavaPlugin {
 						{
 							E.printStackTrace();
 							player.sendMessage(ChatColor.GRAY + "[xpShop]" + ChatColor.RED + (getConfig().getString("command.error.else." + getConfig().getString("language"))));
-							return false;
+							return SubstractedXP;
 						}
 					}
 					else
@@ -566,7 +586,8 @@ public class xpShop extends JavaPlugin {
 			catch (NumberFormatException ex)
 			{
 				player.sendMessage("Invalid exp count: " + sellamount);
-				return false;
+				SubstractedXP = 0;
+				return SubstractedXP;
 			}
 			player.saveData();
 		}
@@ -579,7 +600,7 @@ public class xpShop extends JavaPlugin {
 		{
 			player.sendMessage(ChatColor.GRAY + "[xpShop]" + ChatColor.RED + (getConfig().getString("info.prefix." + getConfig().getString("language"))) + " " + (getConfig().getString("command.success.sell" + "." + getConfig().getString("language") + ".1")) + " " + SubstractedXP + " " + (getConfig().getString("command.success." + "sell" + "." + getConfig().getString("language") + ".2")) + " " + addmoney + " " + (getConfig().getString("command.success." + "sell" + "." + getConfig().getString("language") + ".3")));
 		}
-		return false;
+		return SubstractedXP;
 	}
 
 
@@ -884,15 +905,17 @@ public class xpShop extends JavaPlugin {
 			player.sendMessage(ChatColor.GRAY + "[xpShop]" + ChatColor.RED + "/xpShop buy <money>");
 			player.sendMessage(ChatColor.GRAY + "[xpShop]" + ChatColor.RED + "/xpShop buylevel <amount>");
 			player.sendMessage(ChatColor.GRAY + "[xpShop]" + ChatColor.RED + "/xpShop selllevel <amount>");
+			player.sendMessage(ChatColor.GRAY + "[xpShop]" + ChatColor.RED + "/xpShop send <player> <amount>");
 		}
 		else
-			if(!(args[1].equals("buy") || args[1].equals("sell") || args[1].equals("selllevel") || args[1].equals("buylevel") || args[1].equals("info")))
+			if(!(args[1].equals("buy") || args[1].equals("sell") || args[1].equals("selllevel") || args[1].equals("buylevel") || args[1].equals("send") || args[1].equals("info")))
 			{
 				player.sendMessage(ChatColor.GRAY + "[xpShop]" + ChatColor.RED + "/xpShop info <action> <amount>");
 				player.sendMessage(ChatColor.GRAY + "[xpShop]" + ChatColor.RED + "/xpShop sell <amount>");
 				player.sendMessage(ChatColor.GRAY + "[xpShop]" + ChatColor.RED + "/xpShop buy <money>");
 				player.sendMessage(ChatColor.GRAY + "[xpShop]" + ChatColor.RED + "/xpShop buylevel <amount>");
 				player.sendMessage(ChatColor.GRAY + "[xpShop]" + ChatColor.RED + "/xpShop selllevel <amount>");
+				player.sendMessage(ChatColor.GRAY + "[xpShop]" + ChatColor.RED + "/xpShop send <player> <amount>");
 			}
 			else
 				if (args[1].equals("buy"))
@@ -918,6 +941,11 @@ public class xpShop extends JavaPlugin {
 				else if (args[1].equals("info"))
 				{
 					player.sendMessage(ChatColor.GRAY + "[xpShop]" + ChatColor.RED + "/xpShop info <action> <amount>");
+					player.sendMessage(ChatColor.GRAY + "[xpShop]" + ChatColor.RED + (getConfig().getString("help.info" + "." + getConfig().getString("language"))));
+				}
+				else if (args[1].equals("send"))
+				{
+					player.sendMessage(ChatColor.GRAY + "[xpShop]" + ChatColor.RED + "/xpShop send <player> <amount>");
 					player.sendMessage(ChatColor.GRAY + "[xpShop]" + ChatColor.RED + (getConfig().getString("help.info" + "." + getConfig().getString("language"))));
 				}
 	}
@@ -956,6 +984,11 @@ public class xpShop extends JavaPlugin {
 						{
 							selllevel(player, temp, false);
 						}
+						else
+							if (args[1].equals("send"))
+							{
+								player.sendMessage(ChatColor.GRAY + "[xpShop]" + ChatColor.RED + "There is no info for (send)!");
+							}
 			player.setLevel(nowlevel);
 			player.setExp(nowxp);
 		}
