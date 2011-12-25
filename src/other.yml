@@ -188,3 +188,20 @@ public class server implements Listener {
 	}
 
 				
+				/**	 Noch nicht von Bukkit implementiert!
+				if(player.getTotalExperience() >= sellamount)
+				{
+					getmoney = (getConfig().getDouble("xptomoney"));
+					int neuXP = player.getTotalExperience() - sellamount;
+					player.setTotalExperience(neuXP);
+					addmoney156(getmoney * sellamount, player);
+					if(ActionxpShop.equalsIgnoreCase("sell"))
+					{
+						player.sendMessage(ChatColor.GRAY + "[xpShop]" + ChatColor.RED + (getConfig().getString("command.success." + ActionxpShop + "." + getConfig().getString("language") + ".1")) + " " + sellamount + " " + (getConfig().getString("command.success." + ActionxpShop + "." + getConfig().getString("language") + ".2")) + " " + addmoney + " " + (getConfig().getString("command.success." + ActionxpShop + "." + getConfig().getString("language") + ".3")));
+					}
+				}
+				else
+				{
+					player.sendMessage(ChatColor.GRAY + "[xpShop]" + ChatColor.RED + (getConfig().getString("command.error.notenoughxp." + getConfig().getString("language"))));
+				}
+				**/

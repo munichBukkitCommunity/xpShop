@@ -1,10 +1,12 @@
 package me.ibhh.xpShop;
 
+import me.ibhh.xpShop.Tools;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URL;
 import java.net.URLConnection;
+import java.util.List;
 
 //import net.milkbowl.vault.Vault;
 //import net.milkbowl.vault.economy.Economy;
@@ -22,10 +24,13 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 import ru.tehkode.permissions.PermissionManager;
 import ru.tehkode.permissions.bukkit.PermissionsEx;
+
 import com.iCo6.system.Accounts;
+
 import com.iConomy.*;
 import com.iConomy.system.Account;
 import com.iConomy.system.Holdings;
+
 import com.nijikokun.register.payment.Methods;
 
 public class xpShop extends JavaPlugin {
@@ -57,22 +62,43 @@ public class xpShop extends JavaPlugin {
 	//
 	//        return (economy != null);
 	//    }
+
+	/**
+	 * Called by Bukkit on stopping the server
+	 *
+	 * @param 
+	 * @return 
+	 */
 	@Override
-	public void onDisable() {
+	public void onDisable() 
+	{
 
 		System.out.println("[xpShop] disabled!");
 
 	}
+
+	/**
+	 * Delete an download new version of xpShop in the Update folder.
+	 *
+	 * @param 
+	 * @return 
+	 */
 	public void autoUpdate()
 	{
 
-			try {
-				Update.autoDownload("http://ibhh.de/xpShop.jar", getDataFolder().toString());
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
+		try {
+			Update.autoDownload("http://ibhh.de/xpShop.jar", getDataFolder().toString());
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
-	
+
+	/**
+	 * Gets version.
+	 *
+	 * @param 
+	 * @return float: Version of the installed plugin.
+	 */
 	public float aktuelleVersion()
 	{
 		try
@@ -86,6 +112,12 @@ public class xpShop extends JavaPlugin {
 		return Version;
 	}
 
+	/**
+	 * Checks version with a http-connection
+	 *
+	 * @param 
+	 * @return float: latest recommend build.
+	 */
 	public float getNewVersion(String url)
 	{
 		float rt2 = 0;
@@ -112,6 +144,12 @@ public class xpShop extends JavaPlugin {
 		return rt2;
 	}
 
+	/**
+	 * Compares Version to newVersion
+	 *
+	 * @param url from newVersion file + currentVersion
+	 * @return true if newVersion recommend.
+	 */
 	public boolean UpdateAvailable(String url, float currVersion) {
 		boolean a = false;
 		if(getNewVersion(url) > currVersion)
@@ -120,6 +158,13 @@ public class xpShop extends JavaPlugin {
 		}
 		return a;
 	}
+
+	/**
+	 * Called by Bukkit on starting the server
+	 *
+	 * @param 
+	 * @return 
+	 */
 	@Override
 	public void onEnable()
 	{
@@ -178,11 +223,24 @@ public class xpShop extends JavaPlugin {
 	}
 
 
+	/**
+	 * Called by Bukkit on reloading the server
+	 *
+	 * @param 
+	 * @return 
+	 */
 	public void onReload()
 	{
 		onEnable();
 	}
 
+
+	/**
+	 * Called by Bukkit if player posts a command
+	 *
+	 * @param none, cause of Bukkit.
+	 * @return true if no errors happened else return false to Bukkit, then Bukkit prints /xpShop buy <xp|money>.
+	 */
 	@Override
 	public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args)
 	{
@@ -201,42 +259,111 @@ public class xpShop extends JavaPlugin {
 							ActionxpShop = args[0];
 							if (args[0].equalsIgnoreCase("info")) 
 							{
-								info(player, args);
-								return true;
+								if(!Tools.isInteger(args[1]) && Tools.isInteger(args[2]))
+								{
+									info(player, args);
+									return true;
+								}
+								else
+								{
+									player.sendMessage(ChatColor.GRAY + "[xpShop]" + ChatColor.RED + (getConfig().getString("command.error.noint." + getConfig().getString("language"))));
+									return false;
+								}	
 							}
+//							else
+//								if (args[0].equalsIgnoreCase("send")) 
+//								{
+//									if(!Tools.isInteger(args[1]) && Tools.isInteger(args[2]))
+//									{
+//										int xp = Integer.parseInt (args[2]);
+//										sentxp(sender, xp, args[1], args);
+//										player.sendMessage("send reached");
+//										return true;
+//									}
+//									else
+//									{
+//										player.sendMessage(ChatColor.GRAY + "[xpShop]" + ChatColor.RED + (getConfig().getString("command.error.noint." + getConfig().getString("language"))));
+//										return false;
+//									}	
+//								}
 						}
 						else
 							if (args.length == 2)
 							{
-
-
 								if (args[0].equals("help"))
 								{
-									help(player, args);
+									if(!Tools.isInteger(args[1]))
+									{
+										help(player, args);
+										return true;
+									}
+									else
+									{
+										player.sendMessage(ChatColor.GRAY + "[xpShop]" + ChatColor.RED + (getConfig().getString("command.error.noint." + getConfig().getString("language"))));
+										return false;
+									}
 								}
 								else
 									if (args[0].equals("buy"))
 									{
-										buy = Integer.parseInt (args[1]);
-										buy(player, buy, true, false);
+										if(Tools.isInteger(args[1]))
+										{
+											buy = Integer.parseInt (args[1]);
+											buy(player, buy, true, "buy");
+											return true;
+										}
+										else
+										{
+											player.sendMessage(ChatColor.GRAY + "[xpShop]" + ChatColor.RED + (getConfig().getString("command.error.noint." + getConfig().getString("language"))));
+											return false;
+										}
+
 									}
 									else
 										if (args[0].equals("sell"))
 										{
-											sell = Integer.parseInt(args[1]);
-											sell(player, sell, true, false);
+											if(Tools.isInteger(args[1]))
+											{
+												sell = Integer.parseInt(args[1]);
+												sell(player, sell, true, "sell");
+												return true;
+											}
+											else
+											{
+												player.sendMessage(ChatColor.GRAY + "[xpShop]" + ChatColor.RED + (getConfig().getString("command.error.noint." + getConfig().getString("language"))));
+												return false;
+											}
+
 										}
 										else
 											if (args[0].equals("buylevel"))
 											{
-												buylevel = Integer.parseInt(args[1]);
-												buylevel(player, buylevel, true);
+												if(Tools.isInteger(args[1]))
+												{
+													buylevel = Integer.parseInt(args[1]);
+													buylevel(player, buylevel, true);
+													return true;
+												}
+												else
+												{
+													player.sendMessage(ChatColor.GRAY + "[xpShop]" + ChatColor.RED + (getConfig().getString("command.error.noint." + getConfig().getString("language"))));
+													return false;
+												}
 											}
 											else
 												if (args[0].equals("selllevel"))
 												{
-													selllevel = Integer.parseInt(args[1]);
-													selllevel(player, selllevel, true);
+													if(Tools.isInteger(args[1]))
+													{
+														selllevel = Integer.parseInt(args[1]);
+														selllevel(player, selllevel, true);
+														return true;
+													}
+													else
+													{
+														player.sendMessage(ChatColor.GRAY + "[xpShop]" + ChatColor.RED + (getConfig().getString("command.error.noint." + getConfig().getString("language"))));
+														return false;
+													}
 												}
 												else
 												{
@@ -268,13 +395,56 @@ public class xpShop extends JavaPlugin {
 		return true;
 	} //public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args)
 
+	/**
+	 * Tool of sell
+	 *
+	 * @param 
+	 * @return int newparam
+	 */
 	public int SubstractedXP()
 	{
 		SubstractedXP = SubstractedXP + 1;
 		return SubstractedXP;
 	}
 
-	public boolean buy(CommandSender sender, int buyamount, boolean moneyactive, boolean vonbuylevel)
+	public static Player getPlayer(CommandSender sender, String empfaenger) {
+
+		List<Player> players = sender.getServer().matchPlayer(empfaenger);
+		sender.sendMessage("getplayer reached");
+
+		if (players.isEmpty()) {
+			sender.sendMessage("Could not find player with the name: " + empfaenger);
+			return null;
+		}
+		return (Player)players.get(0);
+
+	}
+
+	public void sentxp(CommandSender sender, int giveamount, String empfaenger, String[] args)
+	{
+		Player player = (Player) sender;
+		if(getPlayer(sender, empfaenger).hasPlayedBefore())
+		{
+			Player empfaenger1 = (Player) getPlayer(sender, empfaenger);
+			sell(sender, giveamount, false, "sentxp");
+			buy(empfaenger1, giveamount, false, "sentxp");
+			player.sendMessage(ChatColor.GRAY + "[xpShop]" + ChatColor.RED + String.format(getConfig().getString("command.success." + "sentxp" + "." + getConfig().getString("language") + ".1"), giveamount, empfaenger1.getName()));
+
+		}
+		else
+		{
+			player.sendMessage(ChatColor.GRAY + "[xpShop]" + ChatColor.RED + "Player doesnt exist!");
+		}
+
+	}
+
+	/**
+	 * Called by onCommand and buylevel, buys XP.
+	 *
+	 * @param sender, amount, moneyactive = true if you want that player have to buy XP, false if there is an info what that would cost.
+	 * @return true if no error occurred.
+	 */
+	public boolean buy(CommandSender sender, int buyamount, boolean moneyactive, String von)
 	{
 		Player player = (Player) sender;
 		double TOTALXPDOUBLE = (buyamount * (getConfig().getDouble("moneytoxp")));
@@ -293,7 +463,7 @@ public class xpShop extends JavaPlugin {
 				{
 					player.sendMessage(ChatColor.GRAY + "[xpShop]" + ChatColor.RED + (getConfig().getString("command.success." + "buy" + "." + getConfig().getString("language") + ".1")) + " " + buyamount + " " + (getConfig().getString("command.success." + "buy" + "." + getConfig().getString("language") + ".2")) + " " + TOTALXP + " " + (getConfig().getString("command.success." + "buy" + "." + getConfig().getString("language") + ".3")));
 				}
-				else if (ActionxpShop.equalsIgnoreCase("info") && vonbuylevel == false)
+				else if (ActionxpShop.equalsIgnoreCase("info") && von.equals("buylevel") == false)
 				{
 					player.sendMessage(ChatColor.GRAY + "[xpShop]" + ChatColor.RED + (getConfig().getString("info.prefix." + getConfig().getString("language"))) + " " + (getConfig().getString("command.success." + "buy" + "." + getConfig().getString("language") + ".1")) + " " + buyamount + " " + (getConfig().getString("command.success." + "buy" + "." + getConfig().getString("language") + ".2")) + " " + TOTALXP + " " + (getConfig().getString("command.success." + "buy" + "." + getConfig().getString("language") + ".3")));
 				}
@@ -315,7 +485,13 @@ public class xpShop extends JavaPlugin {
 		return false;
 	}
 
-	public boolean sell(CommandSender sender, int sellamount, boolean moneyactive, boolean vonselllevel)
+	/**
+	 * Called by onCommand and selllevel, sells XP.
+	 *
+	 * @param sender, amount, moneyactive = true if you want that player have to buy XP, false if there is an info what that would cost.
+	 * @return true if no error occurred.
+	 */
+	public boolean sell(CommandSender sender, int sellamount, boolean moneyactive, String von)
 	{
 		Player player = (Player) sender;
 		if (sellamount == 0)
@@ -399,13 +575,21 @@ public class xpShop extends JavaPlugin {
 		{
 			player.sendMessage(ChatColor.GRAY + "[xpShop]" + ChatColor.RED + (getConfig().getString("command.success." + "sell" + "." + getConfig().getString("language") + ".1")) + " " + SubstractedXP + " " + (getConfig().getString("command.success." + "sell" + "." + getConfig().getString("language") + ".2")) + " " + addmoney + " " + (getConfig().getString("command.success." + "sell" + "." + getConfig().getString("language") + ".3")));
 		}
-		else if (ActionxpShop.equalsIgnoreCase("info") && vonselllevel == false)
+		else if (ActionxpShop.equalsIgnoreCase("info") && von.equals("selllevel") == false)
 		{
 			player.sendMessage(ChatColor.GRAY + "[xpShop]" + ChatColor.RED + (getConfig().getString("info.prefix." + getConfig().getString("language"))) + " " + (getConfig().getString("command.success.sell" + "." + getConfig().getString("language") + ".1")) + " " + SubstractedXP + " " + (getConfig().getString("command.success." + "sell" + "." + getConfig().getString("language") + ".2")) + " " + addmoney + " " + (getConfig().getString("command.success." + "sell" + "." + getConfig().getString("language") + ".3")));
 		}
 		return false;
 	}
 
+
+	/**
+	 * Checks players permissions.
+	 * Works with Bukkitpermissions and PermissionsEX
+	 *
+	 * @param sender, action, which should be performed.
+	 * @return true if player has permission.
+	 */
 	public boolean checkpermissions(CommandSender sender, String action)
 	{
 		if (sender instanceof Player)
@@ -413,10 +597,10 @@ public class xpShop extends JavaPlugin {
 			Player player = (Player) sender;
 			if(!Bukkit.getServer().getPluginManager().isPluginEnabled("PermissionsEx"))
 			{
-			if(player.hasPermission("xpShop." + action))
-			{
-				return true;
-			} //if(permissions.has(player, "xpShop." + action))
+				if(player.hasPermission("xpShop." + action))
+				{
+					return true;
+				} //if(permissions.has(player, "xpShop." + action))
 			}
 			else
 			{
@@ -451,6 +635,13 @@ public class xpShop extends JavaPlugin {
 		return false;
 
 	} //public boolean checkpermissions(CommandSender sender, String action)
+
+	/**
+	 * Checks the config.yml wich moneyplugin should be used.
+	 *
+	 * @param 
+	 * @return 1: Register 5: iConomy5 6: iConomy6
+	 */
 	public int iConomyversion()
 	{
 		try
@@ -463,6 +654,13 @@ public class xpShop extends JavaPlugin {
 		}
 		return iConomyversion;
 	}
+
+	/**
+	 * Gets Balance of a player.
+	 *
+	 * @param player, iConomyversion() must be performed before.
+	 * @return Double balance.
+	 */
 	public Double getBalance156(Player player)
 	{
 		String name = player.getName();
@@ -513,12 +711,22 @@ public class xpShop extends JavaPlugin {
 		//		}
 		return balance;
 	}
+
 	private Account getAccount5(String name) {
 		return com.iConomy.iConomy.getAccount(name);
 	}
+
 	private boolean hasAccount5(String name) {
 		return com.iConomy.iConomy.hasAccount(name);
 	}
+
+
+	/**
+	 * Substracts money.
+	 *
+	 * @param player, amount
+	 * @return 
+	 */
 	public void substractmoney156(double amountsubstract, Player player)
 	{
 		String name = player.getName();
@@ -537,6 +745,13 @@ public class xpShop extends JavaPlugin {
 		}
 		return;
 	}
+
+	/**
+	 * Adds money
+	 *
+	 * @param player, amount
+	 * @return 
+	 */
 	public void addmoney156(double amountadd, Player player)
 	{
 		String name = player.getName();
@@ -555,6 +770,13 @@ public class xpShop extends JavaPlugin {
 		}
 		return;
 	}
+
+	/**
+	 * Outdatet TOOL to find error.
+	 *
+	 * @param 
+	 * @return
+	 */
 	public void set0()
 	{
 		ActionxpShop = "0";
@@ -564,6 +786,13 @@ public class xpShop extends JavaPlugin {
 		buy = 0;
 		sell = 0;
 	}
+
+	/**
+	 * Buys level for a player.
+	 *
+	 * @param sender, amount, moneyactive = true if you want that player have to buy XP, false if there is an info what that would cost.
+	 * @return 
+	 */
 	public void buylevel(CommandSender sender, int levelamontbuy, boolean moneyactive)
 	{
 		Player player = (Player) sender;
@@ -576,11 +805,11 @@ public class xpShop extends JavaPlugin {
 				rounds = rounds++;
 				if(moneyactive == true)
 				{
-					buy(sender, 1, true, true);
+					buy(sender, 1, true, "buylevel");
 				}
 				else if (moneyactive == false)
 				{
-					buy(sender, 1, false, true);
+					buy(sender, 1, false, "buylevel");
 				}
 				System.out.println(rounds);
 			}
@@ -594,6 +823,13 @@ public class xpShop extends JavaPlugin {
 			}
 		}
 	}
+
+	/**
+	 * Sells level from a player.
+	 *
+	 * @param sender, amount, moneyactive = true if you want that player have to buy XP, false if there is an info what that would cost.
+	 * @return 
+	 */
 	public void selllevel(CommandSender sender, int levelamontsell, boolean moneyactive)
 	{
 		Player player = (Player) sender;
@@ -613,11 +849,11 @@ public class xpShop extends JavaPlugin {
 					rounds = rounds++;
 					if(moneyactive == true)
 					{
-						sell(sender, 1, true, true);
+						sell(sender, 1, true, "selllevel");
 					}
 					else if(moneyactive == false)
 					{
-						sell(sender, 1, false, true);
+						sell(sender, 1, false, "sellevel");
 					}
 				}
 				if(ActionxpShop.equalsIgnoreCase("buylevel"))
@@ -631,6 +867,13 @@ public class xpShop extends JavaPlugin {
 			}
 		}
 	}
+
+	/**
+	 * Returns help.
+	 *
+	 * @param sender, action(String[])
+	 * @return 
+	 */
 	public void help(CommandSender sender, String[] args)
 	{
 		Player player = (Player) sender;
@@ -678,6 +921,14 @@ public class xpShop extends JavaPlugin {
 					player.sendMessage(ChatColor.GRAY + "[xpShop]" + ChatColor.RED + (getConfig().getString("help.info" + "." + getConfig().getString("language"))));
 				}
 	}
+
+
+	/**
+	 * Shows a player how much a action would cost.
+	 *
+	 * @param sender, action, amount.
+	 * @return 
+	 */
 	public void info(CommandSender sender, String[] args)
 	{
 		if(args.length == 3 && sender instanceof Player)
@@ -688,12 +939,12 @@ public class xpShop extends JavaPlugin {
 			int temp = Integer.parseInt(args[2]);
 			if (args[1].equals("buy"))
 			{
-				buy(player, temp, false, false);
+				buy(player, temp, false, "info");
 			}
 			else
 				if (args[1].equals("sell"))
 				{
-					sell(player, temp, false, false);
+					sell(player, temp, false, "info");
 				}
 				else
 					if (args[1].equals("buylevel"))

@@ -1,6 +1,8 @@
 language: en
 moneyplugin: 5
 autodownload: true
+moneytoxp: 1.00
+xptomoney: 1.00
 command:
   error:
     notenoughmoney:
@@ -13,8 +15,8 @@ command:
       de: Unbekannter Error!
       en: Error!
     noint:
-      de: Konnte args[1] nicht in int wandeln!
-      en: Couldn't parse arsgs[1] into an int!
+      de: Falsche Eingabe!
+      en: Wrong command!
     noargs0:
       de: Kein buy oder sell vorhanden!
       en: No buy or sell found!
@@ -63,7 +65,10 @@ command:
       en:
         1: You changed 
         2: XP into 
-        3: money. 
+        3: money.
+    sentxp:
+      de: Du hast %s XP to %s gesendet.
+      en: You sent %s XP to %s.
 permissions:
   error:
     de: Houston Wir haben ein Problem! Diesen Befehl darfst Du nicht verwenden!
@@ -71,8 +76,6 @@ permissions:
   notfound:
     de: PermissionsEx plugin nicht gefunden!
     en: PermissionsEx not found!
-moneytoxp: 1.00
-xptomoney: 1.00
 iConomy:
   error:
     de: Kein iConomy5 oder 6 oder Register gefunden!
