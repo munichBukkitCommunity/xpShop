@@ -3,6 +3,7 @@ moneyplugin: 5
 autodownload: true
 moneytoxp: 1.00
 xptomoney: 1.00
+JRE: 1.6
 command:
   error:
     notenoughmoney:
