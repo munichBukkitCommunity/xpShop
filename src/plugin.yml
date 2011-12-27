@@ -1,5 +1,5 @@
 name:  xpShop
-version:  1.3
+version:  1.4
 description:  Player can buy xp
 author:  ibhh
 website: http://www.ibhh.de
@@ -33,4 +33,10 @@ permissions:
     default: true
   xpShop.info:
     description: gives you an info.
+    default: true
+  xpShop.help:
+    description: gives you a help.
+    default: true
+  xpShop.send:
+    description: send XP to other players.
     default: true

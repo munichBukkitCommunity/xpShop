@@ -1,9 +1,7 @@
 language: en
-moneyplugin: 5
 autodownload: true
 moneytoxp: 1.00
 xptomoney: 1.00
-JRE: 1.6
 command:
   error:
     notenoughmoney:
@@ -32,59 +30,23 @@ command:
       en: You are no player!
   success:
     buy:
-      de:
-        1: Du hast 
-        2: Money in 
-        3: XP umgewandelt. 
-      en:
-        1: You changed 
-        2: money into 
-        3: XP. 
+      de: Du hast %1$d Geld in %2$d XP umgewandelt. 
+      en: You changed %1$d money into %2$d XP.
     sell:
-      de:
-        1: Du hast 
-        2: XP in 
-        3: Money umgewandelt. 
-      en:
-        1: You changed 
-        2: XP into 
-        3: money. 
+      de: Du hast %1$d XP in %2$d Money umgewandelt. 
+      en: You changed %1$d XP into %2$d money. 
     buylevel:
-      de:
-        1: Du hast 
-        2: Money in 
-        3: XP umgewandelt. 
-      en:
-        1: You changed 
-        2: money into 
-        3: XP. 
+      de: Du hast %1.2f Geld in %2$d XP umgewandelt. 
+      en: You changed %1.2f money into %2$d XP.
     selllevel:
-      de:
-        1: Du hast 
-        2: XP in 
-        3: Money umgewandelt. 
-      en:
-        1: You changed 
-        2: XP into 
-        3: money.
+      de: Du hast %1$d XP in %2$d Money umgewandelt. 
+      en: You changed %1$d XP into %2$d money. 
     sentxp:
-      de:
-        1: Du hast
-        2: XP to
-        3: gesendet.
-      en:
-        1: You sent
-        2: XP to
-        3: .
+      de: Du hast %1$d XP to %2$s gesendet.
+      en: You sent %1$d XP to %2$s.
     recievedxp:
-      de:
-        1: Du hast
-        2: XP von
-        3: erhalten.
-      en:
-        1: You recieved
-        2: XP from
-        3: .
+      de: Du hast %1$d XP von %2$s erhalten.
+      en: You recieved %1$d XP from %2$s.
 permissions:
   error:
     de: Houston Wir haben ein Problem! Diesen Befehl darfst Du nicht verwenden!
@@ -111,7 +73,7 @@ help:
     en: Changes level into money.
   info:
     de: Zeigt infos zu einer Action, die nicht ausgefuehrt wurde.
-    en: Shows infos to an action, wich is not performed.
+    en: Shows infos to an action, which is not performed.
 info:
   prefix:
     de: Info (nicht ausgefuehrt)
