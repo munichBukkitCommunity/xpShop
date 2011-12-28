@@ -290,7 +290,7 @@ public class xpShop extends JavaPlugin {
 									if ((!Tools.isInteger(args[1])) && (Tools.isInteger(args[2])))
 									{
 										int xp = Integer.parseInt(args[2]);
-										sentxp(sender, xp, args[1], args);
+										sendxp(sender, xp, args[1], args);
 										return true;
 									}
 
@@ -427,7 +427,7 @@ public class xpShop extends JavaPlugin {
 		return (Player)sender;
 	}
 
-	public void sentxp(CommandSender sender, int giveamount, String empfaenger, String[] args)
+	public void sendxp(CommandSender sender, int giveamount, String empfaenger, String[] args)
 	{
 		Player player = (Player) sender;
 		if(getPlayer(sender, args, 1).hasPlayedBefore())
@@ -453,6 +453,9 @@ public class xpShop extends JavaPlugin {
 
 	}
 
+	public static int getNeededExpForNextLevel(int level) {
+		return (7 + level * 7 >> 1); }
+
 	/**
 	 * Called by onCommand and buylevel, buys XP.
 	 *
@@ -462,8 +465,10 @@ public class xpShop extends JavaPlugin {
 	public boolean buy(CommandSender sender, int buyamount, boolean moneyactive, String von)
 	{
 		Player player = (Player) sender;
+		int ENDXP = 0;
 		double TOTALXPDOUBLE = (buyamount * (getConfig().getDouble("moneytoxp")));
 		int TOTALXP = (int) TOTALXPDOUBLE;
+
 		if(buyamount <= 0)
 		{
 			if(!von.equals("sentxp"))
@@ -474,36 +479,47 @@ public class xpShop extends JavaPlugin {
 		}
 		if(getBalance156(player) >= buyamount)
 		{
+			ENDXP = TOTALXP;
 			try
 			{
-				int Turns = 0;
-				while((TOTALXP -1) >= Turns++)
+				if (TOTALXP > 0) 
 				{
-					player.giveExp(1);
-					if(moneyactive == true)
+					int restexpcurrentlevel = (int) (getNeededExpForNextLevel(player.getLevel() + 1) * (1 - player.getExp()));
+					while (TOTALXP > 0) 
 					{
-						substractmoney156(getmoney, player);
-					}			
-				}
-				if(ActionxpShop.equalsIgnoreCase("buy"))
-				{
-					player.sendMessage(ChatColor.GRAY + "[xpShop]" + ChatColor.RED + String.format(getConfig().getString("command.success." + "buy" + "." + getConfig().getString("language")), buyamount, TOTALXP));
-
-				}
-				else if (ActionxpShop.equalsIgnoreCase("info") && von.equals("buylevel") == false)
-				{
-					player.sendMessage(ChatColor.GRAY + "[xpShop]" + ChatColor.RED + String.format((getConfig().getString("info.prefix." + getConfig().getString("language"))) + " " + (getConfig().getString("command.success." + "buy" + "." + getConfig().getString("language"))), buyamount, TOTALXP));
+						if (TOTALXP < restexpcurrentlevel) 
+						{
+							player.giveExp(TOTALXP);
+							if(moneyactive == true)
+							{
+								substractmoney156(buyamount, player);
+							} 
+							break;
+						}
+						if(moneyactive == true)
+						{
+							substractmoney156(restexpcurrentlevel * (getConfig().getDouble("moneytoxp")), player);
+						}
+						player.giveExp(restexpcurrentlevel);
+						TOTALXP -= restexpcurrentlevel;
+						restexpcurrentlevel = getNeededExpForNextLevel(player.getLevel() + 1);
+					}
 				}
 			}
 			catch (NumberFormatException ex)
 			{
 				player.sendMessage("Invalid exp count: " + buyamount);
 			}
-			player.saveData();
-			if(moneyactive == true)
+			if(ActionxpShop.equalsIgnoreCase("buy"))
 			{
-				substractmoney156(buyamount, player);
+				player.sendMessage(ChatColor.GRAY + "[xpShop]" + ChatColor.RED + String.format(getConfig().getString("command.success." + "buy" + "." + getConfig().getString("language")), buyamount, ENDXP));
+
 			}
+			else if (ActionxpShop.equalsIgnoreCase("info") && von.equals("buylevel") == false)
+			{
+				player.sendMessage(ChatColor.GRAY + "[xpShop]" + ChatColor.RED + String.format((getConfig().getString("info.prefix." + getConfig().getString("language"))) + " " + (getConfig().getString("command.success." + "buy" + "." + getConfig().getString("language"))), buyamount, ENDXP));
+			}
+			player.saveData();
 			return true;
 		} //if (Balance >= money)
 		else
