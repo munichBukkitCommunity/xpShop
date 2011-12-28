@@ -44,7 +44,6 @@ public class xpShop extends JavaPlugin {
 	private int sell;
 	private int buylevel;
 	private int selllevel;
-	public long addmoney;
 	public double getmoney;
 	public int SubstractedXP;
 	public iConomy iConomy = null;
@@ -473,11 +472,19 @@ public class xpShop extends JavaPlugin {
 			}
 			return false;
 		}
-		if(getBalance156(player) > buyamount)
+		if(getBalance156(player) >= buyamount)
 		{
 			try
 			{
-				player.giveExp(TOTALXP);
+				int Turns = 0;
+				while((TOTALXP -1) >= Turns++)
+				{
+					player.giveExp(1);
+					if(moneyactive == true)
+					{
+						substractmoney156(getmoney, player);
+					}			
+				}
 				if(ActionxpShop.equalsIgnoreCase("buy"))
 				{
 					player.sendMessage(ChatColor.GRAY + "[xpShop]" + ChatColor.RED + String.format(getConfig().getString("command.success." + "buy" + "." + getConfig().getString("language")), buyamount, TOTALXP));
@@ -505,12 +512,6 @@ public class xpShop extends JavaPlugin {
 		}
 		return false;
 	}
-	/**
-	 * Called by onCommand and selllevel, sells XP.
-	 *
-	 * @param sender, amount, moneyactive = true if you want that player have to buy XP, false if there is an info what that would cost.
-	 * @return true if no error occurred.
-	 */
 	public int sell(CommandSender sender, int sellamount, boolean moneyactive, String von)
 	{
 		Player player = (Player) sender;
@@ -551,9 +552,9 @@ public class xpShop extends JavaPlugin {
 					SubstractedXP = 0;
 				}
 				getmoney = (getConfig().getDouble("xptomoney"));
-				while((SubstractedXP < sellamount) || ((player.getLevel() + player.getExp() >= 0.20) && (SubstractedXP < sellamount)))
+				while((SubstractedXP < sellamount) && ((player.getLevel() + player.getExp() >= 0.20) && (SubstractedXP < sellamount)))
 				{
-					if(player.getExp() <= 0)
+					if(player.getExp() <= 0.1)
 					{
 						try
 						{
@@ -564,7 +565,7 @@ public class xpShop extends JavaPlugin {
 							player.setExp( (float) 0.999999);
 							if(moneyactive == true)
 							{
-								addmoney156(getmoney, player);
+								addmoney156(getmoney * 2, player);
 							}
 						}
 						catch (Exception E)
@@ -594,7 +595,7 @@ public class xpShop extends JavaPlugin {
 			player.saveData();
 		}
 		double x = (getConfig().getDouble("xptomoney"))* SubstractedXP;
-		addmoney = Math.round(x);
+		int addmoney = (int) Math.round(x);
 		if(ActionxpShop.equalsIgnoreCase("sell"))
 		{
 			player.sendMessage(ChatColor.GRAY + "[xpShop]" + ChatColor.RED + String.format((getConfig().getString("command.success." + "sell" + "." + getConfig().getString("language"))), SubstractedXP, addmoney));
