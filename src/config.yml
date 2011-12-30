@@ -48,7 +48,7 @@ command:
       de: Du hast %1$d XP in %2$d Money umgewandelt. 
       en: You changed %1$d XP into %2$d money. 
     sentxp:
-      de: Du hast %1$d XP to %2$s gesendet.
+      de: Du hast %1$d XP zu %2$s gesendet.
       en: You sent %1$d XP to %2$s.
     recievedxp:
       de: Du hast %1$d XP von %2$s erhalten.
@@ -80,7 +80,28 @@ help:
   info:
     de: Zeigt infos zu einer Action, die nicht ausgefuehrt wurde.
     en: Shows infos to an action, which is not performed.
+  send:
+    de: Sendet XP zu anderen Playern.
+    en: Send XP to other players.
+  infoxp:
+    de: Zeigt aktuelle XP.
+    en: Shows XP which a player have.
+  infolevel:
+    de: Zeigt aktuelle XP.
+    en: Shows XP which a player have.
 info:
+  ownXP:
+    de: Du hast %1$d XP.
+    en: You have %1$d XP.
+  otherXP:
+    de: Player %1$s hat %2$d XP.
+    en: Player %1$s has %2$d XP.
+  ownLevel:
+    de: Du hast %1$d Level.
+    en: You have %1$d level.
+  otherLevel:
+    de: Player %1$s hat %2$d Level.
+    en: Player %1$s has %2$d level.
   prefix:
     de: Info (nicht ausgefuehrt)
     en: Info (not performed)

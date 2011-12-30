@@ -1,5 +1,5 @@
 name:  xpShop
-version:  1.8
+version:  1.9
 description:  Player can buy xp
 author:  ibhh
 website: http://www.ibhh.de
@@ -19,6 +19,11 @@ permissions:
       xpShop.buylevel: true
       xpShop.selllevel: true
       xpShop.info: true
+      xpShop.send: true
+      xpShop.infoxp.own: true
+      xpShop.infoxp.other: true
+      xpShop.infolevel.own: true
+      xpShop.infolevel.other: true
   xpShop.buy:
     description: Allows you to buy xp.
     default: true
@@ -39,4 +44,16 @@ permissions:
     default: true
   xpShop.send:
     description: send XP to other players.
+    default: true
+  xpShop.infoxp.own:
+    description: Returns your XP amount.
+    default: true
+  xpShop.infolevel.own:
+    description: Returns your level amount.
+    default: true
+  xpShop.infoxp.other:
+    description: Returns your level amount of any player.
+    default: true
+  xpShop.infolevel.other:
+    description: Returns level amount of any player.
     default: true
