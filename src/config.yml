@@ -4,6 +4,12 @@ moneytoxp: 1.00
 xptomoney: 1.00
 command:
   error:
+    info:
+      de: Du kannst maximal %1$d XP in %2$d Geld umwandeln.
+      en: You can change maximal %1$d XP into %2$d money.
+    buyinfo:
+      de: Du kannst maximal %1$d Geld in %2$d XP umwandeln.
+      en: You can change maximal %1$d money into %2$d XP.
     notenoughmoney:
       de: Du hast nicht genügend Geld!
       en: Not enough money!
@@ -36,8 +42,8 @@ command:
       de: Du hast %1$d XP in %2$d Money umgewandelt. 
       en: You changed %1$d XP into %2$d money. 
     buylevel:
-      de: Du hast %1.2f Geld in %2$d XP umgewandelt. 
-      en: You changed %1.2f money into %2$d XP.
+      de: Du hast %1$d Geld in %2$d XP umgewandelt. 
+      en: You changed %1$d money into %2$d XP.
     selllevel:
       de: Du hast %1$d XP in %2$d Money umgewandelt. 
       en: You changed %1$d XP into %2$d money. 
