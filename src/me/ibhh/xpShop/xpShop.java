@@ -277,31 +277,31 @@ public class xpShop extends JavaPlugin {
 			{		
 				if(args.length >= 1)
 				{
-					ActionxpShop = args[0];
-					if (checkpermissions(sender, args, ActionxpShop))
+					if(checkpermissions(sender, args, ""))
 					{
-						if(args.length == 1)
+						if (args[0].equalsIgnoreCase("infoxp"))
 						{
-								if (args[0].equalsIgnoreCase("infoxp"))
-								{
-										infoxp(sender, args);
-										return true;
-								}
-								else
-									if (args[0].equalsIgnoreCase("infolevel"))
-									{
-											infolevel(sender, args);
-											return true;
-									}
-						} else
-						if (args.length == 3)
-						{
-							this.ActionxpShop = args[0];
-							if (args[0].equalsIgnoreCase("info"))
+							infoxp(sender, args);
+							return true;
+						}
+						else
+							if (args[0].equalsIgnoreCase("infolevel"))
 							{
-								if ((!Tools.isInteger(args[1])) && (Tools.isInteger(args[2])))
+								infolevel(sender, args);
+								return true;
+							}
+					}
+				}
+				else
+					if(args.length == 2 && (args[0].equalsIgnoreCase("infoxp") || args[0].equalsIgnoreCase("infolevel")))
+					{
+						if(checkpermissions(sender, args, ""))
+						{
+							if (args[0].equalsIgnoreCase("infoxp"))
+							{
+								if (!Tools.isInteger(args[1]))
 								{
-									info(player, args);
+									infoxp(sender, args);
 									return true;
 								}
 
@@ -309,12 +309,11 @@ public class xpShop extends JavaPlugin {
 								return false;
 							}
 							else
-								if (args[0].equalsIgnoreCase("send"))
+								if (args[0].equalsIgnoreCase("infolevel"))
 								{
-									if ((!Tools.isInteger(args[1])) && (Tools.isInteger(args[2])))
+									if (!Tools.isInteger(args[1]))
 									{
-										int xp = Integer.parseInt(args[2]);
-										sendxp(sender, xp, args[1], args);
+										infolevel(sender, args);
 										return true;
 									}
 
@@ -322,15 +321,20 @@ public class xpShop extends JavaPlugin {
 									return false;
 								}
 						}
-						else
+					}
+					else
+					{
+						ActionxpShop = args[0];
+						if (checkpermissions(sender, args, ActionxpShop))
 						{
-							if (args.length == 2)
+							if (args.length == 3)
 							{
-								if (args[0].equals("help"))
+								this.ActionxpShop = args[0];
+								if (args[0].equalsIgnoreCase("info"))
 								{
-									if (!Tools.isInteger(args[1]))
+									if ((!Tools.isInteger(args[1])) && (Tools.isInteger(args[2])))
 									{
-										help(player, args);
+										info(player, args);
 										return true;
 									}
 
@@ -338,12 +342,28 @@ public class xpShop extends JavaPlugin {
 									return false;
 								}
 								else
-									if (args[0].equals("buy"))
+									if (args[0].equalsIgnoreCase("send"))
 									{
-										if (Tools.isInteger(args[1]))
+										if ((!Tools.isInteger(args[1])) && (Tools.isInteger(args[2])))
 										{
-											buy = Integer.parseInt(args[1]);
-											buy(player, this.buy, true, "buy");
+											int xp = Integer.parseInt(args[2]);
+											sendxp(sender, xp, args[1], args);
+											return true;
+										}
+
+										player.sendMessage(ChatColor.GRAY + "[xpShop] " + ChatColor.RED + getConfig().getString(new StringBuilder("command.error.noint.").append(getConfig().getString("language")).toString()));
+										return false;
+									}
+							}
+							else
+							{
+								if (args.length == 2)
+								{
+									if (args[0].equals("help"))
+									{
+										if (!Tools.isInteger(args[1]))
+										{
+											help(player, args);
 											return true;
 										}
 
@@ -351,12 +371,12 @@ public class xpShop extends JavaPlugin {
 										return false;
 									}
 									else
-										if (args[0].equals("sell"))
+										if (args[0].equals("buy"))
 										{
 											if (Tools.isInteger(args[1]))
 											{
-												sell = Integer.parseInt(args[1]);
-												sell(player, this.sell, true, "sell");
+												buy = Integer.parseInt(args[1]);
+												buy(player, this.buy, true, "buy");
 												return true;
 											}
 
@@ -364,12 +384,12 @@ public class xpShop extends JavaPlugin {
 											return false;
 										}
 										else
-											if (args[0].equals("buylevel"))
+											if (args[0].equals("sell"))
 											{
 												if (Tools.isInteger(args[1]))
 												{
-													buylevel = Integer.parseInt(args[1]);
-													buylevel(player, this.buylevel, true);
+													sell = Integer.parseInt(args[1]);
+													sell(player, this.sell, true, "sell");
 													return true;
 												}
 
@@ -377,12 +397,12 @@ public class xpShop extends JavaPlugin {
 												return false;
 											}
 											else
-												if (args[0].equals("selllevel"))
+												if (args[0].equals("buylevel"))
 												{
 													if (Tools.isInteger(args[1]))
 													{
-														selllevel = Integer.parseInt(args[1]);
-														selllevel(player, this.selllevel, true);
+														buylevel = Integer.parseInt(args[1]);
+														buylevel(player, this.buylevel, true);
 														return true;
 													}
 
@@ -390,11 +410,12 @@ public class xpShop extends JavaPlugin {
 													return false;
 												}
 												else
-													if (args[0].equalsIgnoreCase("infoxp"))
+													if (args[0].equals("selllevel"))
 													{
-														if (!Tools.isInteger(args[1]))
+														if (Tools.isInteger(args[1]))
 														{
-															infoxp(sender, args);
+															selllevel = Integer.parseInt(args[1]);
+															selllevel(player, this.selllevel, true);
 															return true;
 														}
 
@@ -402,41 +423,24 @@ public class xpShop extends JavaPlugin {
 														return false;
 													}
 													else
-														if (args[0].equalsIgnoreCase("infolevel"))
-														{
-															if (!Tools.isInteger(args[1]))
-															{
-																infolevel(sender, args);
-																return true;
-															}
-
-															player.sendMessage(ChatColor.GRAY + "[xpShop] " + ChatColor.RED + getConfig().getString(new StringBuilder("command.error.noint.").append(getConfig().getString("language")).toString()));
-															return false;
-														}
-														else
-														{
-															help(player, args);
-															return false;
-														}
+													{
+														help(player, args);
+														return false;
+													}
+								}
+								help(player, args);
+								return false;
 							}
-							help(player, args);
-							return false;
 						}
-					}
 
-					//						}
-					//						else
-					//						{
-					//							System.out.println("JRE Error!");
-					//						}
-					//					}
-				} //if (args.length == 2)
-				else
-				{
-					player.sendMessage(ChatColor.GRAY + "[xpShop] " + ChatColor.RED + (getConfig().getString("command.error.toomanyarguments." + getConfig().getString("language"))));
-					help(player, args);
-					return false;
-				}
+
+						//						}
+						//						else
+						//						{
+						//							System.out.println("JRE Error!");
+						//						}
+						//					}
+					}
 			} //if (cmd.getName().equalsIgnoreCase("xpShop"))
 		} //if (sender instanceof Player)
 		else
@@ -458,26 +462,28 @@ public class xpShop extends JavaPlugin {
 		return !(sender instanceof Player);
 	}
 
-	public static Player getPlayer(CommandSender sender, String[] args, int index) {
-		if (args.length > index) {
-			List<Player> players = sender.getServer().matchPlayer(args[index]);
+	protected static Player getPlayer(CommandSender sender, String[] args, int index) 
+	{
+		    if (args.length > index) {
+		      List<Player> players = sender.getServer().matchPlayer(args[index]);
 
-			if (players.isEmpty()) {
-				sender.sendMessage("Could not find player with the name: " + args[index]);
-				return null;
-			}
-			return (Player)players.get(0);
-		}
+		      if (players.isEmpty()) {
+		        sender.sendMessage("Could not find player with the name: " + args[index]);
+		        return null;
+		      }
+		      return (Player)players.get(0);
+		    }
 
-		if (isConsole(sender)) {
-			return null;
-		}
-		return (Player)sender;
-	}
+		    if (isConsole(sender)) {
+		      return null;
+		    }
+		    return (Player)sender;
+		  }
 
 	public void sendxp(CommandSender sender, int giveamount, String empfaenger, String[] args)
 	{
 		Player player = (Player) sender;
+		try{
 		if(getPlayer(sender, args, 1).hasPlayedBefore())
 		{
 			Player empfaenger1 = (Player) getPlayer(sender, args, 1);
@@ -497,6 +503,10 @@ public class xpShop extends JavaPlugin {
 		{
 			player.sendMessage(ChatColor.GRAY + "[xpShop] " + ChatColor.RED + "Player doesnt exist!");
 			player.sendMessage(ChatColor.GRAY + "[xpShop] " + ChatColor.RED + "Player may should leave and join the game.");
+		}
+		}
+		catch (Exception e) {
+			player.sendMessage("Player isnt online");
 		}
 
 	}
@@ -553,22 +563,21 @@ public class xpShop extends JavaPlugin {
 		else if(args.length == 2)
 		{
 			try{
-			if(getPlayer(sender, args, 1).hasPlayedBefore())
-			{
-				Player empfaenger1 = (Player) getPlayer(sender, args, 1);
-				player.sendMessage(ChatColor.GRAY + "[xpShop] " + ChatColor.RED + String.format(getConfig().getString("info.otherLevel." + getConfig().getString("language")), empfaenger1.getName(), empfaenger1.getLevel()));
+				if(getPlayer(sender, args, 1).hasPlayedBefore())
+				{
+					Player empfaenger1 = (Player) getPlayer(sender, args, 1);
+					player.sendMessage(ChatColor.GRAY + "[xpShop] " + ChatColor.RED + String.format(getConfig().getString("info.otherLevel." + getConfig().getString("language")), empfaenger1.getName(), empfaenger1.getLevel()));
 
-			}
-			else
-			{
-				player.sendMessage(ChatColor.GRAY + "[xpShop] " + ChatColor.RED + "Player doesnt exist!");
-				player.sendMessage(ChatColor.GRAY + "[xpShop] " + ChatColor.RED + "Player may should leave and join the game.");
-			}
+				}
+				else
+				{
+					player.sendMessage(ChatColor.GRAY + "[xpShop] " + ChatColor.RED + "Player doesnt exist!");
+					player.sendMessage(ChatColor.GRAY + "[xpShop] " + ChatColor.RED + "Player may should leave and join the game.");
+				}
 			}
 			catch(Exception e)
 			{
-				e.printStackTrace();
-				player.sendMessage("Error on getting Player");
+				player.sendMessage("Player isnt online");
 			}
 		}
 	}	
@@ -584,22 +593,21 @@ public class xpShop extends JavaPlugin {
 		{
 			try
 			{
-			if(getPlayer(sender, args, 1).hasPlayedBefore())
-			{
-				Player empfaenger1 = (Player) getPlayer(sender, args, 1);
-				player.sendMessage(ChatColor.GRAY + "[xpShop] " + ChatColor.RED + String.format(getConfig().getString("info.otherXP." + getConfig().getString("language")), empfaenger1.getName(), (int) getTOTALXP(empfaenger1)));
+				if(getPlayer(sender, args, 1).hasPlayedBefore())
+				{
+					Player empfaenger1 = (Player) getPlayer(sender, args, 1);
+					player.sendMessage(ChatColor.GRAY + "[xpShop] " + ChatColor.RED + String.format(getConfig().getString("info.otherXP." + getConfig().getString("language")), empfaenger1.getName(), (int) getTOTALXP(empfaenger1)));
 
-			}
-			else
-			{
-				player.sendMessage(ChatColor.GRAY + "[xpShop] " + ChatColor.RED + "Player doesnt exist!");
-				player.sendMessage(ChatColor.GRAY + "[xpShop] " + ChatColor.RED + "Player may should leave and join the game.");
-			}
+				}
+				else
+				{
+					player.sendMessage(ChatColor.GRAY + "[xpShop] " + ChatColor.RED + "Player doesnt exist!");
+					player.sendMessage(ChatColor.GRAY + "[xpShop] " + ChatColor.RED + "Player may should leave and join the game.");
+				}
 			}
 			catch (Exception e)
 			{
-				e.printStackTrace();
-				player.sendMessage("Error on getting Player");
+				player.sendMessage("Player isnt online");
 			}
 		}
 	}
@@ -784,7 +792,7 @@ public class xpShop extends JavaPlugin {
 				{
 					try 
 					{
-						if(args[0].equals("infoxp"))
+						if(args[0].equals("infolevel") || args[0].equals("infoxp"))
 						{
 							if(args.length == 2)
 							{
@@ -814,51 +822,17 @@ public class xpShop extends JavaPlugin {
 							{
 								return false;
 							}
-
 						}
 						else
-							if(args[0].equals("infolevel"))
+							if(player.hasPermission("xpShop." + args[0]))
 							{
-								if(args.length == 2)
-								{
-									if(player.hasPermission("xpShop." + args[0] + ".other"))
-									{
-										return true;
-									} //if(permissions.has(player, "xpShop." + other))
-									else
-									{
-										player.sendMessage(ChatColor.GRAY + "[xpShop] " + ChatColor.RED + (getConfig().getString("permissions.error." + getConfig().getString("language"))));
-										return false;
-									}
-								}
-								else if(args.length == 1)
-								{
-									if(player.hasPermission("xpShop." + args[0] + ".own"))
-									{
-										return true;
-									} //if(permissions.has(player, "xpShop." + other))
-									else
-									{
-										player.sendMessage(ChatColor.GRAY + "[xpShop] " + ChatColor.RED + (getConfig().getString("permissions.error." + getConfig().getString("language"))));
-										return false;
-									}
-								}
-								else
-								{
-									return false;
-								}
-
-							}
+								return true;
+							} //if(permissions.has(player, "xpShop." + other))
 							else
-								if(player.hasPermission("xpShop." + args[0]))
-								{
-									return true;
-								} //if(permissions.has(player, "xpShop." + other))
-								else
-								{
-									player.sendMessage(ChatColor.GRAY + "[xpShop] " + ChatColor.RED + (getConfig().getString("permissions.error." + getConfig().getString("language"))));
-									return false;
-								}
+							{
+								player.sendMessage(ChatColor.GRAY + "[xpShop] " + ChatColor.RED + (getConfig().getString("permissions.error." + getConfig().getString("language"))));
+								return false;
+							}
 					} 
 					catch (Exception e) 
 					{
@@ -876,8 +850,7 @@ public class xpShop extends JavaPlugin {
 						try 
 						{
 							PermissionManager permissions = PermissionsEx.getPermissionManager();
-
-							if(args[0].equals("infoxp"))
+							if(args[0].equals("infolevel") || args[0].equals("infoxp"))
 							{
 								if(args.length == 2)
 								{
@@ -910,50 +883,17 @@ public class xpShop extends JavaPlugin {
 
 							}
 							else
-								if(args[0].equals("infolevel"))
+								// Permission check
+								if(permissions.has(player, "xpShop." + args[0])){
+									// yay!
+									return true;
+								} 
+								else 
 								{
-									if(args.length == 2)
-									{
-										if(permissions.has(player, "xpShop." + args[0] + ".other"))
-										{
-											return true;
-										} //if(permissions.has(player, "xpShop." + other))
-										else
-										{
-											player.sendMessage(ChatColor.GRAY + "[xpShop] " + ChatColor.RED + (getConfig().getString("permissions.error." + getConfig().getString("language"))));
-											return false;
-										}
-									}
-									else if(args.length == 1)
-									{
-										if(permissions.has(player, "xpShop." + args[0] + ".own"))
-										{
-											return true;
-										} //if(permissions.has(player, "xpShop." + other))
-										else
-										{
-											player.sendMessage(ChatColor.GRAY + "[xpShop] " + ChatColor.RED + (getConfig().getString("permissions.error." + getConfig().getString("language"))));
-											return false;
-										}
-									}
-									else
-									{
-										return false;
-									}
-
+									// houston, we have a problem :)
+									player.sendMessage(ChatColor.GRAY + "[xpShop] " + ChatColor.RED + (getConfig().getString("permissions.error." + getConfig().getString("language"))));
+									return false;
 								}
-								else
-									// Permission check
-									if(permissions.has(player, "xpShop." + args[0])){
-										// yay!
-										return true;
-									} 
-									else 
-									{
-										// houston, we have a problem :)
-										player.sendMessage(ChatColor.GRAY + "[xpShop] " + ChatColor.RED + (getConfig().getString("permissions.error." + getConfig().getString("language"))));
-										return false;
-									}
 						} 
 						catch (Exception e) 
 						{
@@ -1264,7 +1204,10 @@ public class xpShop extends JavaPlugin {
 		}
 		else
 		{
-			buy(sender, (int) (neededXP), true, "buylevel");
+			if(moneyactive)
+			{
+				buy(sender, (int) (neededXP), true, "buylevel");
+			}
 		}
 		if(ActionxpShop.equalsIgnoreCase("buylevel"))
 		{
@@ -1299,7 +1242,10 @@ public class xpShop extends JavaPlugin {
 			double XP2Sell = xpAktuell - xpNeededForLevel;
 			if(XP2Sell >= 0)
 			{
-				sell(sender, (int) XP2Sell, true, "selllevel");
+				if(moneyactive)
+				{
+					sell(sender, (int) XP2Sell, true, "selllevel");
+				}
 			}
 			else
 			{
