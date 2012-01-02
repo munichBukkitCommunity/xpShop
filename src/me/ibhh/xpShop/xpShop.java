@@ -528,7 +528,8 @@ public class xpShop extends JavaPlugin {
 		Player player = (Player) sender;
 		int level = player.getLevel();
 		float playerExpp = player.getExp();
-		double Exp1 = 3.5 * level * ( level + 1) + ( 7 + level * 7 ) * playerExpp;
+		int XPinLevel = (int) (((level +1) * 7) * playerExpp);
+		double Exp1 = (3.5 *  level * ( level + 1)) + XPinLevel;
 		return Exp1;
 
 	}
@@ -545,7 +546,7 @@ public class xpShop extends JavaPlugin {
 			if(Expaktuell >= 0)
 			{
 				neuesLevel = (Math.pow((Expaktuell / 3.5 + 0.25), 0.5) - 0.5);
-				neuesLevelx = (int) Math.floor(neuesLevel);
+				neuesLevelx = (int) neuesLevel;
 				neueXpp = (neuesLevel - neuesLevelx);
 				player.setLevel(neuesLevelx);
 				player.setExp((float) neueXpp);
