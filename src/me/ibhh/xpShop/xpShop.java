@@ -51,27 +51,27 @@ public class xpShop extends JavaPlugin {
 	public float Version = 0;
 	int rounds1 = 0;
 	int rounds = 0;
-	//	private Vault vault;
-	//    public static Economy economy;
+	// private Vault vault;
+	// public static Economy economy;
 	//
-	//    private Boolean setupEconomy()
-	//    {
-	//        RegisteredServiceProvider<Economy> economyProvider = getServer().getServicesManager().getRegistration(net.milkbowl.vault.economy.Economy.class);
-	//        if (economyProvider != null) {
-	//            economy = economyProvider.getProvider();
-	//        }
+	// private Boolean setupEconomy()
+	// {
+	// RegisteredServiceProvider<Economy> economyProvider = getServer().getServicesManager().getRegistration(net.milkbowl.vault.economy.Economy.class);
+	// if (economyProvider != null) {
+	// economy = economyProvider.getProvider();
+	// }
 	//
-	//        return (economy != null);
-	//    }
+	// return (economy != null);
+	// }
 
 	/**
 	 * Called by Bukkit on stopping the server
 	 *
-	 * @param 
-	 * @return 
+	 * @param
+	 * @return
 	 */
 	@Override
-	public void onDisable() 
+	public void onDisable()
 	{
 
 		System.out.println("[xpShop] disabled!");
@@ -81,8 +81,8 @@ public class xpShop extends JavaPlugin {
 	/**
 	 * Delete an download new version of xpShop in the Update folder.
 	 *
-	 * @param 
-	 * @return 
+	 * @param
+	 * @return
 	 */
 	public void autoUpdate(String url, String path, String name)
 	{
@@ -96,7 +96,7 @@ public class xpShop extends JavaPlugin {
 	/**
 	 * Gets version.
 	 *
-	 * @param 
+	 * @param
 	 * @return float: Version of the installed plugin.
 	 */
 	public float aktuelleVersion()
@@ -115,7 +115,7 @@ public class xpShop extends JavaPlugin {
 	/**
 	 * Checks version with a http-connection
 	 *
-	 * @param 
+	 * @param
 	 * @return float: latest recommend build.
 	 */
 	public float getNewVersion(String url)
@@ -162,8 +162,8 @@ public class xpShop extends JavaPlugin {
 	/**
 	 * Called by Bukkit on starting the server
 	 *
-	 * @param 
-	 * @return 
+	 * @param
+	 * @return
 	 */
 	@Override
 	public void onEnable()
@@ -181,7 +181,7 @@ public class xpShop extends JavaPlugin {
 		}
 
 
-		try 
+		try
 		{
 			aktuelleVersion();
 		} catch (Exception e) {
@@ -189,30 +189,30 @@ public class xpShop extends JavaPlugin {
 		}
 
 
-		try 
+		try
 		{
 			iConomyversion();
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 
-		//        Plugin x = this.getServer().getPluginManager().getPlugin("Vault");
-		//        if(x != null & x instanceof Vault) {
-		//            vault = (Vault) x;
-		//            System.out.println("[xpShop] hooked into Vault.");
-		//        } else {
-		//            /**
-		//             * Throw error & disable because we have Vault set as a dependency, you could give a download link
-		//             * or even download it for the user.  This is all up to you as a developer to decide the best option
-		//             * for your users!  For our example, we assume that our audience (developers) can find the Vault
-		//             * plugin and properly install it.  It's usually a bad idea however.
-		//             */
-		//        	if(iConomyversion == 2)
-		//        	{
-		//        	System.out.println("[xpShop] Vault was NOT found! Disabling plugin. Please check the config.yml");
-		//            getPluginLoader().disablePlugin(this);
-		//        	}
-		//        }
+		// Plugin x = this.getServer().getPluginManager().getPlugin("Vault");
+		// if(x != null & x instanceof Vault) {
+		// vault = (Vault) x;
+		// System.out.println("[xpShop] hooked into Vault.");
+		// } else {
+		// /**
+		// * Throw error & disable because we have Vault set as a dependency, you could give a download link
+		// * or even download it for the user. This is all up to you as a developer to decide the best option
+		// * for your users! For our example, we assume that our audience (developers) can find the Vault
+		// * plugin and properly install it. It's usually a bad idea however.
+		// */
+		// if(iConomyversion == 2)
+		// {
+		// System.out.println("[xpShop] Vault was NOT found! Disabling plugin. Please check the config.yml");
+		// getPluginLoader().disablePlugin(this);
+		// }
+		// }
 		//this.getServer().getPluginManager().registerEvent(Type.PLUGIN_ENABLE, new server(this), Priority.Monitor, this);
 		//this.getServer().getPluginManager().registerEvent(Type.PLUGIN_DISABLE, new server(this), Priority.Monitor, this);
 
@@ -228,12 +228,12 @@ public class xpShop extends JavaPlugin {
 			System.out.println("[xpShop] ******************************************");
 			if(getConfig().getBoolean("autodownload") == true)
 			{
-				try 
+				try
 				{
 					String path = getDataFolder().toString() + "/Update/";
 					autoUpdate("http://ibhh.de/xpShop.jar", path, "xpShop.jar");
-				} 
-				catch (Exception e) 
+				}
+				catch (Exception e)
 				{
 					System.out.println("[xpShop] " + "Error on checking permissions with PermissionsEx!");
 					e.printStackTrace();
@@ -252,8 +252,8 @@ public class xpShop extends JavaPlugin {
 	/**
 	 * Called by Bukkit on reloading the server
 	 *
-	 * @param 
-	 * @return 
+	 * @param
+	 * @return
 	 */
 	public void onReload()
 	{
@@ -274,8 +274,16 @@ public class xpShop extends JavaPlugin {
 		{
 			Player player = (Player) sender;
 			if (cmd.getName().equalsIgnoreCase("xpShop"))
-			{		
+			{
 				if(args.length >= 1)
+				{
+					ActionxpShop = args[0];
+				}
+				else
+				{
+					ActionxpShop = "help";
+				}
+				if(args.length == 1)
 				{
 					if(checkpermissions(sender, args, ""))
 					{
@@ -293,6 +301,7 @@ public class xpShop extends JavaPlugin {
 					}
 				}
 				else
+				{
 					if(args.length == 2 && (args[0].equalsIgnoreCase("infoxp") || args[0].equalsIgnoreCase("infolevel")))
 					{
 						if(checkpermissions(sender, args, ""))
@@ -324,12 +333,10 @@ public class xpShop extends JavaPlugin {
 					}
 					else
 					{
-						ActionxpShop = args[0];
 						if (checkpermissions(sender, args, ActionxpShop))
 						{
 							if (args.length == 3)
 							{
-								this.ActionxpShop = args[0];
 								if (args[0].equalsIgnoreCase("info"))
 								{
 									if ((!Tools.isInteger(args[1])) && (Tools.isInteger(args[2])))
@@ -432,20 +439,21 @@ public class xpShop extends JavaPlugin {
 								return false;
 							}
 						}
+					}
 
 
-						//						}
-						//						else
-						//						{
-						//							System.out.println("JRE Error!");
-						//						}
-						//					}
+						// }
+						// else
+						// {
+						// System.out.println("JRE Error!");
+						// }
+						// }
 					}
 			} //if (cmd.getName().equalsIgnoreCase("xpShop"))
 		} //if (sender instanceof Player)
 		else
 			if (cmd.getName().equalsIgnoreCase("xpShop"))
-			{		
+			{
 				if(args.length == 1)
 				{
 					if (args[0].equals("download"))
@@ -462,48 +470,48 @@ public class xpShop extends JavaPlugin {
 		return !(sender instanceof Player);
 	}
 
-	protected static Player getPlayer(CommandSender sender, String[] args, int index) 
+	protected static Player getPlayer(CommandSender sender, String[] args, int index)
 	{
-		    if (args.length > index) {
-		      List<Player> players = sender.getServer().matchPlayer(args[index]);
+		if (args.length > index) {
+			List<Player> players = sender.getServer().matchPlayer(args[index]);
 
-		      if (players.isEmpty()) {
-		        sender.sendMessage("Could not find player with the name: " + args[index]);
-		        return null;
-		      }
-		      return (Player)players.get(0);
-		    }
+			if (players.isEmpty()) {
+				sender.sendMessage("Could not find player with the name: " + args[index]);
+				return null;
+			}
+			return (Player)players.get(0);
+		}
 
-		    if (isConsole(sender)) {
-		      return null;
-		    }
-		    return (Player)sender;
-		  }
+		if (isConsole(sender)) {
+			return null;
+		}
+		return (Player)sender;
+	}
 
 	public void sendxp(CommandSender sender, int giveamount, String empfaenger, String[] args)
 	{
 		Player player = (Player) sender;
 		try{
-		if(getPlayer(sender, args, 1).hasPlayedBefore())
-		{
-			Player empfaenger1 = (Player) getPlayer(sender, args, 1);
-			sell(sender, giveamount, false, "sentxp");	//Trys to substract amount, else stop.
-			buy(empfaenger1, SubstractedXP, false, "sentxp");	//Gives other player XP wich were substracted.
-			try
+			if(getPlayer(sender, args, 1).hasPlayedBefore())
 			{
-				player.sendMessage(ChatColor.GRAY + "[xpShop] " + ChatColor.RED + String.format(getConfig().getString("command.success." + "sentxp" + "." + getConfig().getString("language")), SubstractedXP, args[1] ));
-				empfaenger1.sendMessage(ChatColor.GRAY + "[xpShop] " + ChatColor.RED + String.format(getConfig().getString("command.success." + "recievedxp" + "." + getConfig().getString("language")), SubstractedXP, args[1]));
+				Player empfaenger1 = (Player) getPlayer(sender, args, 1);
+				sell(sender, giveamount, false, "sentxp"); //Trys to substract amount, else stop.
+				buy(empfaenger1, SubstractedXP, false, "sentxp"); //Gives other player XP wich were substracted.
+				try
+				{
+					player.sendMessage(ChatColor.GRAY + "[xpShop] " + ChatColor.RED + String.format(getConfig().getString("command.success." + "sentxp" + "." + getConfig().getString("language")), SubstractedXP, args[1] ));
+					empfaenger1.sendMessage(ChatColor.GRAY + "[xpShop] " + ChatColor.RED + String.format(getConfig().getString("command.success." + "recievedxp" + "." + getConfig().getString("language")), SubstractedXP, args[1]));
+				}
+				catch (NullPointerException e)
+				{
+					player.sendMessage("Error!");
+				}
 			}
-			catch (NullPointerException e)
+			else
 			{
-				player.sendMessage("Error!");
+				player.sendMessage(ChatColor.GRAY + "[xpShop] " + ChatColor.RED + "Player doesnt exist!");
+				player.sendMessage(ChatColor.GRAY + "[xpShop] " + ChatColor.RED + "Player may should leave and join the game.");
 			}
-		}
-		else
-		{
-			player.sendMessage(ChatColor.GRAY + "[xpShop] " + ChatColor.RED + "Player doesnt exist!");
-			player.sendMessage(ChatColor.GRAY + "[xpShop] " + ChatColor.RED + "Player may should leave and join the game.");
-		}
 		}
 		catch (Exception e) {
 			player.sendMessage("Player isnt online");
@@ -580,7 +588,7 @@ public class xpShop extends JavaPlugin {
 				player.sendMessage("Player isnt online");
 			}
 		}
-	}	
+	}
 
 	public void infoxp(CommandSender sender, String[] args)
 	{
@@ -790,7 +798,7 @@ public class xpShop extends JavaPlugin {
 			{
 				if(!Bukkit.getServer().getPluginManager().isPluginEnabled("PermissionsEx"))
 				{
-					try 
+					try
 					{
 						if(args[0].equals("infolevel") || args[0].equals("infoxp"))
 						{
@@ -833,8 +841,8 @@ public class xpShop extends JavaPlugin {
 								player.sendMessage(ChatColor.GRAY + "[xpShop] " + ChatColor.RED + (getConfig().getString("permissions.error." + getConfig().getString("language"))));
 								return false;
 							}
-					} 
-					catch (Exception e) 
+					}
+					catch (Exception e)
 					{
 						System.out.println("[xpShop] " + "Error on checking permissions with BukkitPermissions!");
 						player.sendMessage("[xpShop] " + "Error on checking permissions with BukkitPermissions!");
@@ -847,7 +855,7 @@ public class xpShop extends JavaPlugin {
 				{
 					if(Bukkit.getServer().getPluginManager().isPluginEnabled("PermissionsEx"))
 					{
-						try 
+						try
 						{
 							PermissionManager permissions = PermissionsEx.getPermissionManager();
 							if(args[0].equals("infolevel") || args[0].equals("infoxp"))
@@ -887,23 +895,23 @@ public class xpShop extends JavaPlugin {
 								if(permissions.has(player, "xpShop." + args[0])){
 									// yay!
 									return true;
-								} 
-								else 
+								}
+								else
 								{
 									// houston, we have a problem :)
 									player.sendMessage(ChatColor.GRAY + "[xpShop] " + ChatColor.RED + (getConfig().getString("permissions.error." + getConfig().getString("language"))));
 									return false;
 								}
-						} 
-						catch (Exception e) 
+						}
+						catch (Exception e)
 						{
 							System.out.println("[xpShop] " + "Error on checking permissions with PermissionsEx!");
 							player.sendMessage("[xpShop] " + "Error on checking permissions with PermissionsEx!");
 							e.printStackTrace();
 							return false;
 						}
-					} 
-					else 
+					}
+					else
 					{
 						System.out.println("PermissionsEx plugin are not found.");
 						return false;
@@ -934,7 +942,7 @@ public class xpShop extends JavaPlugin {
 	/**
 	 * Checks the config.yml wich moneyplugin should be used.
 	 *
-	 * @param 
+	 * @param
 	 * @return 1: Register 5: iConomy5 6: iConomy6
 	 */
 	public int iConomyversion()
@@ -947,7 +955,7 @@ public class xpShop extends JavaPlugin {
 				System.out.println("[xpShop] xpShop hooked into Register");
 			}
 			else
-				if (packageExists(new String[] { "com.iCo6.system.Accounts" })) 
+				if (packageExists(new String[] { "com.iCo6.system.Accounts" }))
 				{
 					iConomyversion = 6;
 					System.out.println("[xpShop] xpShop hooked into iConomy6");
@@ -962,7 +970,7 @@ public class xpShop extends JavaPlugin {
 					{
 						System.out.println("[xpShop] xpShop cant hook into iConomy5, iConomy6 or Register. Downloading Register!");
 						System.out.println("[xpShop] ************ Please configure Register!!!!! **********");
-						try 
+						try
 						{
 							String path = "plugins/";
 							Update.autoDownload("http://mirror.nexua.org/Register/latest/stable/Register.jar", path, "Register.jar");
@@ -1022,7 +1030,7 @@ public class xpShop extends JavaPlugin {
 		}
 		else if(iConomyversion == 6)
 		{
-			try 
+			try
 			{
 				balance = new Accounts().get(player.getName()).getHoldings().getBalance();
 			} catch (Exception e) {
@@ -1036,10 +1044,10 @@ public class xpShop extends JavaPlugin {
 		}
 		else if(iConomyversion == 1)
 		{
-			try 
+			try
 			{
 				balance = Methods.getMethod().getAccount(player.getName()).balance();
-			} catch (Exception e) 
+			} catch (Exception e)
 			{
 				System.out.println("[xpShop] " + "No Account! Please report it to an admin!");
 				player.sendMessage("[xpShop] " + "No Account! Please report it to an admin!");
@@ -1049,16 +1057,16 @@ public class xpShop extends JavaPlugin {
 			}
 
 		}
-		//		else if(iConomyversion == 2)
-		//		{
-		//            player.sendMessage(String.format("You have %s", vault.getEconomy().format(vault.getEconomy().getBalance(player.getName()).amount)));
-		//            EconomyResponse r = vault.getEconomy().depositPlayer(player.getName(), 1.05);
-		//            if(r.transactionSuccess()) {
-		//                player.sendMessage(String.format("You were given %s and now have %s", vault.getEconomy().format(r.amount), vault.getEconomy().format(r.balance)));
-		//            } else {
-		//                player.sendMessage(String.format("An error occured: %s", r.errorMessage));
-		//            }
-		//		}
+		// else if(iConomyversion == 2)
+		// {
+		// player.sendMessage(String.format("You have %s", vault.getEconomy().format(vault.getEconomy().getBalance(player.getName()).amount)));
+		// EconomyResponse r = vault.getEconomy().depositPlayer(player.getName(), 1.05);
+		// if(r.transactionSuccess()) {
+		// player.sendMessage(String.format("You were given %s and now have %s", vault.getEconomy().format(r.amount), vault.getEconomy().format(r.balance)));
+		// } else {
+		// player.sendMessage(String.format("An error occured: %s", r.errorMessage));
+		// }
+		// }
 		return balance;
 	}
 
@@ -1075,18 +1083,18 @@ public class xpShop extends JavaPlugin {
 	 * Substracts money.
 	 *
 	 * @param player, amount
-	 * @return 
+	 * @return
 	 */
 	public void substractmoney156(double amountsubstract, Player player)
 	{
 		String name = player.getName();
 		if(iConomyversion == 5)
 		{
-			try 
+			try
 			{
 				getAccount5(name).getHoldings().subtract(amountsubstract);
-			} 
-			catch (Exception e) 
+			}
+			catch (Exception e)
 			{
 				System.out.println("[xpShop] " + "Cant substract money! Does account exist?");
 				player.sendMessage("[xpShop] " + "Cant substract money! Does account exist?");
@@ -1096,12 +1104,12 @@ public class xpShop extends JavaPlugin {
 		}
 		else if(iConomyversion == 6)
 		{
-			try 
+			try
 			{
 				com.iCo6.system.Account account = new Accounts().get(player.getName());
 				account.getHoldings().subtract(amountsubstract);
-			} 
-			catch (Exception e) 
+			}
+			catch (Exception e)
 			{
 				System.out.println("[xpShop] " + "Cant substract money! Does account exist?");
 				player.sendMessage("[xpShop] " + "Cant substract money! Does account exist?");
@@ -1111,11 +1119,11 @@ public class xpShop extends JavaPlugin {
 		}
 		else if(iConomyversion == 1)
 		{
-			try 
+			try
 			{
 				Methods.getMethod().getAccount(player.getName()).subtract(amountsubstract);
-			} 
-			catch (Exception e) 
+			}
+			catch (Exception e)
 			{
 				System.out.println("[xpShop] " + "Cant substract money! Does account exist?");
 				player.sendMessage("[xpShop] " + "Cant substract money! Does account exist?");
@@ -1130,18 +1138,18 @@ public class xpShop extends JavaPlugin {
 	 * Adds money
 	 *
 	 * @param player, amount
-	 * @return 
+	 * @return
 	 */
 	public void addmoney156(double amountadd, Player player)
 	{
 		String name = player.getName();
 		if(iConomyversion == 5)
 		{
-			try 
+			try
 			{
 				getAccount5(name).getHoldings().add(amountadd);
-			} 
-			catch (Exception e) 
+			}
+			catch (Exception e)
 			{
 				System.out.println("[xpShop] " + "Cant add money! Does account exist?");
 				player.sendMessage("[xpShop] " + "Cant add money! Does account exist?");
@@ -1151,12 +1159,12 @@ public class xpShop extends JavaPlugin {
 		}
 		else if(iConomyversion == 6)
 		{
-			try 
+			try
 			{
 				com.iCo6.system.Account account = new Accounts().get(player.getName());
 				account.getHoldings().add(amountadd);
-			} 
-			catch (Exception e) 
+			}
+			catch (Exception e)
 			{
 				System.out.println("[xpShop] " + "Cant add money! Does account exist?");
 				player.sendMessage("[xpShop] " + "Cant add money! Does account exist?");
@@ -1167,11 +1175,11 @@ public class xpShop extends JavaPlugin {
 		}
 		else if(iConomyversion == 1)
 		{
-			try 
+			try
 			{
 				Methods.getMethod().getAccount(player.getName()).add(amountadd);
-			} 
-			catch (Exception e) 
+			}
+			catch (Exception e)
 			{
 				System.out.println("[xpShop] " + "Cant add money! Does account exist?");
 				player.sendMessage("[xpShop] " + "Cant add money! Does account exist?");
@@ -1187,7 +1195,7 @@ public class xpShop extends JavaPlugin {
 	 * Buys level for a player.
 	 *
 	 * @param sender, amount, moneyactive = true if you want that player have to buy XP, false if there is an info what that would cost.
-	 * @return 
+	 * @return
 	 */
 	public void buylevel(CommandSender sender, int levelamontbuy, boolean moneyactive)
 	{
@@ -1223,7 +1231,7 @@ public class xpShop extends JavaPlugin {
 	 * Sells level from a player.
 	 *
 	 * @param sender, amount, moneyactive = true if you want that player have to buy XP, false if there is an info what that would cost.
-	 * @return 
+	 * @return
 	 */
 	public void selllevel(CommandSender sender, int levelamountsell, boolean moneyactive)
 	{
@@ -1267,7 +1275,7 @@ public class xpShop extends JavaPlugin {
 	 * Returns help.
 	 *
 	 * @param sender, action(String[])
-	 * @return 
+	 * @return
 	 */
 	public void help(CommandSender sender, String[] args)
 	{
@@ -1459,7 +1467,7 @@ public class xpShop extends JavaPlugin {
 	 * Shows a player how much a action would cost.
 	 *
 	 * @param sender, action, amount.
-	 * @return 
+	 * @return
 	 */
 	public void info(CommandSender sender, String[] args)
 	{

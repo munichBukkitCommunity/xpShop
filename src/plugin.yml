@@ -1,7 +1,7 @@
-name:  xpShop
-version:  2.0
-description:  Player can buy xp
-author:  ibhh
+name: xpShop
+version: 2.1
+description: Player can buy xp
+author: ibhh
 website: http://www.ibhh.de
 
 main: me.ibhh.xpShop.xpShop
@@ -14,46 +14,46 @@ permissions:
   xpShop.*:
     description: Gives access to all xpShop commands
     children:
-      xpShop.buy: true
-      xpShop.sell: true
-      xpShop.buylevel: true
-      xpShop.selllevel: true
-      xpShop.info: true
-      xpShop.send: true
-      xpShop.infoxp.own: true
-      xpShop.infoxp.other: true
-      xpShop.infolevel.own: true
-      xpShop.infolevel.other: true
+      xpShop.buy: false
+      xpShop.sell: false
+      xpShop.buylevel: false
+      xpShop.selllevel: false
+      xpShop.info: false
+      xpShop.send: false
+      xpShop.infoxp.own: false
+      xpShop.infoxp.other: false
+      xpShop.infolevel.own: false
+      xpShop.infolevel.other: false
   xpShop.buy:
     description: Allows you to buy xp.
-    default: true
+    default: false
   xpShop.sell:
     description: Allows you to sell xp.
-    default: true
+    default: false
   xpShop.buylevel:
     description: Allows you to buy level.
-    default: true
+    default: false
   xpShop.selllevel:
     description: Allows you to sell level.
-    default: true
+    default: false
   xpShop.info:
     description: gives you an info.
-    default: true
+    default: false
   xpShop.help:
     description: gives you a help.
-    default: true
+    default: false
   xpShop.send:
     description: send XP to other players.
-    default: true
+    default: false
   xpShop.infoxp.own:
     description: Returns your XP amount.
-    default: true
+    default: false
   xpShop.infolevel.own:
     description: Returns your level amount.
-    default: true
+    default: false
   xpShop.infoxp.other:
     description: Returns your level amount of any player.
-    default: true
+    default: false
   xpShop.infolevel.other:
     description: Returns level amount of any player.
-    default: true
+    default: false
