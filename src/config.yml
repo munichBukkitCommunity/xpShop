@@ -11,10 +11,10 @@ command:
       de: Du kannst maximal %1$d Geld in %2$d XP umwandeln.
       en: You can change maximal %1$d money into %2$d XP.
     notenoughmoney:
-      de: Du hast nicht genügend Geld!
+      de: Du hast nicht genuegend Geld!
       en: Not enough money!
     notenoughxp:
-      de: Du hast nicht genügend XP!
+      de: Du hast nicht genuegend XP!
       en: Not enough XP!
     else:
       de: Unbekannter Error!
