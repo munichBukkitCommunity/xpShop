@@ -3,6 +3,7 @@ version: 2.6
 description: Player can buy xp
 author: ibhh
 website: http://www.ibhh.de
+softdepend: [Vault]
 
 main: me.ibhh.xpShop.xpShop
 
