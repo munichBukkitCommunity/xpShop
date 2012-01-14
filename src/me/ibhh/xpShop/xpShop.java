@@ -861,11 +861,16 @@ public class xpShop extends JavaPlugin {
     }
 
         private Boolean setupEconomy() {
+            try{
         RegisteredServiceProvider<Economy> economyProvider = getServer().getServicesManager().getRegistration(net.milkbowl.vault.economy.Economy.class);
         if (economyProvider != null) {
             economy = economyProvider.getProvider();
         }
-
+            }
+            catch(NoClassDefFoundError e)
+            {
+                return false;
+            }
         return (economy != null);
     }
     
