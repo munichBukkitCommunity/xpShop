@@ -1,6 +1,8 @@
 package me.ibhh.xpShop;
 
 import me.ibhh.xpShop.Tools;
+import net.minecraft.server.EntityPlayer;
+import net.minecraft.server.MinecraftServer;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -17,6 +19,8 @@ import org.bukkit.OfflinePlayer;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.bukkit.craftbukkit.CraftServer;
+import org.bukkit.craftbukkit.entity.CraftPlayer;
 
 //import org.bukkit.plugin.Plugin;
 //import org.bukkit.plugin.RegisteredServiceProvider;
@@ -167,8 +171,7 @@ public class xpShop extends JavaPlugin {
             e.printStackTrace();
         }
 
-        if(setupEconomy() == true)
-        {
+        if (setupEconomy() == true) {
             iConomyversion = 2;
         }
         try {
@@ -255,6 +258,7 @@ public class xpShop extends JavaPlugin {
                     ActionxpShop = args[0];
                 } else {
                     ActionxpShop = "help";
+                    help(sender, args);
                 }
                 if (args.length == 1) {
                     if (checkpermissions(sender, args, "")) {
@@ -390,12 +394,15 @@ public class xpShop extends JavaPlugin {
         return !(sender instanceof Player);
     }
 
-    protected static Player getPlayer(CommandSender sender, String[] args, int index) {
+    protected Player getPlayer(CommandSender sender, String[] args, int index) {
 //        if (args.length > index) {
 //            OfflinePlayer players = sender.getServer().getOfflinePlayer(args[index]);
 //            return (Player) players.getPlayer();
 //        }
         Player newplayer = null;
+//        MinecraftServer server = ((CraftServer)this.getServer()).getServer();
+//        EntityPlayer entity = new EntityPlayer(server, server.getWorldServer(0), args[index], new ItemInWorldManager(server.getWorldServer(0)));
+//        newplayer = entity == null ? null : (Player)entity.getBukkitEntity();
         if (args[index] != null) {
             Boolean exist = false;
             for (OfflinePlayer p : sender.getServer().getOfflinePlayers()) {
@@ -435,14 +442,19 @@ public class xpShop extends JavaPlugin {
     public void sendxp(CommandSender sender, int giveamount, String empfaenger, String[] args) {
         Player player = (Player) sender;
         try {
-            Player empfaenger1 = (Player) getPlayer(sender, args, 1);
-            sell(sender, giveamount, false, "sendxp"); //Trys to substract amount, else stop.
-            buy(empfaenger1, SubstractedXP, false, "sentxp"); //Gives other player XP wich were substracted.
-            try {
-                player.sendMessage(ChatColor.GRAY + "[xpShop] " + ChatColor.RED + String.format(getConfig().getString("command.success." + "sentxp" + "." + getConfig().getString("language")), SubstractedXP, args[1]));
-                empfaenger1.sendMessage(ChatColor.GRAY + "[xpShop] " + ChatColor.RED + String.format(getConfig().getString("command.success." + "recievedxp" + "." + getConfig().getString("language")), SubstractedXP, sender.getName()));
-            } catch (NullPointerException e) {
-                player.sendMessage("Error!");
+
+            if (this.getServer().getOfflinePlayer(empfaenger).hasPlayedBefore()) {
+                Player empfaenger1 = (Player) getPlayer(sender, args, 1);
+                sell(sender, giveamount, false, "sendxp"); //Trys to substract amount, else stop.
+                buy(empfaenger1, SubstractedXP, false, "sendxp"); //Gives other player XP wich were substracted.
+                try {
+                    player.sendMessage(ChatColor.GRAY + "[xpShop] " + ChatColor.RED + String.format(getConfig().getString("command.success." + "sentxp" + "." + getConfig().getString("language")), SubstractedXP, args[1]));
+                    empfaenger1.sendMessage(ChatColor.GRAY + "[xpShop] " + ChatColor.RED + String.format(getConfig().getString("command.success." + "recievedxp" + "." + getConfig().getString("language")), SubstractedXP, sender.getName()));
+                } catch (NullPointerException e) {
+                    player.sendMessage("Error!");
+                }
+            } else {
+                player.sendMessage("Player wasnt online before.");
             }
         } catch (Exception e) {
             player.sendMessage("Player isnt online");
@@ -525,7 +537,7 @@ public class xpShop extends JavaPlugin {
         double TOTALXPDOUBLE = (buyamount * (getConfig().getDouble("moneytoxp")));
 
         if (buyamount <= 0) {
-            if (!von.equals("sentxp")) {
+            if (!von.equals("sendxp")) {
                 player.sendMessage(ChatColor.GRAY + "[xpShop] " + ChatColor.RED + "Invalid Amount!");
             }
             return false;
@@ -842,8 +854,7 @@ public class xpShop extends JavaPlugin {
                 return balance;
             }
 
-        }
-        else if (iConomyversion == 2) {
+        } else if (iConomyversion == 2) {
             this.balance = economy.getBalance(name);
             return balance;
         }
@@ -860,20 +871,18 @@ public class xpShop extends JavaPlugin {
         return balance;
     }
 
-        private Boolean setupEconomy() {
-            try{
-        RegisteredServiceProvider<Economy> economyProvider = getServer().getServicesManager().getRegistration(net.milkbowl.vault.economy.Economy.class);
-        if (economyProvider != null) {
-            economy = economyProvider.getProvider();
+    private Boolean setupEconomy() {
+        try {
+            RegisteredServiceProvider<Economy> economyProvider = getServer().getServicesManager().getRegistration(net.milkbowl.vault.economy.Economy.class);
+            if (economyProvider != null) {
+                economy = economyProvider.getProvider();
+            }
+        } catch (NoClassDefFoundError e) {
+            return false;
         }
-            }
-            catch(NoClassDefFoundError e)
-            {
-                return false;
-            }
         return (economy != null);
     }
-    
+
     private Account getAccount5(String name) {
         return com.iConomy.iConomy.getAccount(name);
     }
@@ -918,7 +927,7 @@ public class xpShop extends JavaPlugin {
                 e.printStackTrace();
                 return;
             }
-                } else if (iConomyversion == 2) {
+        } else if (iConomyversion == 2) {
             try {
                 economy.withdrawPlayer(name, amountsubstract);
             } catch (Exception e) {
@@ -970,10 +979,8 @@ public class xpShop extends JavaPlugin {
                 e.printStackTrace();
                 return;
             }
-        }
-        else if(iConomyversion == 2)
-        {
-                        try {
+        } else if (iConomyversion == 2) {
+            try {
                 economy.depositPlayer(name, amountadd);
             } catch (Exception e) {
                 System.out.println("[AuctionTrade] Cant add money! Does account exist?");
