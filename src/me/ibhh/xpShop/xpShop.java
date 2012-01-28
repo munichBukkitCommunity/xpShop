@@ -268,7 +268,7 @@ public class xpShop extends JavaPlugin {
                             }
                         }
                         if (ActionxpShop.equalsIgnoreCase("infolevel")) {
-                            if (Permission.checkpermissions(player, "xpShop.infoxp.own")) {
+                            if (Permission.checkpermissions(player, "xpShop.infolevel.own")) {
                                 infolevel(sender, args);
                                 return true;
                             } else {
@@ -352,13 +352,11 @@ public class xpShop extends JavaPlugin {
                                 return false;
                             }
                         }
-
-
-
+                        break;
                     case 3:
                         ActionxpShop = args[0];
                         if (ActionxpShop.equalsIgnoreCase("info")) {
-                            if (Permission.checkpermissions(player, "xpShop.help")) {
+                            if (Permission.checkpermissions(player, "xpShop.info")) {
                                 if ((!Tools.isInteger(args[1])) && (Tools.isInteger(args[2]))) {
                                     info(player, args);
                                     return true;
@@ -368,7 +366,7 @@ public class xpShop extends JavaPlugin {
                             }
                         }
                         if (ActionxpShop.equalsIgnoreCase("send")) {
-                            if (Permission.checkpermissions(player, "xpShop.help")) {
+                            if (Permission.checkpermissions(player, "xpShop.send")) {
                                 if ((!Tools.isInteger(args[1])) && (Tools.isInteger(args[2]))) {
                                     int xp = Integer.parseInt(args[2]);
                                     sendxp(sender, xp, args[1], args);
@@ -378,6 +376,7 @@ public class xpShop extends JavaPlugin {
                                 return false;
                             }
                         }
+                        break;
                     default:
                         help(player, args);
                         return false;
