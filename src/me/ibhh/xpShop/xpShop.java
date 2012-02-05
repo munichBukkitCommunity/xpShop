@@ -1,72 +1,38 @@
 package me.ibhh.xpShop;
 
-import me.ibhh.xpShop.Tools;
-import net.minecraft.server.EntityPlayer;
-import net.minecraft.server.MinecraftServer;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URL;
 import java.net.URLConnection;
-
-//import net.milkbowl.vault.Vault;
-//import net.milkbowl.vault.economy.Economy;
-//import net.milkbowl.vault.economy.EconomyResponse;
-import net.milkbowl.vault.economy.Economy;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
-import org.bukkit.craftbukkit.CraftServer;
-import org.bukkit.craftbukkit.entity.CraftPlayer;
-
-//import org.bukkit.plugin.Plugin;
-//import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
-
 import ru.tehkode.permissions.PermissionManager;
 import ru.tehkode.permissions.bukkit.PermissionsEx;
-
-import com.iCo6.system.Accounts;
-
-import com.iConomy.iConomy;
-import com.iConomy.system.Account;
-
-import com.nijikokun.register.payment.Methods;
-import org.bukkit.plugin.RegisteredServiceProvider;
 
 public class xpShop extends JavaPlugin {
 
     private String ActionxpShop;
-    private com.iConomy.system.Holdings balance5;
-    private Double balance;
     private int buy;
     private int sell;
     private int buylevel;
     private int selllevel;
     public double getmoney;
     public int SubstractedXP;
-    public iConomy iConomy = null;
-    public int iConomyversion = 0;
     public float Version = 0;
     int rounds1 = 0;
     int rounds = 0;
-    public static Economy economy = null;
+    private iConomyHandler Geldsystem;
     private PermissionsHandler Permission;
-    // private Vault vault;
-    // public static Economy economy;
-    //
-    // private Boolean setupEconomy()
-    // {
-    // RegisteredServiceProvider<Economy> economyProvider = getServer().getServicesManager().getRegistration(net.milkbowl.vault.economy.Economy.class);
-    // if (economyProvider != null) {
-    // economy = economyProvider.getProvider();
-    // }
-    //
-    // return (economy != null);
-    // }
+    private Help Help;
+    public static boolean debug;
+    public static String Prefix = "ChatColor.DARK_BLUE + " + "[AuctionTrade] " + " + ChatColor.GOLD";
+    private PanelControl panel;
 
     /**
      * Called by Bukkit on stopping the server
@@ -125,7 +91,6 @@ public class xpShop extends JavaPlugin {
             URLConnection connectMe = myConnection.openConnection();
 
             InputStreamReader lineReader = new InputStreamReader(connectMe.getInputStream());
-            //BufferedReader buffer = new BufferedReader(lineReader);
             BufferedReader br = new BufferedReader(new BufferedReader(lineReader));
             zeile = br.readLine();
             rt2 = Float.parseFloat(zeile);
@@ -171,42 +136,16 @@ public class xpShop extends JavaPlugin {
         } catch (Exception e) {
             e.printStackTrace();
         }
+        debug = getConfig().getBoolean("debug");
 
-        if (setupEconomy() == true) {
-            iConomyversion = 2;
+        if (getConfig().getBoolean("firstRun")) {
+            panel = new PanelControl(this);
+            panel.setSize(400, 300);
+            panel.setLocation(200, 300);
+            panel.setVisible(true);
         }
-        try {
-            aktuelleVersion();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-
-        try {
-            iConomyversion();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-        // Plugin x = this.getServer().getPluginManager().getPlugin("Vault");
-        // if(x != null & x instanceof Vault) {
-        // vault = (Vault) x;
-        // System.out.println("[xpShop] hooked into Vault.");
-        // } else {
-        // /**
-        // * Throw error & disable because we have Vault set as a dependency, you could give a download link
-        // * or even download it for the user. This is all up to you as a developer to decide the best option
-        // * for your users! For our example, we assume that our audience (developers) can find the Vault
-        // * plugin and properly install it. It's usually a bad idea however.
-        // */
-        // if(iConomyversion == 2)
-        // {
-        // System.out.println("[xpShop] Vault was NOT found! Disabling plugin. Please check the config.yml");
-        // getPluginLoader().disablePlugin(this);
-        // }
-        // }
-        //this.getServer().getPluginManager().registerEvent(Type.PLUGIN_ENABLE, new server(this), Priority.Monitor, this);
-        //this.getServer().getPluginManager().registerEvent(Type.PLUGIN_DISABLE, new server(this), Priority.Monitor, this);
+        Permission = new PermissionsHandler(this);
+        Help = new Help(this);
 
         System.out.println("[xpShop] Version: " + Version + " successfully enabled!");
 
@@ -345,7 +284,7 @@ public class xpShop extends JavaPlugin {
                         if (ActionxpShop.equalsIgnoreCase("help")) {
                             if (Permission.checkpermissions(player, "xpShop.help")) {
                                 if (!Tools.isInteger(args[1])) {
-                                    help(player, args);
+                                    Help.help(player, args);
                                     return true;
                                 }
                                 player.sendMessage(ChatColor.GRAY + "[xpShop] " + ChatColor.RED + getConfig().getString(new StringBuilder("command.error.noint.").append(getConfig().getString("language")).toString()));
@@ -378,7 +317,7 @@ public class xpShop extends JavaPlugin {
                         }
                         break;
                     default:
-                        help(player, args);
+                        Help.help(player, args);
                         return false;
                 }
             }
@@ -392,6 +331,25 @@ public class xpShop extends JavaPlugin {
             }
         }
         return false;
+    }
+    
+    
+    public static void Logger(String msg, String TYPE) {
+        if (TYPE.equalsIgnoreCase("Warning") || TYPE.equalsIgnoreCase("Error")) {
+            System.err.println("[AuctionTrade] " + TYPE + msg);
+        } else if (TYPE.equalsIgnoreCase("Debug")) {
+            System.out.println("[AuctionTrade] Debug:" + msg);
+        } else {
+            System.out.println("[AuctionTrade] " + msg);
+        }
+    }
+
+    public static void PlayerLogger(Player p, String msg, String TYPE) {
+        if (TYPE.equalsIgnoreCase("Error")) {
+            p.sendMessage(Prefix + "Error: " + msg);
+        } else {
+            p.sendMessage(Prefix + msg);
+        }
     }
 
     protected Player getPlayer(CommandSender sender, String[] args, int index) {
@@ -477,9 +435,9 @@ public class xpShop extends JavaPlugin {
     public void UpdateXP(CommandSender sender, int amount, String von) {
         Player player = (Player) sender;
         double Expaktuell = getTOTALXP(sender) + amount;
-        double neuesLevel = 0;
-        int neuesLevelx = 0;
-        double neueXpp = 0;
+        double neuesLevel;
+        int neuesLevelx;
+        double neueXpp;
         try {
             if (Expaktuell >= 0) {
                 neuesLevel = (Math.pow((Expaktuell / 3.5 + 0.25), 0.5) - 0.5);
@@ -543,7 +501,7 @@ public class xpShop extends JavaPlugin {
         boolean valid;
         valid = false;
         if (moneyactive) {
-            if (getBalance156(player) >= TOTALXPDOUBLE) {
+            if (Geldsystem.getBalance156(player) >= TOTALXPDOUBLE) {
                 valid = true;
             } else {
                 player.sendMessage(ChatColor.GRAY + "[xpShop] " + ChatColor.RED + (getConfig().getString("command.error.notenoughmoney." + getConfig().getString("language"))));
@@ -555,12 +513,12 @@ public class xpShop extends JavaPlugin {
             if (buyamount > 0) {
                 UpdateXP(sender, buyamount, "buy");
                 if (moneyactive) {
-                    substractmoney156(TOTALXPDOUBLE, player);
+                    Geldsystem.substractmoney156(TOTALXPDOUBLE, player);
                 }
             } else {
                 if (!von.equals("buylevel")) {
                     player.sendMessage("Invalid exp count: " + buyamount);
-                    player.sendMessage(ChatColor.GRAY + "[xpShop] " + ChatColor.RED + String.format((getConfig().getString("command.error.info." + getConfig().getString("language"))), getBalance156(player), (int) (getBalance156(player) / getmoney)));
+                    player.sendMessage(ChatColor.GRAY + "[xpShop] " + ChatColor.RED + String.format((getConfig().getString("command.error.info." + getConfig().getString("language"))), Geldsystem.getBalance156(player), (int) (Geldsystem.getBalance156(player) / getmoney)));
                 }
             }
             if (ActionxpShop.equalsIgnoreCase("buy")) {
@@ -586,7 +544,7 @@ public class xpShop extends JavaPlugin {
             if (sellamount <= TOTAL) {
                 UpdateXP(sender, -sellamount, "sell");
                 if (moneyactive) {
-                    addmoney156(sellamount * getmoney, player);
+                    Geldsystem.addmoney156(sellamount * getmoney, player);
                 }
                 SubstractedXP = sellamount;
             } else {
@@ -601,7 +559,7 @@ public class xpShop extends JavaPlugin {
         }
         player.saveData();
         if (ActionxpShop.equalsIgnoreCase("sell")) {
-            player.sendMessage(ChatColor.GRAY + "[xpShop] " + ChatColor.RED + String.format((getConfig().getString("command.success." + "sell" + "." + getConfig().getString("language"))), SubstractedXP, (int) (sellamount * getmoney)));
+            player.sendMessage(ChatColor.GRAY + "[xpShop] " + ChatColor.RED + String.format((getConfig().getString("command.success.sell." + getConfig().getString("language"))), SubstractedXP, (int) (sellamount * getmoney)));
         } else if (ActionxpShop.equalsIgnoreCase("info") && von.equals("selllevel") == false) {
             player.sendMessage(ChatColor.GRAY + "[xpShop] " + ChatColor.RED + String.format((getConfig().getString("info.prefix." + getConfig().getString("language"))) + " " + (getConfig().getString("command.success.sell." + getConfig().getString("language"))), SubstractedXP, (int) (sellamount * getmoney)));
         }
@@ -751,287 +709,6 @@ public class xpShop extends JavaPlugin {
 
     } //public boolean checkpermissions(CommandSender sender, String other)
 
-    private static boolean packageExists(String[] packages) {
-        try {
-            for (String pkg : packages) {
-                Class.forName(pkg);
-            }
-            return true;
-        } catch (Exception e) {
-        }
-        return false;
-    }
-
-    /**
-     * Checks the config.yml wich moneyplugin should be used.
-     *
-     * @param
-     * @return 1: Register 5: iConomy5 6: iConomy6
-     */
-    public int iConomyversion() {
-        try {
-            if (packageExists(new String[]{"com.nijikokun.register.payment.Methods"})) {
-                iConomyversion = 1;
-                System.out.println("[xpShop] xpShop hooked into Register");
-            } else if (packageExists(new String[]{"com.iCo6.system.Accounts"})) {
-                iConomyversion = 6;
-                System.out.println("[xpShop] xpShop hooked into iConomy6");
-            } else if (packageExists(new String[]{"com.iConomy.iConomy", "com.iConomy.system.Account", "com.iConomy.system.Holdings"})) {
-                iConomyversion = 5;
-                System.out.println("[xpShop] xpShop hooked into iConomy5");
-            } else if (packageExists(new String[]{"net.milkbowl.vault.economy.Economy"})) {
-                iConomyversion = 2;
-                System.out.println("[AuctionTrade] AuctionTrade hooked into Vault");
-            } else {
-                System.out.println("[xpShop] xpShop cant hook into iConomy5, iConomy6 or Register. Downloading Register!");
-                System.out.println("[xpShop] ************ Please configure Register!!!!! **********");
-                try {
-                    String path = "plugins/";
-                    Update.autoDownload("http://mirror.nexua.org/Register/latest/stable/Register.jar", path, "Register.jar");
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-
-            }
-        } catch (Exception E) {
-            E.printStackTrace();
-            iConomyversion = 0;
-        }
-        return iConomyversion;
-    }
-
-    /**
-     * Gets Balance of a player.
-     *
-     * @param player, iConomyversion() must be performed before.
-     * @return Double balance.
-     */
-    public Double getBalance156(Player player) {
-        String name = player.getName();
-        if (iConomyversion == 5) {
-            try {
-                if (hasAccount5(name) == true) {
-                    balance5 = getAccount5(name).getHoldings();
-                }
-            } catch (Exception E) {
-                System.out.println("[xpShop] " + "No Account! Please report it to an admin!");
-                player.sendMessage("[xpShop] " + "No Account! Please report it to an admin!");
-                E.printStackTrace();
-                balance5 = null;
-                return balance;
-            }
-            try {
-                balance = (double) balance5.balance();
-            } catch (Exception E) {
-                System.out.println("[xpShop] " + "No Account! Please report it to an admin!");
-                player.sendMessage("[xpShop] " + "No Account! Please report it to an admin!");
-                E.printStackTrace();
-                balance5 = null;
-                return balance;
-            }
-            return balance;
-        } else if (iConomyversion == 6) {
-            try {
-                balance = new Accounts().get(player.getName()).getHoldings().getBalance();
-            } catch (Exception e) {
-                System.out.println("[xpShop] " + "No Account! Please report it to an admin!");
-                player.sendMessage("[xpShop] " + "No Account! Please report it to an admin!");
-                e.printStackTrace();
-                balance5 = null;
-                return balance;
-            }
-
-        } else if (iConomyversion == 1) {
-            try {
-                balance = Methods.getMethod().getAccount(player.getName()).balance();
-            } catch (Exception e) {
-                System.out.println("[xpShop] " + "No Account! Please report it to an admin!");
-                player.sendMessage("[xpShop] " + "No Account! Please report it to an admin!");
-                e.printStackTrace();
-                balance5 = null;
-                return balance;
-            }
-
-        } else if (iConomyversion == 2) {
-            this.balance = economy.getBalance(name);
-            return balance;
-        }
-        // else if(iConomyversion == 2)
-        // {
-        // player.sendMessage(String.format("You have %s", vault.getEconomy().format(vault.getEconomy().getBalance(player.getName()).amount)));
-        // EconomyResponse r = vault.getEconomy().depositPlayer(player.getName(), 1.05);
-        // if(r.transactionSuccess()) {
-        // player.sendMessage(String.format("You were given %s and now have %s", vault.getEconomy().format(r.amount), vault.getEconomy().format(r.balance)));
-        // } else {
-        // player.sendMessage(String.format("An error occured: %s", r.errorMessage));
-        // }
-        // }
-        return balance;
-    
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-}
-
-    private Boolean setupEconomy() {
-        try {
-            RegisteredServiceProvider<Economy> economyProvider = getServer().getServicesManager().getRegistration(net.milkbowl.vault.economy.Economy.class  
-
-    );
-            if (economyProvider
-
-    
-        != null) {
-                economy = economyProvider.getProvider();
-    }
-}
-catch (NoClassDefFoundError e) {
-            return false;
-        }
-        return (economy != null);
-    }
-
-    private Account getAccount5(String name) {
-        return com.iConomy.iConomy.getAccount(name);
-    }
-
-    private boolean hasAccount5(String name) {
-        return com.iConomy.iConomy.hasAccount(name);
-    }
-
-    /**
-     * Substracts money.
-     *
-     * @param player, amount
-     * @return
-     */
-    public void substractmoney156(double amountsubstract, Player player) {
-        String name = player.getName();
-        if (iConomyversion == 5) {
-            try {
-                getAccount5(name).getHoldings().subtract(amountsubstract);
-            } catch (Exception e) {
-                System.out.println("[xpShop] " + "Cant substract money! Does account exist?");
-                player.sendMessage("[xpShop] " + "Cant substract money! Does account exist?");
-                e.printStackTrace();
-                return;
-            }
-        } else if (iConomyversion == 6) {
-            try {
-                com.iCo6.system.Account account = new Accounts().get(player.getName());
-                account.getHoldings().subtract(amountsubstract);
-            } catch (Exception e) {
-                System.out.println("[xpShop] " + "Cant substract money! Does account exist?");
-                player.sendMessage("[xpShop] " + "Cant substract money! Does account exist?");
-                e.printStackTrace();
-                return;
-            }
-        } else if (iConomyversion == 1) {
-            try {
-                Methods.getMethod().getAccount(player.getName()).subtract(amountsubstract);
-            } catch (Exception e) {
-                System.out.println("[xpShop] " + "Cant substract money! Does account exist?");
-                player.sendMessage("[xpShop] " + "Cant substract money! Does account exist?");
-                e.printStackTrace();
-                return;
-            }
-        } else if (iConomyversion == 2) {
-            try {
-                economy.withdrawPlayer(name, amountsubstract);
-            } catch (Exception e) {
-                System.out.println("[AuctionTrade] Cant substract money! Does account exist?");
-
-                player.sendMessage("[AuctionTrade] Cant substract money! Does account exist?");
-
-                e.printStackTrace();
-                return;
-            }
-        }
-        return;
-    }
-
-    /**
-     * Adds money
-     *
-     * @param player, amount
-     * @return
-     */
-    public void addmoney156(double amountadd, Player player) {
-        String name = player.getName();
-        if (iConomyversion == 5) {
-            try {
-                getAccount5(name).getHoldings().add(amountadd);
-            } catch (Exception e) {
-                System.out.println("[xpShop] " + "Cant add money! Does account exist?");
-                player.sendMessage("[xpShop] " + "Cant add money! Does account exist?");
-                e.printStackTrace();
-                return;
-            }
-        } else if (iConomyversion == 6) {
-            try {
-                com.iCo6.system.Account account = new Accounts().get(player.getName());
-                account.getHoldings().add(amountadd);
-            } catch (Exception e) {
-                System.out.println("[xpShop] " + "Cant add money! Does account exist?");
-                player.sendMessage("[xpShop] " + "Cant add money! Does account exist?");
-                e.printStackTrace();
-                return;
-            }
-
-        } else if (iConomyversion == 1) {
-            try {
-                Methods.getMethod().getAccount(player.getName()).add(amountadd);
-            } catch (Exception e) {
-                System.out.println("[xpShop] " + "Cant add money! Does account exist?");
-                player.sendMessage("[xpShop] " + "Cant add money! Does account exist?");
-                e.printStackTrace();
-                return;
-            }
-        } else if (iConomyversion == 2) {
-            try {
-                economy.depositPlayer(name, amountadd);
-            } catch (Exception e) {
-                System.out.println("[AuctionTrade] Cant add money! Does account exist?");
-
-                player.sendMessage("[AuctionTrade] Cant add money! Does account exist?");
-
-                e.printStackTrace();
-                return;
-            }
-        }
-        return;
-    }
-
     /**
      * Buys level for a player.
      *
@@ -1046,7 +723,7 @@ catch (NoClassDefFoundError e) {
         double xpNeededForLevel = getLevelXP(levelamontbuy + level);
         double xpAktuell = getTOTALXP(sender);
         double neededXP = xpNeededForLevel - xpAktuell;
-        if (getBalance156(player) < (money1 * neededXP)) {
+        if (Geldsystem.getBalance156(player) < (money1 * neededXP)) {
             player.sendMessage(ChatColor.GRAY + "[xpShop] " + ChatColor.RED + "Stopped because of not having enough money!");
             player.sendMessage("Invalid exp count: " + levelamontbuy);
         } else {
@@ -1095,137 +772,6 @@ catch (NoClassDefFoundError e) {
         }
     }
 
-    /**
-     * Returns help.
-     *
-     * @param sender, action(String[])
-     * @return
-     */
-    public void help(CommandSender sender, String[] args) {
-        Player player = (Player) sender;
-        if (args.length == 0 || args.length >= 3) {
-            player.sendMessage(ChatColor.GRAY + "[xpShop] " + ChatColor.RED + "/xpShop infoxp <player>");
-            player.sendMessage(ChatColor.GRAY + "[xpShop] " + ChatColor.RED + "/xpShop infolevel <player>");
-            player.sendMessage(ChatColor.GRAY + "[xpShop] " + ChatColor.RED + "/xpShop info <action> <amount>");
-            player.sendMessage(ChatColor.GRAY + "[xpShop] " + ChatColor.RED + "/xpShop sell <amount>");
-            player.sendMessage(ChatColor.GRAY + "[xpShop] " + ChatColor.RED + "/xpShop buy <money>");
-            player.sendMessage(ChatColor.GRAY + "[xpShop] " + ChatColor.RED + "/xpShop buylevel <amount>");
-            player.sendMessage(ChatColor.GRAY + "[xpShop] " + ChatColor.RED + "/xpShop selllevel <amount>");
-            player.sendMessage(ChatColor.GRAY + "[xpShop] " + ChatColor.RED + "/xpShop send <player> <amount>");
-        } else if (args.length == 2) {
-            if (!(args[1].equals("buy") || args[1].equals("sell") || args[1].equals("selllevel") || args[1].equals("buylevel") || args[1].equals("send") || args[1].equals("info") || args[0].equals("infoxp") || args[0].equals("infolevel"))) {
-                player.sendMessage(ChatColor.GRAY + "[xpShop] " + ChatColor.RED + "Cant find command!");
-            } else if (args[1].equals("buy")) {
-                if (!checkpermissions(sender, args, "buy")) {
-                    player.sendMessage(ChatColor.GRAY + "[xpShop] " + ChatColor.RED + (getConfig().getString("permissions.error" + "." + getConfig().getString("language"))));
-
-                }
-                player.sendMessage(ChatColor.GRAY + "[xpShop] " + ChatColor.RED + "/xpShop buy <xp>");
-                player.sendMessage(ChatColor.GRAY + "[xpShop] " + ChatColor.RED + (getConfig().getString("help.buy" + "." + getConfig().getString("language"))));
-            } else if (args[1].equals("buylevel")) {
-                if (!checkpermissions(sender, args, "buylevel")) {
-                    player.sendMessage(ChatColor.GRAY + "[xpShop] " + ChatColor.RED + (getConfig().getString("permissions.error" + "." + getConfig().getString("language"))));
-                }
-                player.sendMessage(ChatColor.GRAY + "[xpShop] " + ChatColor.RED + "/xpShop buylevel <amount>");
-                player.sendMessage(ChatColor.GRAY + "[xpShop] " + ChatColor.RED + (getConfig().getString("help.buylevel" + "." + getConfig().getString("language"))));
-            } else if (args[1].equals("sell")) {
-                if (!checkpermissions(sender, args, "sell")) {
-                    player.sendMessage(ChatColor.GRAY + "[xpShop] " + ChatColor.RED + (getConfig().getString("permissions.error" + "." + getConfig().getString("language"))));
-                }
-                player.sendMessage(ChatColor.GRAY + "[xpShop] " + ChatColor.RED + "/xpShop sell <amount>");
-                player.sendMessage(ChatColor.GRAY + "[xpShop] " + ChatColor.RED + (getConfig().getString("help.sell" + "." + getConfig().getString("language"))));
-            } else if (args[1].equals("selllevel")) {
-                if (!checkpermissions(sender, args, "selllevel")) {
-                    player.sendMessage(ChatColor.GRAY + "[xpShop] " + ChatColor.RED + (getConfig().getString("permissions.error" + "." + getConfig().getString("language"))));
-                }
-                player.sendMessage(ChatColor.GRAY + "[xpShop] " + ChatColor.RED + "/xpShop sell <amount>");
-                player.sendMessage(ChatColor.GRAY + "[xpShop] " + ChatColor.RED + (getConfig().getString("help.selllevel" + "." + getConfig().getString("language"))));
-            } else if (args[1].equals("info")) {
-                if (!checkpermissions(sender, args, "info")) {
-                    player.sendMessage(ChatColor.GRAY + "[xpShop] " + ChatColor.RED + (getConfig().getString("permissions.error" + "." + getConfig().getString("language"))));
-                }
-                player.sendMessage(ChatColor.GRAY + "[xpShop] " + ChatColor.RED + "/xpShop info <action> <amount>");
-                player.sendMessage(ChatColor.GRAY + "[xpShop] " + ChatColor.RED + (getConfig().getString("help.info" + "." + getConfig().getString("language"))));
-            } else if (args[1].equals("send")) {
-                if (!checkpermissions(sender, args, "send")) {
-                    player.sendMessage(ChatColor.GRAY + "[xpShop] " + ChatColor.RED + (getConfig().getString("permissions.error" + "." + getConfig().getString("language"))));
-                }
-                player.sendMessage(ChatColor.GRAY + "[xpShop] " + ChatColor.RED + "/xpShop send <player> <amount>");
-                player.sendMessage(ChatColor.GRAY + "[xpShop] " + ChatColor.RED + (getConfig().getString("help.send" + "." + getConfig().getString("language"))));
-            } else if (args[1].equals("infoxp")) {
-                if (!checkpermissions(sender, args, "infoxp")) {
-                    player.sendMessage(ChatColor.GRAY + "[xpShop] " + ChatColor.RED + (getConfig().getString("permissions.error" + "." + getConfig().getString("language"))));
-                }
-                player.sendMessage(ChatColor.GRAY + "[xpShop] " + ChatColor.RED + "/xpShop infoxp <player>");
-                player.sendMessage(ChatColor.GRAY + "[xpShop] " + ChatColor.RED + (getConfig().getString("help.infoxp" + "." + getConfig().getString("language"))));
-            } else if (args[1].equals("infolevel")) {
-                if (!checkpermissions(sender, args, "infoxp")) {
-                    player.sendMessage(ChatColor.GRAY + "[xpShop] " + ChatColor.RED + (getConfig().getString("permissions.error" + "." + getConfig().getString("language"))));
-                }
-                player.sendMessage(ChatColor.GRAY + "[xpShop] " + ChatColor.RED + "/xpShop infolevel <player>");
-                player.sendMessage(ChatColor.GRAY + "[xpShop] " + ChatColor.RED + (getConfig().getString("help.infolevel" + "." + getConfig().getString("language"))));
-            }
-        } else {
-            if (!(args[0].equals("buy") || args[0].equals("sell") || args[0].equals("selllevel") || args[0].equals("buylevel") || args[0].equals("send") || args[0].equals("info") || args[0].equals("infoxp") || args[0].equals("infolevel"))) {
-                player.sendMessage(ChatColor.GRAY + "[xpShop] " + ChatColor.RED + "/xpShop infoxp <player>");
-                player.sendMessage(ChatColor.GRAY + "[xpShop] " + ChatColor.RED + "/xpShop infolevel <player>");
-                player.sendMessage(ChatColor.GRAY + "[xpShop] " + ChatColor.RED + "/xpShop info <action> <amount>");
-                player.sendMessage(ChatColor.GRAY + "[xpShop] " + ChatColor.RED + "/xpShop sell <amount>");
-                player.sendMessage(ChatColor.GRAY + "[xpShop] " + ChatColor.RED + "/xpShop buy <money>");
-                player.sendMessage(ChatColor.GRAY + "[xpShop] " + ChatColor.RED + "/xpShop buylevel <amount>");
-                player.sendMessage(ChatColor.GRAY + "[xpShop] " + ChatColor.RED + "/xpShop selllevel <amount>");
-                player.sendMessage(ChatColor.GRAY + "[xpShop] " + ChatColor.RED + "/xpShop send <player> <amount>");
-            } else if (args[0].equals("buy")) {
-                if (!checkpermissions(sender, args, "buy")) {
-                    player.sendMessage(ChatColor.GRAY + "[xpShop] " + ChatColor.RED + (getConfig().getString("permissions.error" + "." + getConfig().getString("language"))));
-                }
-                player.sendMessage(ChatColor.GRAY + "[xpShop] " + ChatColor.RED + "/xpShop buy <money>");
-                player.sendMessage(ChatColor.GRAY + "[xpShop] " + ChatColor.RED + (getConfig().getString("help.buy" + "." + getConfig().getString("language"))));
-            } else if (args[0].equals("buylevel")) {
-                if (!checkpermissions(sender, args, "buylevel")) {
-                    player.sendMessage(ChatColor.GRAY + "[xpShop] " + ChatColor.RED + (getConfig().getString("permissions.error" + "." + getConfig().getString("language"))));
-                }
-                player.sendMessage(ChatColor.GRAY + "[xpShop] " + ChatColor.RED + "/xpShop buy <money>");
-                player.sendMessage(ChatColor.GRAY + "[xpShop] " + ChatColor.RED + (getConfig().getString("help.buylevel" + "." + getConfig().getString("language"))));
-            } else if (args[0].equals("sell")) {
-                if (!checkpermissions(sender, args, "sell")) {
-                    player.sendMessage(ChatColor.GRAY + "[xpShop] " + ChatColor.RED + (getConfig().getString("permissions.error" + "." + getConfig().getString("language"))));
-                }
-                player.sendMessage(ChatColor.GRAY + "[xpShop] " + ChatColor.RED + "/xpShop sell <amount>");
-                player.sendMessage(ChatColor.GRAY + "[xpShop] " + ChatColor.RED + (getConfig().getString("help.sell" + "." + getConfig().getString("language"))));
-            } else if (args[0].equals("selllevel")) {
-                if (!checkpermissions(sender, args, "selllevel")) {
-                    player.sendMessage(ChatColor.GRAY + "[xpShop] " + ChatColor.RED + (getConfig().getString("permissions.error" + "." + getConfig().getString("language"))));
-                }
-                player.sendMessage(ChatColor.GRAY + "[xpShop] " + ChatColor.RED + "/xpShop sell <amount>");
-                player.sendMessage(ChatColor.GRAY + "[xpShop] " + ChatColor.RED + (getConfig().getString("help.selllevel" + "." + getConfig().getString("language"))));
-            } else if (args[0].equals("info")) {
-                if (!checkpermissions(sender, args, "info")) {
-                    player.sendMessage(ChatColor.GRAY + "[xpShop] " + ChatColor.RED + (getConfig().getString("permissions.error" + "." + getConfig().getString("language"))));
-                }
-                player.sendMessage(ChatColor.GRAY + "[xpShop] " + ChatColor.RED + "/xpShop info <action> <amount>");
-                player.sendMessage(ChatColor.GRAY + "[xpShop] " + ChatColor.RED + (getConfig().getString("help.info" + "." + getConfig().getString("language"))));
-            } else if (args[0].equals("send")) {
-                if (!checkpermissions(sender, args, "send")) {
-                    player.sendMessage(ChatColor.GRAY + "[xpShop] " + ChatColor.RED + (getConfig().getString("permissions.error" + "." + getConfig().getString("language"))));
-                }
-                player.sendMessage(ChatColor.GRAY + "[xpShop] " + ChatColor.RED + "/xpShop send <player> <amount>");
-                player.sendMessage(ChatColor.GRAY + "[xpShop] " + ChatColor.RED + (getConfig().getString("help.send" + "." + getConfig().getString("language"))));
-            } else if (args[0].equals("infoxp")) {
-                if (!checkpermissions(sender, args, "infoxp")) {
-                    player.sendMessage(ChatColor.GRAY + "[xpShop] " + ChatColor.RED + (getConfig().getString("permissions.error" + "." + getConfig().getString("language"))));
-                }
-                player.sendMessage(ChatColor.GRAY + "[xpShop] " + ChatColor.RED + "/xpShop infoxp <player>");
-                player.sendMessage(ChatColor.GRAY + "[xpShop] " + ChatColor.RED + (getConfig().getString("help.infoxp" + "." + getConfig().getString("language"))));
-            } else if (args[0].equals("infolevel")) {
-                if (!checkpermissions(sender, args, "infoxp")) {
-                    player.sendMessage(ChatColor.GRAY + "[xpShop] " + ChatColor.RED + (getConfig().getString("permissions.error" + "." + getConfig().getString("language"))));
-                }
-                player.sendMessage(ChatColor.GRAY + "[xpShop] " + ChatColor.RED + "/xpShop infolevel <player>");
-                player.sendMessage(ChatColor.GRAY + "[xpShop] " + ChatColor.RED + (getConfig().getString("help.infolevel" + "." + getConfig().getString("language"))));
-            }
-        }
-    }
 
     /**
      * Shows a player how much a action would cost.
@@ -1255,7 +801,7 @@ catch (NoClassDefFoundError e) {
             player.setLevel(nowlevel);
             player.setExp(nowxp);
         } else {
-            help(sender, args);
+            Help.help(sender, args);
             return;
         }
     }

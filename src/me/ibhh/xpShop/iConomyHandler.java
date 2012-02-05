@@ -35,6 +35,7 @@ public class iConomyHandler {
         }
         return false;
     }
+
         private Boolean setupEconomy() {
             try{
         RegisteredServiceProvider<Economy> economyProvider = AnimalShopV.getServer().getServicesManager().getRegistration(net.milkbowl.vault.economy.Economy.class);
