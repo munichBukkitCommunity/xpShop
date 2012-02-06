@@ -6,31 +6,41 @@ import java.awt.event.ActionListener;
 import javax.swing.*;
 
 public class PanelControl extends JFrame {
-
+    
     private JPanel hauptPanel;
     private xpShop auc;
     private JButton Button1;
     private JButton Button2;
     private JButton Button3;
-    private JTextField text;
-    private JCheckBox Haken;
+    private JRadioButton Radio1;
+    private JRadioButton Radio2;
     private BorderLayout borderLayout;
-
+    private ButtonGroup gruppe;
+    private int panelaktuell;
+    private GroupLayout layout;
+    private GroupLayout.SequentialGroup horizontalegruppe1;
+    
     public PanelControl(xpShop au) {
         super();
         auc = au;
         setTitle("Default options");
         setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
         borderLayout = new BorderLayout();
+        gruppe = new ButtonGroup();
+        layout = new GroupLayout(getContentPane());
+        layout.setAutoCreateGaps(true);
+        layout.setAutoCreateContainerGaps(true);
+        horizontalegruppe1 = layout.createSequentialGroup();
+        
         hauptPanel = init();
         this.getContentPane().add(hauptPanel);
     }
-
-    public JPanel hauptpanel(){
-        JPanel panel = new JPanel(borderLayout);
+    
+    public JPanel hauptpanel() {
+        final JPanel panel = new JPanel(borderLayout);
         Button1 = new JButton("Abbruch");
         Button1.addActionListener(new ActionListener() {
-
+            
             @Override
             public void actionPerformed(ActionEvent event) {
                 if (xpShop.debug) {
@@ -42,82 +52,124 @@ public class PanelControl extends JFrame {
                 PanelControl.this.dispose();
             }
         });
+        Button2 = new JButton("I will edit the config.yml");
         Button3 = new JButton("Weiter");
         Button3.addActionListener(new ActionListener() {
-
+            
             @Override
             public void actionPerformed(ActionEvent event) {
                 if (xpShop.debug) {
                     System.out.println("Button2 get" + event.toString());
                     System.out.println("Source: " + event.getSource());
                 }
+                panel.remove(getPanel(panelaktuell + 1));
+                panelaktuell++;
+                panel.add(getPanel(panelaktuell + 1));
+            }
+        });
+        Button2.addActionListener(new ActionListener() {
+            
+            @Override
+            public void actionPerformed(ActionEvent event) {
+                if (xpShop.debug) {
+                    System.out.println("Button2 get" + event.toString());
+                    System.out.println("Source: " + event.getSource());
+                }
+                auc.getConfig().set("firstRun", false);
+                PanelControl.this.remove(hauptPanel);
+                PanelControl.this.repaint();
+                PanelControl.this.dispose();
             }
         });
         JPanel panelunten = new JPanel();
-        panelunten.add(Button1, BorderLayout.SOUTH);
-        panelunten.add(Button3, BorderLayout.SOUTH);
-        panel.add(firstPanel(), BorderLayout.CENTER);
+        panelunten.add(Button1, BorderLayout.WEST);
+        if (auc.getConfig().getBoolean("firstRun")) {
+            panelunten.add(Button2, BorderLayout.CENTER);
+        }
+        panelunten.add(Button3, BorderLayout.EAST);
+        
+        if (panelaktuell == 0) {
+            JPanel mixed = new JPanel();
+            mixed.add(getPanel(1), BorderLayout.NORTH);
+            mixed.add(getPanel(2), BorderLayout.SOUTH);
+            panel.add(mixed);
+        } else {
+            panel.add(getPanel(panelaktuell + 1), BorderLayout.CENTER);
+        }
         panel.add(panelunten, BorderLayout.SOUTH);
         return panel;
     }
     
-    public JPanel secondPanel() {
-        JPanel panel = new JPanel();
-        final JLabel label = new JLabel("SQLUser: ");
-        text = new JTextField("User");
-
-        Button2 = new JButton("Weiter");
-        Button2.addActionListener(new ActionListener() {
-
-            @Override
-            public void actionPerformed(ActionEvent event) {
-                if (xpShop.debug) {
-                    System.out.println("Button1 get");
-                    System.out.println("Source: " + event.getSource());
+    public JPanel getPanel(int panelindex) {
+        if (xpShop.debug) {
+            xpShop.Logger("" + panelindex, "Debug");
+        }
+        if (panelindex == 1) {
+            JPanel panel = new JPanel();
+            final JLabel label = new JLabel("Select your language: ");
+            Radio1 = new JRadioButton("en");
+            Radio2 = new JRadioButton("de");
+            Radio1.setSelected(auc.getConfig().getString("language").equalsIgnoreCase("en"));
+            Radio2.setSelected(auc.getConfig().getString("language").equalsIgnoreCase("de"));
+            Radio2.addActionListener(new ActionListener() {
+                
+                @Override
+                public void actionPerformed(ActionEvent event) {
+                    if (xpShop.debug) {
+                        System.out.println("Button2 get" + event.toString());
+                        System.out.println("Source: " + event.getSource());
+                    }
+                    auc.getConfig().set("language", "en");
+                    auc.saveConfig();
+                    auc.reloadConfig();
+                    auc.config.loadStrings();
                 }
-                auc.getConfig().set("dbUser", text.getText());
-                if (xpShop.debug) {
-                    System.out.println("User: " + text.getText());
-                    System.out.println("Weiter");
+            });
+            Radio2.addActionListener(new ActionListener() {
+                
+                @Override
+                public void actionPerformed(ActionEvent event) {
+                    if (xpShop.debug) {
+                        System.out.println("Button2 get" + event.toString());
+                        System.out.println("Source: " + event.getSource());
+                    }
+                    auc.getConfig().set("language", "de");
+                    auc.saveConfig();
+                    auc.reloadConfig();
+                    auc.config.loadStrings();
                 }
-                auc.getConfig().set("firstRun", false);
-            }
-        });
-        panel.add(label);
-        panel.add(text);
-        panel.add(Button2);
-        PanelControl.this.repaint();
-        return panel;
-    }
-
-    public JPanel firstPanel() {
-        JPanel panel = new JPanel();
-        final JLabel label = new JLabel("Use MYSQL?");
-        Haken = new JCheckBox();
-        Haken.setSelected(auc.getConfig().getBoolean("SQL"));
-        Haken.addActionListener(new ActionListener() {
-
-            @Override
-            public void actionPerformed(ActionEvent event) {
-                if (xpShop.debug) {
-                    System.out.println("Button2 get" + event.toString());
-                    System.out.println("Source: " + event.getSource());
+            });
+            panel.add(label);
+            gruppe.add(Radio1);
+            gruppe.add(Radio2);
+            panel.add(Radio1);
+            panel.add(Radio2);
+            return panel;
+        } else if (panelindex == 2) {
+            JPanel panel = new JPanel();
+            final JLabel label = new JLabel("Select if debug should be aktivated: ");
+            JCheckBox Haken = new JCheckBox("debug mode");
+            Haken.addActionListener(new ActionListener() {
+                
+                @Override
+                public void actionPerformed(ActionEvent event) {
+                    if (xpShop.debug) {
+                        System.out.println("Button2 get" + event.toString());
+                        System.out.println("Source: " + event.getSource());
+                    }
+                    auc.getConfig().set("debug", !auc.getConfig().getBoolean("debug"));
+                    auc.saveConfig();
+                    auc.reloadConfig();
+                    auc.reloaddebug();
+                    auc.config.loadStrings();
                 }
-                boolean temp = auc.getConfig().getBoolean("SQL");
-                auc.getConfig().set("SQL", !temp);
-                auc.saveConfig();
-                auc.reloadConfig();
-                if (xpShop.debug) {
-                    System.out.println("temp: " + temp);
-                    System.out.println("Selected: " + Haken.isSelected());
-                    System.out.println("Neue Config: " + auc.getConfig().getBoolean("SQL"));
-                    System.out.println("Weiter");
-                }
-            }
-        });
-        panel.add(label);
-        panel.add(Haken);
-        return panel;
+            });
+            panel.add(label);
+            panel.add(Haken);
+            return panel;
+        } else {
+            return null;
+        }
     }
 
     /**

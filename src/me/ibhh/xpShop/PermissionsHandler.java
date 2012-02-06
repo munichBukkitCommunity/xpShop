@@ -1,19 +1,17 @@
 package me.ibhh.xpShop;
 
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import ru.tehkode.permissions.PermissionManager;
 import ru.tehkode.permissions.bukkit.PermissionsEx;
 
 public class PermissionsHandler
 {
-  private xpShop AnimalShopV;
-  String Error;
+  private xpShop plugin;
 
-  public PermissionsHandler(xpShop AnimalSh)
+  public PermissionsHandler(xpShop pl)
   {
-    this.AnimalShopV = AnimalSh;
+    this.plugin = pl;
   }
 
   public boolean checkpermissions(Player sender, String action)
@@ -21,13 +19,6 @@ public class PermissionsHandler
     if ((sender instanceof Player))
     {
       Player player = sender;
-      try {
-        this.Error = (ChatColor.DARK_BLUE + "" + ChatColor.GOLD + "Houston we have a problem! You can't use this command!");
-      }
-      catch (Exception e) {
-        e.printStackTrace();
-        sender.sendMessage("[xpShop] Error on checking permissions (Config)!");
-      }
       if (!Bukkit.getServer().getPluginManager().isPluginEnabled("PermissionsEx")) {
         try
         {
@@ -36,7 +27,7 @@ public class PermissionsHandler
             return true;
           }
 
-          player.sendMessage(this.Error);
+          xpShop.PlayerLogger(player, player.getDisplayName() + " " + plugin.getConfig().getString("permissions.error." + plugin.getConfig().getString("language")), "");
           return false;
         }
         catch (Exception e)
@@ -62,7 +53,7 @@ public class PermissionsHandler
             return true;
           }
 
-          player.sendMessage(this.Error);
+          xpShop.PlayerLogger(player, player.getDisplayName() + " " + plugin.getConfig().getString("permissions.error." + plugin.getConfig().getString("language")), "");
           return false;
         }
         catch (Exception e)
@@ -75,12 +66,12 @@ public class PermissionsHandler
 
       }
 
-      System.out
-        .println("PermissionsEx plugin are not found.");
+      System.out.println("PermissionsEx plugin are not found.");
       return false;
     }
 
-    System.out.println("[xpShop] " + this.AnimalShopV.getConfig().getString(new StringBuilder("command.error.noplayer").append(this.AnimalShopV.getConfig().getString("language")).toString()));
+    xpShop.Logger(plugin.getConfig().getString("command.error.noplayer" + plugin.getConfig().getString("language")), "Error");
+      
     return false;
   }
 }

@@ -1,12 +1,6 @@
 package me.ibhh.xpShop;
 
-import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.Reader;
-import java.io.Serializable;
+import java.io.*;
 import java.net.URL;
 
 class Update implements Serializable
@@ -61,7 +55,7 @@ class Update implements Serializable
 				buffout.flush();
 				buffout.close();
 				buffin.close();
-				System.out.println("[xpShop] New " + name + " downloaded, Look up under " + path);
+				xpShop.Logger("New " + name +" downloaded, Look up under " + path, "Warning");
 			}
 			finally
 			{
@@ -85,12 +79,11 @@ class Update implements Serializable
 				buffout.flush();
 				buffout.close();
 				buffin.close();
-				System.out.println("[xpShop] New " + name +" downloaded, Look up under " + path);
+				xpShop.Logger("New " + name +" downloaded, Look up under " + path, "Warning");
 			}
 			finally
 			{
 			}
 		}
-		return;
 	}
 }

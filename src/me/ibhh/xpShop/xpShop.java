@@ -31,8 +31,9 @@ public class xpShop extends JavaPlugin {
     private PermissionsHandler Permission;
     private Help Help;
     public static boolean debug;
-    public static String Prefix = "ChatColor.DARK_BLUE + " + "[AuctionTrade] " + " + ChatColor.GOLD";
+    public static String Prefix = "ChatColor.DARK_BLUE + " + "[xpShop] " + " + ChatColor.GOLD";
     private PanelControl panel;
+    public ConfigHandler config;
 
     /**
      * Called by Bukkit on stopping the server
@@ -71,7 +72,7 @@ public class xpShop extends JavaPlugin {
         try {
             Version = Float.parseFloat(getDescription().getVersion());
         } catch (Exception e) {
-            System.out.println("[xpShop]Could not parse version in float");
+            System.out.println("[AuctionTrade]Could not parse version in float");
         }
         return Version;
     }
@@ -120,6 +121,13 @@ public class xpShop extends JavaPlugin {
         return a;
     }
 
+    public void openGUI(){
+            panel = new PanelControl(this);
+            panel.setSize(400, 300);
+            panel.setLocation(200, 300);
+            panel.setVisible(true);
+    }
+    
     /**
      * Called by Bukkit on starting the server
      *
@@ -128,21 +136,13 @@ public class xpShop extends JavaPlugin {
      */
     @Override
     public void onEnable() {
-        try {
-            this.getConfig().options().copyDefaults(true);
-            saveConfig();
-            reloadConfig();
-            System.out.println("[xpShop] Config file found!");
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        config = new ConfigHandler(this);
+        config.loadConfigonStart();
+        aktuelleVersion();
         debug = getConfig().getBoolean("debug");
 
         if (getConfig().getBoolean("firstRun")) {
-            panel = new PanelControl(this);
-            panel.setSize(400, 300);
-            panel.setLocation(200, 300);
-            panel.setVisible(true);
+            openGUI();
         }
         Permission = new PermissionsHandler(this);
         Help = new Help(this);
@@ -323,24 +323,31 @@ public class xpShop extends JavaPlugin {
             }
         } else if (cmd.getName().equalsIgnoreCase("xpShop")) {
             if (args.length == 1) {
-                if (args[0].equals("download")) {
+                if (args[0].equalsIgnoreCase("download")) {
                     String path = getDataFolder().toString() + "/Update/";
                     autoUpdate("http://ibhh.de/xpShop.jar", path, "xpShop.jar");
                     return true;
+                } else if(args[0].equalsIgnoreCase("gui")){
+                    openGUI();
+                } else if(args[0].equalsIgnoreCase("reload")){
+                    onReload();
                 }
             }
         }
         return false;
     }
     
+    public void reloaddebug(){
+        debug = getConfig().getBoolean("debug");
+    }
     
     public static void Logger(String msg, String TYPE) {
         if (TYPE.equalsIgnoreCase("Warning") || TYPE.equalsIgnoreCase("Error")) {
-            System.err.println("[AuctionTrade] " + TYPE + msg);
+            System.err.println(Prefix + TYPE + ": " + msg);
         } else if (TYPE.equalsIgnoreCase("Debug")) {
-            System.out.println("[AuctionTrade] Debug:" + msg);
+            System.out.println(Prefix + "Debug: " + msg);
         } else {
-            System.out.println("[AuctionTrade] " + msg);
+            System.out.println(Prefix + msg);
         }
     }
 

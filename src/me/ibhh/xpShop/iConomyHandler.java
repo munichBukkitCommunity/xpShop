@@ -12,14 +12,15 @@ public class iConomyHandler {
     private static int iConomyversion = 0;
     private com.iConomy.system.Holdings balance5;
     private Double balance;
-    private xpShop AnimalShopV;
+    private xpShop plugin;
     public static Economy economy = null;
 
-    public iConomyHandler(xpShop AnimalShop) {
-        this.AnimalShopV = AnimalShop;
-        this.AnimalShopV.aktuelleVersion();
-        if(setupEconomy() == true)
+    public iConomyHandler(xpShop pl) {
+        plugin = pl;
+        plugin.aktuelleVersion();
+        if (setupEconomy() == true) {
             iConomyversion = 2;
+        }
     }
 
     private static boolean packageExists(String[] packages) {
@@ -36,17 +37,15 @@ public class iConomyHandler {
         return false;
     }
 
-        private Boolean setupEconomy() {
-            try{
-        RegisteredServiceProvider<Economy> economyProvider = AnimalShopV.getServer().getServicesManager().getRegistration(net.milkbowl.vault.economy.Economy.class);
-        if (economyProvider != null) {
-            economy = economyProvider.getProvider();
+    private Boolean setupEconomy() {
+        try {
+            RegisteredServiceProvider<Economy> economyProvider = plugin.getServer().getServicesManager().getRegistration(net.milkbowl.vault.economy.Economy.class);
+            if (economyProvider != null) {
+                economy = economyProvider.getProvider();
+            }
+        } catch (NoClassDefFoundError e) {
+            return false;
         }
-            }
-            catch(NoClassDefFoundError e)
-            {
-                return false;
-            }
         return (economy != null);
     }
 
@@ -54,20 +53,19 @@ public class iConomyHandler {
         try {
             if (packageExists(new String[]{"com.nijikokun.register.payment.Methods"})) {
                 iConomyversion = 1;
-                System.out.println("[AuctionTrade] AuctionTrade hooked into Register");
+                xpShop.Logger("hooked into Register", "");
             } else if (packageExists(new String[]{"com.iCo6.system.Accounts"})) {
                 iConomyversion = 6;
-                System.out.println("[AuctionTrade] AuctionTrade hooked into iConomy6");
-            } else if (packageExists(new String[]{"com.iConomy.iConomy",
-                        "com.iConomy.system.Account", "com.iConomy.system.Holdings"})) {
+                xpShop.Logger("hooked into iConomy6", "");
+            } else if (packageExists(new String[]{"com.iConomy.iConomy", "com.iConomy.system.Account", "com.iConomy.system.Holdings"})) {
                 iConomyversion = 5;
-                System.out.println("[AuctionTrade] AuctionTrade hooked into iConomy5");
+                xpShop.Logger("hooked into iConomy5", "");
             } else if (packageExists(new String[]{"net.milkbowl.vault.economy.Economy"})) {
                 iConomyversion = 2;
-                System.out.println("[AuctionTrade] AuctionTrade hooked into Vault");
+                xpShop.Logger("hooked into Vault", "");
             } else {
-                System.out.println("[AuctionTrade] AuctionTrade cant hook into iConomy5, iConomy6 or Register. Downloading Register!");
-                System.out.println("[AuctionTrade] ************ Please configure Register!!!!! **********");
+                xpShop.Logger("cant hook into iConomy5, iConomy6 or Register. Downloading Register!", "");
+                xpShop.Logger(" ************ Please configure Register!!!!! **********", "Warning");
                 try {
                     String path = "plugins/";
                     Update.autoDownload(
@@ -92,9 +90,8 @@ public class iConomyHandler {
                     this.balance5 = getAccount5(name).getHoldings();
                 }
             } catch (Exception E) {
-                System.out.println("[AuctionTrade] No Account! Please report it to an admin!");
-
-                player.sendMessage("[AuctionTrade] No Account! Please report it to an admin!");
+                xpShop.Logger("No Account! Please report it to an admin!", "Error");
+                xpShop.PlayerLogger(player, "No Account! Please report it to an admin!", "Error");
 
                 E.printStackTrace();
                 this.balance5 = null;
@@ -103,9 +100,8 @@ public class iConomyHandler {
             try {
                 this.balance = Double.valueOf(this.balance5.balance());
             } catch (Exception E) {
-                System.out.println("[AuctionTrade] No Account! Please report it to an admin!");
-
-                player.sendMessage("[AuctionTrade] No Account! Please report it to an admin!");
+                xpShop.Logger("No Account! Please report it to an admin!", "Error");
+                xpShop.PlayerLogger(player, "No Account! Please report it to an admin!", "Error");
 
                 E.printStackTrace();
                 this.balance5 = null;
@@ -117,10 +113,8 @@ public class iConomyHandler {
             try {
                 this.balance = new Accounts().get(player.getName()).getHoldings().getBalance();
             } catch (Exception e) {
-                System.out.println("[AuctionTrade] No Account! Please report it to an admin!");
-
-                player.sendMessage("[AuctionTrade] No Account! Please report it to an admin!");
-
+                xpShop.Logger("No Account! Please report it to an admin!", "Error");
+                xpShop.PlayerLogger(player, "No Account! Please report it to an admin!", "Error");
                 e.printStackTrace();
                 this.balance5 = null;
                 return this.balance;
@@ -131,10 +125,8 @@ public class iConomyHandler {
                 this.balance =
                         Double.valueOf(Methods.getMethod().getAccount(player.getName()).balance());
             } catch (Exception e) {
-                System.out.println("[AuctionTrade] No Account! Please report it to an admin!");
-
-                player.sendMessage("[AuctionTrade] No Account! Please report it to an admin!");
-
+                xpShop.Logger("No Account! Please report it to an admin!", "Error");
+                xpShop.PlayerLogger(player, "No Account! Please report it to an admin!", "Error");
                 e.printStackTrace();
                 this.balance5 = null;
                 return this.balance;
@@ -162,10 +154,8 @@ public class iConomyHandler {
             try {
                 getAccount5(name).getHoldings().subtract(amountsubstract);
             } catch (Exception e) {
-                System.out.println("[AuctionTrade] Cant substract money! Does account exist?");
-
-                player.sendMessage("[AuctionTrade] Cant substract money! Does account exist?");
-
+                xpShop.Logger("Cant substract money! Does account exist?", "Error");
+                xpShop.PlayerLogger(player, "Cant substract money! Does account exist?", "Error");
                 e.printStackTrace();
             }
         } else if (iConomyversion == 6) {
@@ -173,30 +163,24 @@ public class iConomyHandler {
                 com.iCo6.system.Account account = new Accounts().get(player.getName());
                 account.getHoldings().subtract(amountsubstract);
             } catch (Exception e) {
-                System.out.println("[AuctionTrade] Cant substract money! Does account exist?");
-
-                player.sendMessage("[AuctionTrade] Cant substract money! Does account exist?");
-
+                xpShop.Logger("Cant substract money! Does account exist?", "Error");
+                xpShop.PlayerLogger(player, "Cant substract money! Does account exist?", "Error");
                 e.printStackTrace();
             }
         } else if (iConomyversion == 1) {
             try {
                 Methods.getMethod().getAccount(player.getName()).subtract(amountsubstract);
             } catch (Exception e) {
-                System.out.println("[AuctionTrade] Cant substract money! Does account exist?");
-
-                player.sendMessage("[AuctionTrade] Cant substract money! Does account exist?");
-
+                xpShop.Logger("Cant substract money! Does account exist?", "Error");
+                xpShop.PlayerLogger(player, "Cant substract money! Does account exist?", "Error");
                 e.printStackTrace();
             }
         } else if (iConomyversion == 2) {
             try {
                 economy.withdrawPlayer(name, amountsubstract);
             } catch (Exception e) {
-                System.out.println("[AuctionTrade] Cant substract money! Does account exist?");
-
-                player.sendMessage("[AuctionTrade] Cant substract money! Does account exist?");
-
+                xpShop.Logger("Cant substract money! Does account exist?", "Error");
+                xpShop.PlayerLogger(player, "Cant substract money! Does account exist?", "Error");
                 e.printStackTrace();
             }
         }
@@ -208,10 +192,8 @@ public class iConomyHandler {
             try {
                 getAccount5(name).getHoldings().add(amountadd);
             } catch (Exception e) {
-                System.out.println("[AuctionTrade] Cant add money! Does account exist?");
-
-                player.sendMessage("[AuctionTrade] Cant add money! Does account exist?");
-
+                xpShop.Logger("Cant substract money! Does account exist?", "Error");
+                xpShop.PlayerLogger(player, "Cant substract money! Does account exist?", "Error");
                 e.printStackTrace();
             }
         } else if (iConomyversion == 6) {
@@ -219,32 +201,24 @@ public class iConomyHandler {
                 com.iCo6.system.Account account = new Accounts().get(player.getName());
                 account.getHoldings().add(amountadd);
             } catch (Exception e) {
-                System.out.println("[AuctionTrade] Cant add money! Does account exist?");
-
-                player.sendMessage("[AuctionTrade] Cant add money! Does account exist?");
-
+                xpShop.Logger("Cant substract money! Does account exist?", "Error");
+                xpShop.PlayerLogger(player, "Cant substract money! Does account exist?", "Error");
                 e.printStackTrace();
             }
         } else if (iConomyversion == 1) {
             try {
                 Methods.getMethod().getAccount(player.getName()).add(amountadd);
             } catch (Exception e) {
-                System.out.println("[AuctionTrade] Cant add money! Does account exist?");
-
-                player.sendMessage("[AuctionTrade] Cant add money! Does account exist?");
-
+                xpShop.Logger("Cant substract money! Does account exist?", "Error");
+                xpShop.PlayerLogger(player, "Cant substract money! Does account exist?", "Error");
                 e.printStackTrace();
             }
-        }
-        else if(iConomyversion == 2)
-        {
-                        try {
+        } else if (iConomyversion == 2) {
+            try {
                 economy.depositPlayer(name, amountadd);
             } catch (Exception e) {
-                System.out.println("[AuctionTrade] Cant add money! Does account exist?");
-
-                player.sendMessage("[AuctionTrade] Cant add money! Does account exist?");
-
+                xpShop.Logger("Cant substract money! Does account exist?", "Error");
+                xpShop.PlayerLogger(player, "Cant substract money! Does account exist?", "Error");
                 e.printStackTrace();
             }
         }

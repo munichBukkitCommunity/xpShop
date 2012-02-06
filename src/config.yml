@@ -1,5 +1,7 @@
 language: en
 autodownload: true
+debug: false
+firstRun: true
 moneytoxp: 1.00
 xptomoney: 1.00
 command:
@@ -55,8 +57,8 @@ command:
       en: You recieved %1$d XP from %2$s.
 permissions:
   error:
-    de: Houston Wir haben ein Problem! Diesen Befehl darfst Du nicht verwenden!
-    en: Houston we have a problem! You can't use this command!
+    de: Wir haben ein Problem! Diesen Befehl darfst Du nicht verwenden!
+    en: we have a problem! You can't use this command!
   notfound:
     de: PermissionsEx plugin nicht gefunden!
     en: PermissionsEx not found!
