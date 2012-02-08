@@ -58,11 +58,17 @@ public class ConfigHandler {
             plugin.saveConfig();
             plugin.reloadConfig();
             xpShop.Logger("Config file found!", "");
-            loadStrings();
+            reload();
         } catch (Exception e) {
             e.printStackTrace();
             plugin.onDisable();
         }
+    }
+    
+    public void reload(){
+            loadStrings();
+            loadBooleans();
+            loadDoubles();
     }
     
     public void loadDoubles(){

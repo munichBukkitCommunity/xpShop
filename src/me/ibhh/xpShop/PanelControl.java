@@ -6,7 +6,7 @@ import java.awt.event.ActionListener;
 import javax.swing.*;
 
 public class PanelControl extends JFrame {
-    
+
     private JPanel hauptPanel;
     private xpShop auc;
     private JButton Button1;
@@ -14,33 +14,30 @@ public class PanelControl extends JFrame {
     private JButton Button3;
     private JRadioButton Radio1;
     private JRadioButton Radio2;
-    private BorderLayout borderLayout;
     private ButtonGroup gruppe;
-    private int panelaktuell;
     private GroupLayout layout;
-    private GroupLayout.SequentialGroup horizontalegruppe1;
-    
+
     public PanelControl(xpShop au) {
         super();
         auc = au;
         setTitle("Default options");
         setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
-        borderLayout = new BorderLayout();
         gruppe = new ButtonGroup();
         layout = new GroupLayout(getContentPane());
         layout.setAutoCreateGaps(true);
         layout.setAutoCreateContainerGaps(true);
-        horizontalegruppe1 = layout.createSequentialGroup();
-        
+
         hauptPanel = init();
         this.getContentPane().add(hauptPanel);
+
     }
-    
+
     public JPanel hauptpanel() {
-        final JPanel panel = new JPanel(borderLayout);
+        final JPanel panel = new JPanel();
+        panel.setLayout(new BorderLayout());
         Button1 = new JButton("Abbruch");
         Button1.addActionListener(new ActionListener() {
-            
+
             @Override
             public void actionPerformed(ActionEvent event) {
                 if (xpShop.debug) {
@@ -53,22 +50,8 @@ public class PanelControl extends JFrame {
             }
         });
         Button2 = new JButton("I will edit the config.yml");
-        Button3 = new JButton("Weiter");
-        Button3.addActionListener(new ActionListener() {
-            
-            @Override
-            public void actionPerformed(ActionEvent event) {
-                if (xpShop.debug) {
-                    System.out.println("Button2 get" + event.toString());
-                    System.out.println("Source: " + event.getSource());
-                }
-                panel.remove(getPanel(panelaktuell + 1));
-                panelaktuell++;
-                panel.add(getPanel(panelaktuell + 1));
-            }
-        });
         Button2.addActionListener(new ActionListener() {
-            
+
             @Override
             public void actionPerformed(ActionEvent event) {
                 if (xpShop.debug) {
@@ -76,30 +59,51 @@ public class PanelControl extends JFrame {
                     System.out.println("Source: " + event.getSource());
                 }
                 auc.getConfig().set("firstRun", false);
+                auc.saveConfig();
+                auc.reloadConfig();
+                auc.config.reload();
+                PanelControl.this.remove(hauptPanel);
+                PanelControl.this.repaint();
+                PanelControl.this.dispose();
+            }
+        });
+        Button3 = new JButton("Finish");
+        Button3.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent event) {
+                if (xpShop.debug) {
+                    System.out.println("Button2 get" + event.toString());
+                    System.out.println("Source: " + event.getSource());
+                }
+                auc.getConfig().set("firstRun", false);
+                auc.saveConfig();
+                auc.reloadConfig();
+                auc.config.reload();
                 PanelControl.this.remove(hauptPanel);
                 PanelControl.this.repaint();
                 PanelControl.this.dispose();
             }
         });
         JPanel panelunten = new JPanel();
-        panelunten.add(Button1, BorderLayout.WEST);
+        panelunten.add(Button1);
         if (auc.getConfig().getBoolean("firstRun")) {
-            panelunten.add(Button2, BorderLayout.CENTER);
+            panelunten.add(Button2);
         }
-        panelunten.add(Button3, BorderLayout.EAST);
-        
-        if (panelaktuell == 0) {
-            JPanel mixed = new JPanel();
-            mixed.add(getPanel(1), BorderLayout.NORTH);
-            mixed.add(getPanel(2), BorderLayout.SOUTH);
-            panel.add(mixed);
-        } else {
-            panel.add(getPanel(panelaktuell + 1), BorderLayout.CENTER);
-        }
+        panelunten.add(Button3);
+        JPanel mixed = new JPanel(new BorderLayout());
+        mixed.add(getPanel(1), BorderLayout.NORTH);
+        mixed.add(getPanel(2), BorderLayout.CENTER);
+        JPanel new1 = new JPanel(new BorderLayout());
+        new1.add(getPanel(3), BorderLayout.NORTH);
+        new1.add(getPanel(4), BorderLayout.CENTER);
+        new1.add(getPanel(5), BorderLayout.SOUTH);
+        panel.add(mixed, BorderLayout.NORTH);
+        panel.add(new1, BorderLayout.CENTER);
         panel.add(panelunten, BorderLayout.SOUTH);
         return panel;
     }
-    
+
     public JPanel getPanel(int panelindex) {
         if (xpShop.debug) {
             xpShop.Logger("" + panelindex, "Debug");
@@ -112,7 +116,7 @@ public class PanelControl extends JFrame {
             Radio1.setSelected(auc.getConfig().getString("language").equalsIgnoreCase("en"));
             Radio2.setSelected(auc.getConfig().getString("language").equalsIgnoreCase("de"));
             Radio2.addActionListener(new ActionListener() {
-                
+
                 @Override
                 public void actionPerformed(ActionEvent event) {
                     if (xpShop.debug) {
@@ -122,11 +126,11 @@ public class PanelControl extends JFrame {
                     auc.getConfig().set("language", "en");
                     auc.saveConfig();
                     auc.reloadConfig();
-                    auc.config.loadStrings();
+                    auc.config.reload();
                 }
             });
             Radio2.addActionListener(new ActionListener() {
-                
+
                 @Override
                 public void actionPerformed(ActionEvent event) {
                     if (xpShop.debug) {
@@ -136,7 +140,7 @@ public class PanelControl extends JFrame {
                     auc.getConfig().set("language", "de");
                     auc.saveConfig();
                     auc.reloadConfig();
-                    auc.config.loadStrings();
+                    auc.config.reload();
                 }
             });
             panel.add(label);
@@ -150,7 +154,7 @@ public class PanelControl extends JFrame {
             final JLabel label = new JLabel("Select if debug should be aktivated: ");
             JCheckBox Haken = new JCheckBox("debug mode");
             Haken.addActionListener(new ActionListener() {
-                
+
                 @Override
                 public void actionPerformed(ActionEvent event) {
                     if (xpShop.debug) {
@@ -161,7 +165,104 @@ public class PanelControl extends JFrame {
                     auc.saveConfig();
                     auc.reloadConfig();
                     auc.reloaddebug();
-                    auc.config.loadStrings();
+                    auc.config.reload();
+                }
+            });
+            panel.add(label);
+            panel.add(Haken);
+            return panel;
+        } else if (panelindex == 3) {
+            JPanel panel = new JPanel();
+            final JLabel label = new JLabel("moneytoxp: ");
+            final JTextField moneytoxp = new JTextField(String.valueOf(auc.config.moneytoxp));
+            moneytoxp.setSize(20, 50);
+            final JLabel Status = new JLabel();
+            final JButton Save = new JButton("Save");
+            Save.addActionListener(new ActionListener() {
+
+                @Override
+                public void actionPerformed(ActionEvent event) {
+                    double temp = auc.config.moneytoxp;
+                    try {
+                        temp = Double.parseDouble(moneytoxp.getText());
+                    } catch (Exception e3) {
+                        Status.setText("Cant save this value!");
+                    }
+                    if (xpShop.debug) {
+                        System.out.println("Button2 get" + event.toString());
+                        System.out.println("Source: " + event.getSource());
+                    }
+                    try {
+                        auc.getConfig().set("moneytoxp", temp);
+                    } catch (Exception e2) {
+                        Status.setText("Cant save this value!");
+                    }
+                    auc.saveConfig();
+                    auc.reloadConfig();
+                    auc.reloaddebug();
+                    auc.config.reload();
+                }
+            });
+            panel.add(label);
+            panel.add(moneytoxp);
+            panel.add(Status);
+            panel.add(Save);
+            return panel;
+        } else if (panelindex == 4) {
+            JPanel panel = new JPanel();
+            final JLabel label = new JLabel("xptomoney: ");
+            final JTextField xptomoney = new JTextField(String.valueOf(auc.config.xptomoney));
+            xptomoney.setSize(20, 50);
+            final JLabel Status = new JLabel();
+            final JButton Save = new JButton("Save");
+            Save.addActionListener(new ActionListener() {
+
+                @Override
+                public void actionPerformed(ActionEvent event) {
+                    double temp = auc.config.xptomoney;
+                    try {
+                        temp = Double.parseDouble(xptomoney.getText());
+                    } catch (Exception e3) {
+                        Status.setText("Cant save this value!");
+                    }
+                    if (xpShop.debug) {
+                        System.out.println("Button2 get" + event.toString());
+                        System.out.println("Source: " + event.getSource());
+                    }
+                    try {
+                        auc.getConfig().set("xptomoney", temp);
+                    } catch (Exception e2) {
+                        Status.setText("Cant save this value!");
+                    }
+                    auc.saveConfig();
+                    auc.reloadConfig();
+                    auc.reloaddebug();
+                    auc.config.reload();
+                }
+            });
+            panel.add(label);
+            panel.add(xptomoney);
+            panel.add(Status);
+            panel.add(Save);
+            return panel;
+        }else if(panelindex == 5){
+            JPanel panel = new JPanel();
+            final JLabel label = new JLabel("Select if a new version should be downloaded: ");
+            JCheckBox Haken = new JCheckBox("autodownload");
+            Haken.setSelected(auc.config.autodownload);
+            Haken.addActionListener(new ActionListener() {
+
+                @Override
+                public void actionPerformed(ActionEvent event) {
+                    if (xpShop.debug) {
+                        System.out.println("Button2 get" + event.toString());
+                        System.out.println("Source: " + event.getSource());
+                    }
+                    auc.getConfig().set("autodownload", !auc.getConfig().getBoolean("autodownload"));
+                    auc.saveConfig();
+                    auc.reloadConfig();
+                    auc.reloaddebug();
+                    auc.config.reload();
                 }
             });
             panel.add(label);

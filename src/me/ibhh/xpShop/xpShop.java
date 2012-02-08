@@ -31,6 +31,7 @@ public class xpShop extends JavaPlugin {
     private PermissionsHandler Permission;
     private Help Help;
     public static boolean debug;
+    public static String PrefixConsole = "[xpShop] ";
     public static String Prefix = "ChatColor.DARK_BLUE + " + "[xpShop] " + " + ChatColor.GOLD";
     private PanelControl panel;
     public ConfigHandler config;
@@ -43,9 +44,7 @@ public class xpShop extends JavaPlugin {
      */
     @Override
     public void onDisable() {
-
-        System.out.println("[xpShop] disabled!");
-
+        Logger("disabled!", "");
     }
 
     /**
@@ -72,7 +71,7 @@ public class xpShop extends JavaPlugin {
         try {
             Version = Float.parseFloat(getDescription().getVersion());
         } catch (Exception e) {
-            System.out.println("[AuctionTrade]Could not parse version in float");
+            Logger("Could not parse version in float", "");
         }
         return Version;
     }
@@ -86,7 +85,6 @@ public class xpShop extends JavaPlugin {
     public float getNewVersion(String url) {
         float rt2 = 0;
         String zeile;
-
         try {
             URL myConnection = new URL(url);
             URLConnection connectMe = myConnection.openConnection();
@@ -97,11 +95,11 @@ public class xpShop extends JavaPlugin {
             rt2 = Float.parseFloat(zeile);
         } catch (IOException ioe) {
             ioe.printStackTrace();
-            System.out.println("[xpShop]Exception: IOException!");
+            Logger("Exception: IOException!", "Error");
             return -1;
         } catch (Exception e) {
             e.printStackTrace();
-            System.out.println("[xpShop]Exception: Exception!");
+            Logger("Exception: Exception!", "");
             return 0;
         }
         return rt2;
@@ -147,27 +145,27 @@ public class xpShop extends JavaPlugin {
         Permission = new PermissionsHandler(this);
         Help = new Help(this);
 
-        System.out.println("[xpShop] Version: " + Version + " successfully enabled!");
+        Logger("Version: " + Version + " successfully enabled!", "");
 
         String URL = "http://ibhh.de:80/aktuelleversion.html";
         if ((UpdateAvailable(URL, Version) == true)) {
-            System.out.println("[xpShop] New version: " + getNewVersion(URL) + " found!");
-            System.out.println("[xpShop] ******************************************");
-            System.out.println("[xpShop] *********** Please update!!!! ************");
-            System.out.println("[xpShop] * http://ibhh.de/xpShop.jar *");
-            System.out.println("[xpShop] ******************************************");
+            Logger("New version: " + getNewVersion(URL) + " found!", "Warning");
+            Logger("******************************************", "Warning");
+            Logger("*********** Please update!!!! ************", "Warning");
+            Logger("* http://ibhh.de/xpShop.jar *", "Warning");
+            Logger("******************************************", "Warning");
             if (getConfig().getBoolean("autodownload") == true) {
                 try {
                     String path = getDataFolder().toString() + "/Update/";
                     autoUpdate("http://ibhh.de/xpShop.jar", path, "xpShop.jar");
                 } catch (Exception e) {
-                    System.out.println("[xpShop] " + "Error on checking permissions with PermissionsEx!");
+                    Logger("Error on checking permissions with PermissionsEx!", "Error");
                     e.printStackTrace();
                     return;
                 }
 
             } else {
-                System.out.println("[xpShop] Please type [xpShop download] to download manual! ");
+                Logger("Please type [xpShop download] to download manual! ", "Warning");
             }
         }
         Permission = new PermissionsHandler(this);
@@ -343,11 +341,11 @@ public class xpShop extends JavaPlugin {
     
     public static void Logger(String msg, String TYPE) {
         if (TYPE.equalsIgnoreCase("Warning") || TYPE.equalsIgnoreCase("Error")) {
-            System.err.println(Prefix + TYPE + ": " + msg);
+            System.err.println(PrefixConsole + TYPE + ": " + msg);
         } else if (TYPE.equalsIgnoreCase("Debug")) {
-            System.out.println(Prefix + "Debug: " + msg);
+            System.out.println(PrefixConsole + "Debug: " + msg);
         } else {
-            System.out.println(Prefix + msg);
+            System.out.println(PrefixConsole + msg);
         }
     }
 
@@ -404,12 +402,15 @@ public class xpShop extends JavaPlugin {
     //	}
     public void sendxp(CommandSender sender, int giveamount, String empfaenger, String[] args) {
         Player player = (Player) sender;
-        try {
-
-            if (this.getServer().getOfflinePlayer(empfaenger).hasPlayedBefore()) {
+            if (getPlayer(sender, args, 1).hasPlayedBefore()) {
                 Player empfaenger1 = (Player) getPlayer(sender, args, 1);
                 sell(sender, giveamount, false, "sendxp"); //Trys to substract amount, else stop.
+                try{
                 buy(empfaenger1, SubstractedXP, false, "sendxp"); //Gives other player XP wich were substracted.
+                } catch (Exception e1){
+                    buy(player, giveamount, false, "sendxp");
+                    player.sendMessage("Player isnt online.");
+                }
                 try {
                     player.sendMessage(ChatColor.GRAY + "[xpShop] " + ChatColor.RED + String.format(getConfig().getString("command.success." + "sentxp" + "." + getConfig().getString("language")), SubstractedXP, args[1]));
                     empfaenger1.sendMessage(ChatColor.GRAY + "[xpShop] " + ChatColor.RED + String.format(getConfig().getString("command.success." + "recievedxp" + "." + getConfig().getString("language")), SubstractedXP, sender.getName()));
@@ -419,9 +420,6 @@ public class xpShop extends JavaPlugin {
             } else {
                 player.sendMessage("Player wasnt online before.");
             }
-        } catch (Exception e) {
-            player.sendMessage("Player isnt online");
-        }
 
     }
 
