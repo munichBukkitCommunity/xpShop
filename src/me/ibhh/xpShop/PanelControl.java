@@ -35,7 +35,7 @@ public class PanelControl extends JFrame {
     public JPanel hauptpanel() {
         final JPanel panel = new JPanel();
         panel.setLayout(new BorderLayout());
-        Button1 = new JButton("Abbruch");
+        Button1 = new JButton("Cancel");
         Button1.addActionListener(new ActionListener() {
 
             @Override

@@ -1,3 +1,149 @@
+
+    /**
+     * Checks players permissions. Works with Bukkitpermissions and
+     * PermissionsEX
+     *
+     * @param sender, action, which should be performed.
+     * @return true if player has permission.
+     */
+    public boolean checkpermissions(CommandSender sender, String[] args, String other) {
+        if (sender instanceof Player) {
+            Player player = (Player) sender;
+            if (!other.isEmpty()) {
+                if (!Bukkit.getServer().getPluginManager().isPluginEnabled("PermissionsEx")) {
+                    try {
+                        if (player.hasPermission("xpShop." + other)) {
+                            return true;
+                        } //if(permissions.has(player, "xpShop." + action))
+                        else {
+                            player.sendMessage(ChatColor.GRAY + "[xpShop] " + ChatColor.RED + (getConfig().getString("permissions.error." + getConfig().getString("language"))));
+                            return false;
+                        }
+                    } catch (Exception e) {
+                        System.out.println("[xpShop] " + "Error on checking permissions with BukkitPermissions!");
+                        player.sendMessage("[xpShop] " + "Error on checking permissions with BukkitPermissions!");
+                        e.printStackTrace();
+                        return false;
+                    }
+
+                } else {
+                    if (Bukkit.getServer().getPluginManager().isPluginEnabled("PermissionsEx")) {
+                        try {
+                            PermissionManager permissions = PermissionsEx.getPermissionManager();
+
+                            // Permission check
+                            if (permissions.has(player, "xpShop." + other)) {
+                                // yay!
+                                return true;
+                            } else {
+                                // houston, we have a problem :)
+                                player.sendMessage(ChatColor.GRAY + "[xpShop] " + ChatColor.RED + (getConfig().getString("permissions.error." + getConfig().getString("language"))));
+                                return false;
+                            }
+                        } catch (Exception e) {
+                            System.out.println("[xpShop] " + "Error on checking permissions with PermissionsEx!");
+                            player.sendMessage("[xpShop] " + "Error on checking permissions with PermissionsEx!");
+                            e.printStackTrace();
+                            return false;
+                        }
+                    } else {
+                        System.out.println("PermissionsEx plugin are not found.");
+                        return false;
+                    }
+                }
+            } else {
+                if (!Bukkit.getServer().getPluginManager().isPluginEnabled("PermissionsEx")) {
+                    try {
+                        if (args[0].equals("infolevel") || args[0].equals("infoxp")) {
+                            if (args.length == 2) {
+                                if (player.hasPermission("xpShop." + args[0] + ".other")) {
+                                    return true;
+                                } //if(permissions.has(player, "xpShop." + other))
+                                else {
+                                    player.sendMessage(ChatColor.GRAY + "[xpShop] " + ChatColor.RED + (getConfig().getString("permissions.error." + getConfig().getString("language"))));
+                                    return false;
+                                }
+                            } else if (args.length == 1) {
+                                if (player.hasPermission("xpShop." + args[0] + ".own")) {
+                                    return true;
+                                } //if(permissions.has(player, "xpShop." + other))
+                                else {
+                                    player.sendMessage(ChatColor.GRAY + "[xpShop] " + ChatColor.RED + (getConfig().getString("permissions.error." + getConfig().getString("language"))));
+                                    return false;
+                                }
+                            } else {
+                                return false;
+                            }
+                        } else if (player.hasPermission("xpShop." + args[0])) {
+                            return true;
+                        } //if(permissions.has(player, "xpShop." + other))
+                        else {
+                            player.sendMessage(ChatColor.GRAY + "[xpShop] " + ChatColor.RED + (getConfig().getString("permissions.error." + getConfig().getString("language"))));
+                            return false;
+                        }
+                    } catch (Exception e) {
+                        System.out.println("[xpShop] " + "Error on checking permissions with BukkitPermissions!");
+                        player.sendMessage("[xpShop] " + "Error on checking permissions with BukkitPermissions!");
+                        e.printStackTrace();
+                        return false;
+                    }
+
+                } else {
+                    if (Bukkit.getServer().getPluginManager().isPluginEnabled("PermissionsEx")) {
+                        try {
+                            PermissionManager permissions = PermissionsEx.getPermissionManager();
+                            if (args[0].equals("infolevel") || args[0].equals("infoxp")) {
+                                if (args.length == 2) {
+                                    if (permissions.has(player, "xpShop." + args[0] + ".other")) {
+                                        return true;
+                                    } //if(permissions.has(player, "xpShop." + other))
+                                    else {
+                                        player.sendMessage(ChatColor.GRAY + "[xpShop] " + ChatColor.RED + (getConfig().getString("permissions.error." + getConfig().getString("language"))));
+                                        return false;
+                                    }
+                                } else if (args.length == 1) {
+                                    if (permissions.has(player, "xpShop." + args[0] + ".own")) {
+                                        return true;
+                                    } //if(permissions.has(player, "xpShop." + other))
+                                    else {
+                                        player.sendMessage(ChatColor.GRAY + "[xpShop] " + ChatColor.RED + (getConfig().getString("permissions.error." + getConfig().getString("language"))));
+                                        return false;
+                                    }
+                                } else {
+                                    return false;
+                                }
+
+                            } else // Permission check
+                            if (permissions.has(player, "xpShop." + args[0])) {
+                                // yay!
+                                return true;
+                            } else {
+                                // houston, we have a problem :)
+                                player.sendMessage(ChatColor.GRAY + "[xpShop] " + ChatColor.RED + (getConfig().getString("permissions.error." + getConfig().getString("language"))));
+                                return false;
+                            }
+                        } catch (Exception e) {
+                            System.out.println("[xpShop] " + "Error on checking permissions with PermissionsEx!");
+                            player.sendMessage("[xpShop] " + "Error on checking permissions with PermissionsEx!");
+                            e.printStackTrace();
+                            return false;
+                        }
+                    } else {
+                        System.out.println("PermissionsEx plugin are not found.");
+                        return false;
+                    }
+                }
+            }
+        } //if (sender instanceof Player)
+        else {
+            System.out.println("[xpShop] " + (getConfig().getString("command.error.noplayer" + getConfig().getString("language"))));
+            return false;
+        }
+
+    } //public boolean checkpermissions(CommandSender sender, String other)
+
+    
+    
     /*public void loadConfig(){
         config.addDefault("language", "de");
         config.addDefault("command.error.toomanyarguments.de", "Dieser Befehl darf nur eine Zahl enthalten!");
