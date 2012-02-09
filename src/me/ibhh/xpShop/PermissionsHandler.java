@@ -14,11 +14,8 @@ public class PermissionsHandler
     this.plugin = pl;
   }
 
-  public boolean checkpermissions(Player sender, String action)
+  public boolean checkpermissions(Player player, String action)
   {
-    if ((sender instanceof Player))
-    {
-      Player player = sender;
       if (!Bukkit.getServer().getPluginManager().isPluginEnabled("PermissionsEx")) {
         try
         {
@@ -27,15 +24,13 @@ public class PermissionsHandler
             return true;
           }
 
-          xpShop.PlayerLogger(player, player.getDisplayName() + " " + plugin.getConfig().getString("permissions.error." + plugin.getConfig().getString("language")), "");
+          xpShop.PlayerLogger(player, player.getDisplayName() + " " + plugin.config.permissionserror + "(" + action + ")", "Error");
           return false;
         }
         catch (Exception e)
         {
-          System.out.println("[xpShop] Error on checking permissions with BukkitPermissions!");
-
-          player.sendMessage("[xpShop] Error on checking permissions with BukkitPermissions!");
-
+          xpShop.Logger("Error on checking permissions with BukkitPermissions!", "Error");
+          xpShop.PlayerLogger(player, "Error on checking permissions with BukkitPermissions!", "Error");
           e.printStackTrace();
           return false;
         }
@@ -52,26 +47,19 @@ public class PermissionsHandler
           {
             return true;
           }
-
-          xpShop.PlayerLogger(player, player.getDisplayName() + " " + plugin.getConfig().getString("permissions.error." + plugin.getConfig().getString("language")), "");
+          xpShop.PlayerLogger(player, player.getDisplayName() + " " + plugin.config.permissionserror + "(" + action + ")", "Error");
           return false;
         }
         catch (Exception e)
         {
-          System.out.println("[xpShop] Error on checking permissions with PermissionsEx!");
-          player.sendMessage("[xpShop] Error on checking permissions with PermissionsEx!");
+          xpShop.Logger("Error on checking permissions with BukkitPermissions!", "Error");
+          xpShop.PlayerLogger(player, "Error on checking permissions with BukkitPermissions!", "Error");
           e.printStackTrace();
           return false;
         }
 
       }
-
       System.out.println("PermissionsEx plugin are not found.");
       return false;
-    }
-
-    xpShop.Logger(plugin.getConfig().getString("command.error.noplayer" + plugin.getConfig().getString("language")), "Error");
-      
-    return false;
   }
 }

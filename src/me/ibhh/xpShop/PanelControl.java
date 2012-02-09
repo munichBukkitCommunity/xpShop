@@ -115,7 +115,7 @@ public class PanelControl extends JFrame {
             Radio2 = new JRadioButton("de");
             Radio1.setSelected(auc.getConfig().getString("language").equalsIgnoreCase("en"));
             Radio2.setSelected(auc.getConfig().getString("language").equalsIgnoreCase("de"));
-            Radio2.addActionListener(new ActionListener() {
+            Radio1.addActionListener(new ActionListener() {
 
                 @Override
                 public void actionPerformed(ActionEvent event) {
@@ -153,6 +153,7 @@ public class PanelControl extends JFrame {
             JPanel panel = new JPanel();
             final JLabel label = new JLabel("Select if debug should be aktivated: ");
             JCheckBox Haken = new JCheckBox("debug mode");
+            Haken.setSelected(auc.config.debug);
             Haken.addActionListener(new ActionListener() {
 
                 @Override

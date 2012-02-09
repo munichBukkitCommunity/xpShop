@@ -20,6 +20,7 @@ public class iConomyHandler {
         plugin.aktuelleVersion();
         if (setupEconomy() == true) {
             iConomyversion = 2;
+            xpShop.Logger("hooked into Vault", "");
         }
     }
 
@@ -51,18 +52,19 @@ public class iConomyHandler {
 
     public static int iConomyversion() {
         try {
+            if (packageExists(new String[]{"net.milkbowl.vault.economy.Economy"})) {
+                iConomyversion = 2;
+                xpShop.Logger("hooked into Vault", "");
+            }else
             if (packageExists(new String[]{"com.nijikokun.register.payment.Methods"})) {
                 iConomyversion = 1;
                 xpShop.Logger("hooked into Register", "");
-            } else if (packageExists(new String[]{"com.iCo6.system.Accounts"})) {
-                iConomyversion = 6;
-                xpShop.Logger("hooked into iConomy6", "");
             } else if (packageExists(new String[]{"com.iConomy.iConomy", "com.iConomy.system.Account", "com.iConomy.system.Holdings"})) {
                 iConomyversion = 5;
                 xpShop.Logger("hooked into iConomy5", "");
-            } else if (packageExists(new String[]{"net.milkbowl.vault.economy.Economy"})) {
-                iConomyversion = 2;
-                xpShop.Logger("hooked into Vault", "");
+            } else if (packageExists(new String[]{"com.iCo6.system.Accounts"})) {
+                iConomyversion = 6;
+                xpShop.Logger("hooked into iConomy6", "");
             } else {
                 xpShop.Logger("cant hook into iConomy5, iConomy6 or Register. Downloading Register!", "");
                 xpShop.Logger(" ************ Please configure Register!!!!! **********", "Warning");

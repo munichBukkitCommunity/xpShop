@@ -95,7 +95,7 @@ public class ConfigHandler {
             commanderrorfewargs = plugin.getConfig().getString("command.error.fewargs." + language);
             commanderrornoplayer = plugin.getConfig().getString("command.error.noplayer." + language);
             commandsuccessbuy = plugin.getConfig().getString("command.success.buy." + language);
-            commandsuccesssell = plugin.getConfig().getString("command.success.success." + language);
+            commandsuccesssell = plugin.getConfig().getString("command.success.sell." + language);
             commandsuccessbuylevel = plugin.getConfig().getString("command.success.buylevel." + language);
             commandsuccessselllevel = plugin.getConfig().getString("command.success.selllevel." + language);
             commandsuccesssentxp = plugin.getConfig().getString("command.success.sentxp." + language);

@@ -16,6 +16,7 @@ public class Help {
     private PermissionsHandler Permission;
     public Help(xpShop pl){
         plugin = pl;
+        Permission = new PermissionsHandler(pl);
     }
     
     /**

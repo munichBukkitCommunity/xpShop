@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URL;
 import java.net.URLConnection;
+import org.bukkit.ChatColor;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
@@ -28,7 +29,7 @@ public class xpShop extends JavaPlugin {
     private Help Help;
     public static boolean debug;
     public static String PrefixConsole = "[xpShop] ";
-    public static String Prefix = "ChatColor.DARK_BLUE + " + "[xpShop] " + " + ChatColor.GOLD";
+    public static String Prefix = "[xpShop] ";
     private PanelControl panel;
     public ConfigHandler config;
 
@@ -133,13 +134,14 @@ public class xpShop extends JavaPlugin {
         config = new ConfigHandler(this);
         config.loadConfigonStart();
         aktuelleVersion();
-        debug = getConfig().getBoolean("debug");
+        debug = config.debug;
 
         if (getConfig().getBoolean("firstRun")) {
             openGUI();
         }
         Permission = new PermissionsHandler(this);
         Help = new Help(this);
+        Geldsystem = new iConomyHandler(this);
 
         Logger("Version: " + Version + " successfully enabled!", "");
 
@@ -164,7 +166,6 @@ public class xpShop extends JavaPlugin {
                 Logger("Please type [xpShop download] to download manual! ", "Warning");
             }
         }
-        Permission = new PermissionsHandler(this);
     }
 
     /**
@@ -199,7 +200,7 @@ public class xpShop extends JavaPlugin {
                             } else {
                                 return false;
                             }
-                        }
+                        } else
                         if (ActionxpShop.equalsIgnoreCase("infolevel")) {
                             if (Permission.checkpermissions(player, "xpShop.infolevel.own")) {
                                 infolevel(sender, args);
@@ -207,7 +208,8 @@ public class xpShop extends JavaPlugin {
                             } else {
                                 return false;
                             }
-                        }
+                        } else
+                            Help.help(sender, args);
                         break;
                     case 2:
                         ActionxpShop = args[0];
@@ -221,7 +223,7 @@ public class xpShop extends JavaPlugin {
                                 PlayerLogger(player, config.commanderrornoint, "Error");
                                 return false;
                             }
-                        }
+                        } else
                         if (ActionxpShop.equals("buylevel")) {
                             if (Permission.checkpermissions(player, "xpShop.buylevel")) {
                                 if (Tools.isInteger(args[1])) {
@@ -232,7 +234,7 @@ public class xpShop extends JavaPlugin {
                                 PlayerLogger(player, config.commanderrornoint, "Error");
                                 return false;
                             }
-                        }
+                        } else
                         if (ActionxpShop.equals("sell")) {
                             if (Permission.checkpermissions(player, "xpShop.sell")) {
                                 if (Tools.isInteger(args[1])) {
@@ -243,7 +245,7 @@ public class xpShop extends JavaPlugin {
                                 PlayerLogger(player, config.commanderrornoint, "Error");
                                 return false;
                             }
-                        }
+                        } else
                         if (ActionxpShop.equals("buy")) {
                             if (Permission.checkpermissions(player, "xpShop.buy")) {
                                 if (Tools.isInteger(args[1])) {
@@ -253,7 +255,7 @@ public class xpShop extends JavaPlugin {
                                 }
                                 return false;
                             }
-                        }
+                        } else
                         if (ActionxpShop.equalsIgnoreCase("infoxp")) {
                             if (Permission.checkpermissions(player, "xpShop.infoxp.other")) {
                                 if (!Tools.isInteger(args[1])) {
@@ -263,7 +265,7 @@ public class xpShop extends JavaPlugin {
                                 PlayerLogger(player, config.commanderrornoint, "Error");
                                 return false;
                             }
-                        }
+                        } else
                         if (ActionxpShop.equalsIgnoreCase("infolevel")) {
                             if (Permission.checkpermissions(player, "xpShop.infolevel.other")) {
                                 if (!Tools.isInteger(args[1])) {
@@ -273,7 +275,7 @@ public class xpShop extends JavaPlugin {
                                 PlayerLogger(player, config.commanderrornoint, "Error");
                                 return false;
                             }
-                        }
+                        } else
                         if (ActionxpShop.equalsIgnoreCase("help")) {
                             if (Permission.checkpermissions(player, "xpShop.help")) {
                                 if (!Tools.isInteger(args[1])) {
@@ -283,7 +285,8 @@ public class xpShop extends JavaPlugin {
                                 PlayerLogger(player, config.commanderrornoint, "Error");
                                 return false;
                             }
-                        }
+                        } else
+                            Help.help(sender, args);
                         break;
                     case 3:
                         ActionxpShop = args[0];
@@ -296,7 +299,7 @@ public class xpShop extends JavaPlugin {
                                 PlayerLogger(player, config.commanderrornoint, "Error");
                                 return false;
                             }
-                        }
+                        } else
                         if (ActionxpShop.equalsIgnoreCase("send")) {
                             if (Permission.checkpermissions(player, "xpShop.send")) {
                                 if ((!Tools.isInteger(args[1])) && (Tools.isInteger(args[2]))) {
@@ -307,7 +310,8 @@ public class xpShop extends JavaPlugin {
                                 PlayerLogger(player, config.commanderrornoint, "Error");
                                 return false;
                             }
-                        }
+                        } else
+                            Help.help(sender, args);
                         break;
                     default:
                         Help.help(player, args);
@@ -346,9 +350,9 @@ public class xpShop extends JavaPlugin {
 
     public static void PlayerLogger(Player p, String msg, String TYPE) {
         if (TYPE.equalsIgnoreCase("Error")) {
-            p.sendMessage(Prefix + "Error: " + msg);
+            p.sendMessage(ChatColor.DARK_BLUE + Prefix + ChatColor.GOLD + "Error: " + msg);
         } else {
-            p.sendMessage(Prefix + msg);
+            p.sendMessage(ChatColor.DARK_BLUE + Prefix + ChatColor.GOLD + msg);
         }
     }
 
@@ -491,7 +495,7 @@ public class xpShop extends JavaPlugin {
      */
     public boolean buy(CommandSender sender, int buyamount, boolean moneyactive, String von) {
         Player player = (Player) sender;
-        double TOTALXPDOUBLE = (buyamount * (getConfig().getDouble("moneytoxp")));
+        double TOTALXPDOUBLE = (buyamount * config.moneytoxp);
 
         if (buyamount <= 0) {
             if (!von.equals("sendxp")) {
@@ -541,7 +545,7 @@ public class xpShop extends JavaPlugin {
             SubstractedXP = 0;
             double TOTAL = getTOTALXP(sender);
             int TOTALint = (int) TOTAL;
-            getmoney = (getConfig().getDouble("xptomoney"));
+            getmoney = config.xptomoney;
             if (sellamount <= TOTAL) {
                 UpdateXP(sender, -sellamount, "sell");
                 if (moneyactive) {
@@ -578,7 +582,7 @@ public class xpShop extends JavaPlugin {
     public void buylevel(CommandSender sender, int levelamontbuy, boolean moneyactive) {
         Player player = (Player) sender;
         int level = player.getLevel();
-        double money1 = (getConfig().getDouble("moneytoxp"));
+        double money1 = config.moneytoxp;
         double xpNeededForLevel = getLevelXP(levelamontbuy + level);
         double xpAktuell = getTOTALXP(sender);
         double neededXP = xpNeededForLevel - xpAktuell;
@@ -591,9 +595,11 @@ public class xpShop extends JavaPlugin {
             }
         }
         if (ActionxpShop.equalsIgnoreCase("buylevel")) {
-            PlayerLogger(player, String.format(config.commandsuccessbuylevel, (int) (getConfig().getDouble("moneytoxp") * neededXP), (int) neededXP), "");
+            if(config.debug)
+                Logger("String: " + config.commandsuccessbuylevel + "moneytoxp: " + config.moneytoxp + "needed xp: " + neededXP, "Debug");
+            PlayerLogger(player, String.format(config.commandsuccessbuylevel, (int) (config.moneytoxp * neededXP), ((int) neededXP)), "");
         } else if (ActionxpShop.equalsIgnoreCase("info")) {
-            PlayerLogger(player, String.format(config.infoPrefix + " " + config.commandsuccessbuylevel, (int) (getConfig().getDouble("moneytoxp") * neededXP), (int) neededXP), "");
+            PlayerLogger(player, String.format(config.infoPrefix + " " + config.commandsuccessbuylevel, (int) (config.moneytoxp * neededXP), (int) neededXP), "");
         }
     }
 
@@ -610,7 +616,7 @@ public class xpShop extends JavaPlugin {
             PlayerLogger(player, config.commanderrornotenoughxp, "Error");
         } else {
             int level = player.getLevel();
-            double money1 = (getConfig().getDouble("moneytoxp"));
+            double money1 = config.moneytoxp;
             double xpNeededForLevel = getLevelXP(level - levelamountsell);
             double xpAktuell = getTOTALXP(sender);
             double XP2Sell = xpAktuell - xpNeededForLevel;
