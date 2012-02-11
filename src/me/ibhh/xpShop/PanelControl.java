@@ -40,7 +40,7 @@ public class PanelControl extends JFrame {
 
             @Override
             public void actionPerformed(ActionEvent event) {
-                if (xpShop.debug) {
+                if (auc.config.debug) {
                     System.out.println("Button2 get" + event.toString());
                     System.out.println("Source: " + event.getSource());
                 }
@@ -54,7 +54,7 @@ public class PanelControl extends JFrame {
 
             @Override
             public void actionPerformed(ActionEvent event) {
-                if (xpShop.debug) {
+                if (auc.config.debug) {
                     System.out.println("Button2 get" + event.toString());
                     System.out.println("Source: " + event.getSource());
                 }
@@ -72,7 +72,7 @@ public class PanelControl extends JFrame {
 
             @Override
             public void actionPerformed(ActionEvent event) {
-                if (xpShop.debug) {
+                if (auc.config.debug) {
                     System.out.println("Button2 get" + event.toString());
                     System.out.println("Source: " + event.getSource());
                 }
@@ -105,7 +105,7 @@ public class PanelControl extends JFrame {
     }
 
     public JPanel getPanel(int panelindex) {
-        if (xpShop.debug) {
+        if (auc.config.debug) {
             xpShop.Logger("" + panelindex, "Debug");
         }
         if (panelindex == 1) {
@@ -119,7 +119,7 @@ public class PanelControl extends JFrame {
 
                 @Override
                 public void actionPerformed(ActionEvent event) {
-                    if (xpShop.debug) {
+                    if (auc.config.debug) {
                         System.out.println("Button2 get" + event.toString());
                         System.out.println("Source: " + event.getSource());
                     }
@@ -133,7 +133,7 @@ public class PanelControl extends JFrame {
 
                 @Override
                 public void actionPerformed(ActionEvent event) {
-                    if (xpShop.debug) {
+                    if (auc.config.debug) {
                         System.out.println("Button2 get" + event.toString());
                         System.out.println("Source: " + event.getSource());
                     }
@@ -158,14 +158,13 @@ public class PanelControl extends JFrame {
 
                 @Override
                 public void actionPerformed(ActionEvent event) {
-                    if (xpShop.debug) {
+                    if (auc.config.debug) {
                         System.out.println("Button2 get" + event.toString());
                         System.out.println("Source: " + event.getSource());
                     }
                     auc.getConfig().set("debug", !auc.getConfig().getBoolean("debug"));
                     auc.saveConfig();
                     auc.reloadConfig();
-                    auc.reloaddebug();
                     auc.config.reload();
                 }
             });
@@ -189,7 +188,7 @@ public class PanelControl extends JFrame {
                     } catch (Exception e3) {
                         Status.setText("Cant save this value!");
                     }
-                    if (xpShop.debug) {
+                    if (auc.config.debug) {
                         System.out.println("Button2 get" + event.toString());
                         System.out.println("Source: " + event.getSource());
                     }
@@ -200,7 +199,6 @@ public class PanelControl extends JFrame {
                     }
                     auc.saveConfig();
                     auc.reloadConfig();
-                    auc.reloaddebug();
                     auc.config.reload();
                 }
             });
@@ -226,7 +224,7 @@ public class PanelControl extends JFrame {
                     } catch (Exception e3) {
                         Status.setText("Cant save this value!");
                     }
-                    if (xpShop.debug) {
+                    if (auc.config.debug) {
                         System.out.println("Button2 get" + event.toString());
                         System.out.println("Source: " + event.getSource());
                     }
@@ -237,7 +235,6 @@ public class PanelControl extends JFrame {
                     }
                     auc.saveConfig();
                     auc.reloadConfig();
-                    auc.reloaddebug();
                     auc.config.reload();
                 }
             });
@@ -255,14 +252,13 @@ public class PanelControl extends JFrame {
 
                 @Override
                 public void actionPerformed(ActionEvent event) {
-                    if (xpShop.debug) {
+                    if (auc.config.debug) {
                         System.out.println("Button2 get" + event.toString());
                         System.out.println("Source: " + event.getSource());
                     }
                     auc.getConfig().set("autodownload", !auc.getConfig().getBoolean("autodownload"));
                     auc.saveConfig();
                     auc.reloadConfig();
-                    auc.reloaddebug();
                     auc.config.reload();
                 }
             });

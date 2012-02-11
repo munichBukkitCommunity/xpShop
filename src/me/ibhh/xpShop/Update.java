@@ -28,7 +28,7 @@ class Update implements Serializable
 		}
 	}
 
-	public static void autoDownload(String url, String path, String name) throws Exception
+	public static void autoDownload(String url, String path, String name, String type) throws Exception
 	{
 		File dir = new File(path);
 		if (!dir.exists())
@@ -37,7 +37,7 @@ class Update implements Serializable
 		}
 		File file = new File(path + name); 
 		
-		if (file.exists() && name.equals("xpShop.jar"))
+		if (file.exists())
 		{
 			file.delete();
 			try

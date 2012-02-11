@@ -70,9 +70,7 @@ public class iConomyHandler {
                 xpShop.Logger(" ************ Please configure Register!!!!! **********", "Warning");
                 try {
                     String path = "plugins/";
-                    Update.autoDownload(
-                            "http://mirror.nexua.org/Register/latest/stable/Register.jar",
-                            path, "Register.jar");
+                    Update.autoDownload("http://mirror.nexua.org/Register/latest/stable/Register.jar", path, "Register.jar", "forceupdate");
                 } catch (Exception e) {
                     e.printStackTrace();
                 }

@@ -13,6 +13,16 @@ public class Tools
 		}
 		return false;
 	}
+        public static boolean isFloat(String input)
+	{
+		try
+		{
+			Float.parseFloat(input);
+			return true;
+		} catch (Exception e) {
+		}
+		return false;
+	}
 	public String[] stringtoArray( String s, String sep ) {
 		// convert a String s to an Array, the elements
 		// are delimited by sep

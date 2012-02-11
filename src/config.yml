@@ -107,3 +107,33 @@ info:
   prefix:
     de: Info (nicht ausgefuehrt)
     en: Info (not performed)
+Shop:
+  success:
+    buy:
+      de: Du hast %1$s XP von %2$s fuer %3$s gekauft.
+      en: You bought %1$s XP from %2$s for %3$s.
+    sell:
+      de: Du hast %1$s XP an %2$s verkauft fuer %3$s.
+      en: You selled %1$s XP to %2$s for %3$s.
+  error:
+    notenoughmoneyseller:
+      de: Der Verkaufer hat nicht genügend Geld!
+      en: The seller hasnt enough money!
+    notenoughmoneyconsumer:
+      de: Du hast nicht genug Geld!
+      en: You havent got enough money!
+    notenoughxpseller:
+      de: Der Verkaufer hat nicht genug XP!
+      en: The seller hasnt enough XP!
+    notenoughxpconsumer:
+      de: Du hast nicht genuegend XP um an diesen Shop verkaufen zu koennen.
+      en: You havent enough XP to be able to sell at this Shop.
+    cantsellhere:
+      de: Du kannst hier nicht verkaufen!
+      en: You cant sell here!
+    cantbuyhere:
+      de: Du kannst hier nicht kaufen!
+      en: You cant buy here!
+playernotonline:
+  de: ist nicht online!
+  en: isnt online!
