@@ -754,7 +754,7 @@ public class xpShop extends JavaPlugin {
             } else if (args[1].equals("send")) {
                 PlayerLogger(player, "There is no info for (send)!", "Error");
             } else {
-                PlayerLogger(player, "Error: Command not found!", "Error");
+                PlayerLogger(player, "Command not found!", "Error");
             }
             player.setLevel(nowlevel);
             player.setExp(nowxp);

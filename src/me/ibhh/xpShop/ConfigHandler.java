@@ -46,6 +46,8 @@ public class ConfigHandler {
             infoPrefix,
             Shopsuccessbuy,
             Shopsuccesssell,
+            Shopsuccesssellerselled,
+            Shopsuccesssellerbuy,
             Shoperrornotenoughmoneyseller,
             Shoperrornotenoughmoneyconsumer,
             Shoperrornotenoughxpseller,
@@ -95,14 +97,16 @@ public class ConfigHandler {
     public void loadStrings(){
             language = plugin.getConfig().getString("language");
             playernotonline = plugin.getConfig().getString("playernotonline." + language);
-            Shoperrornotenoughmoneyconsumer = plugin.getConfig().getString("Shop.error.notenoughmoneyseller." + language);
-            Shoperrornotenoughmoneyseller = plugin.getConfig().getString("Shop.error.notenoughmoneyconsumer." + language);
+            Shoperrornotenoughmoneyconsumer = plugin.getConfig().getString("Shop.error.notenoughmoneyconsumer." + language);
+            Shoperrornotenoughmoneyseller = plugin.getConfig().getString("Shop.error.notenoughmoneyseller." + language);
             Shoperrorcantbuyhere = plugin.getConfig().getString("Shop.error.cantbuyhere." + language);
             Shoperrorcantsellhere = plugin.getConfig().getString("Shop.error.cantsellhere." + language);
             Shoperrornotenoughxpconsumer = plugin.getConfig().getString("Shop.error.notenoughxpconsumer." + language);
             Shoperrornotenoughxpseller = plugin.getConfig().getString("Shop.error.notenoughxpseller." + language);
             Shopsuccessbuy = plugin.getConfig().getString("Shop.success.buy." + language);
             Shopsuccesssell = plugin.getConfig().getString("Shop.success.sell." + language);
+            Shopsuccesssellerbuy = plugin.getConfig().getString("Shop.success.sellerbuy." + language);
+            Shopsuccesssellerselled = plugin.getConfig().getString("Shop.success.sellerselled." + language);
             commanderrorinfo = plugin.getConfig().getString("command.error.info." + language);
             commanderrorbuyinfo = plugin.getConfig().getString("command.error.buyinfo." + language);
             commanderrornotenoughmoney = plugin.getConfig().getString("command.error.notenoughmoney." + language);

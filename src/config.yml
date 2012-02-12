@@ -57,8 +57,8 @@ command:
       en: You recieved %1$d XP from %2$s.
 permissions:
   error:
-    de: Wir haben ein Problem! Diesen Befehl darfst Du nicht verwenden!
-    en: we have a problem! You can't use this command!
+    de: Wir haben ein Problem! Dies darfst Du nicht machen!
+    en: we have a problem! You musnt do this!
   notfound:
     de: PermissionsEx plugin nicht gefunden!
     en: PermissionsEx not found!
@@ -115,9 +115,15 @@ Shop:
     sell:
       de: Du hast %1$s XP an %2$s verkauft fuer %3$s.
       en: You selled %1$s XP to %2$s for %3$s.
+    sellerselled:
+      de: Player %2$s hat an Dich %1$s XP fuer %3$s verkauft.
+      en: Player %2$s has selled %1$s XP to you for %3$s.
+    sellerbuy:
+      de: Player %2$s hat von Dir %1$s XP fuer %3$s gekauft.
+      en: Player %2$s has bought %1$s XP from you for %3$s.
   error:
     notenoughmoneyseller:
-      de: Der Verkaufer hat nicht genügend Geld!
+      de: Der Verkaufer hat nicht genuegend Geld!
       en: The seller hasnt enough money!
     notenoughmoneyconsumer:
       de: Du hast nicht genug Geld!
