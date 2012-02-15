@@ -276,7 +276,7 @@ public class xpShopListener implements Listener {
                                             xpShop.PlayerLogger(p, String.format(plugin.config.Shopsuccessbuy, s.getLine(2), s.getLine(1), split[0]), "");
                                             plugin.UpdateXP(empfaenger, -(Integer.parseInt(s.getLine(2))), "Sign");
                                             plugin.Geldsystem.addmoney156(price, empfaenger);
-                                            xpShop.PlayerLogger(empfaenger, String.format(plugin.config.Shopsuccesssellerbuy, s.getLine(2), s.getLine(1), split[0]), "");
+                                            xpShop.PlayerLogger(empfaenger, String.format(plugin.config.Shopsuccesssellerbuy, s.getLine(2), p.getDisplayName(), split[0]), "");
                                         } else {
                                             xpShop.PlayerLogger(p, plugin.config.Shoperrornotenoughmoneyconsumer, "Error");
                                         }
@@ -321,7 +321,7 @@ public class xpShopListener implements Listener {
                                         if ((plugin.Geldsystem.getBalance156(empfaenger) - price) >= 0) {
                                             plugin.Geldsystem.substractmoney156(price, empfaenger);
                                             plugin.UpdateXP(empfaenger, (Integer.parseInt(s.getLine(2))), "Sign");
-                                            xpShop.PlayerLogger(empfaenger, String.format(plugin.config.Shopsuccesssellerselled, s.getLine(2), s.getLine(1), split[1]), "");
+                                            xpShop.PlayerLogger(empfaenger, String.format(plugin.config.Shopsuccesssellerselled, s.getLine(2), p.getDisplayName(), split[1]), "");
                                             plugin.Geldsystem.addmoney156(price, p);
                                             plugin.UpdateXP(p, -(Integer.parseInt(s.getLine(2))), "Sign");
                                             xpShop.PlayerLogger(p, String.format(plugin.config.Shopsuccesssell, s.getLine(2), s.getLine(1), split[1]), "");

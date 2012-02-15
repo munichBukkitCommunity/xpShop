@@ -1,5 +1,5 @@
 name: xpShop
-version: 3.2
+version: 3.3
 description: Player can buy xp
 author: ibhh
 website: http://www.ibhh.de
@@ -25,6 +25,7 @@ permissions:
       xpShop.infoxp.other: false
       xpShop.infolevel.own: false
       xpShop.infolevel.other: false
+    default: false
   xpShop.buy:
     description: Allows you to buy xp.
     default: false

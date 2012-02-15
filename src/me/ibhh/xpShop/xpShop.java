@@ -5,9 +5,9 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URL;
 import java.net.URLConnection;
+import java.util.logging.Level;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
-import org.bukkit.block.Sign;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -42,6 +42,17 @@ public class xpShop extends JavaPlugin {
      */
     @Override
     public void onDisable() {
+        Geldsystem = null;
+        Permission = null;
+        Help = null;
+        panel = null;
+        config = null;
+        ListenerShop = null;
+        try{
+        finalize();
+        } catch (Throwable ew){
+            Logger("cant finalize!", "Error");
+        }
         forceUpdate();
         Logger("disabled!", "");
     }
@@ -52,15 +63,23 @@ public class xpShop extends JavaPlugin {
      * @param
      * @return
      */
-    public void autoUpdate(String url, String path, String name, String type) {
+    public boolean autoUpdate(String url, String path, String name, String type) {
         try {
             Update.autoDownload(url, path, "xpShop.jar", type);
+            return true;
         } catch (Exception e) {
-            e.printStackTrace();
+            Logger(e.getMessage(), "Error");
+            try {
+                Update.autoDownload(url, path + "xpShop\\", "xpShop.jar", type);
+                return true;
+            } catch (Exception ex) {
+                Logger(ex.getMessage(), "Error");
+                return false;
+            }
         }
     }
 
-    public void forceUpdate(){
+    public void forceUpdate() {
         String URL = "http://ibhh.de:80/aktuelleversion.html";
         if ((UpdateAvailable(URL, Version) == true)) {
             Logger("New version: " + getNewVersion(URL) + " found!", "Warning");
@@ -71,9 +90,12 @@ public class xpShop extends JavaPlugin {
             if (getConfig().getBoolean("autodownload") == true) {
                 try {
                     String path = "plugins" + "\\";
-                    autoUpdate("http://ibhh.de/xpShop.jar", path, "xpShop.jar", "forceupdate");
-                    Logger("Downloaded new Version!", "Warning");
-                    Logger("xpShop will be updated on the next restart!", "Warning");
+                    if(autoUpdate("http://ibhh.de/xpShop.jar", path, "xpShop.jar", "forceupdate")){
+                        Logger("Downloaded new Version!", "Warning");
+                        Logger("xpShop will be updated on the next restart!", "Warning");
+                    } else {
+                        Logger(" Cant download new Version!", "Warning");
+                    }
                 } catch (Exception e) {
                     Logger("Error on donwloading new Version!", "Error");
                     e.printStackTrace();
@@ -83,7 +105,7 @@ public class xpShop extends JavaPlugin {
             }
         }
     }
-    
+
     /**
      * Gets version.
      *
@@ -127,7 +149,6 @@ public class xpShop extends JavaPlugin {
         }
         return rt2;
     }
-    
 
     /**
      * Compares Version to newVersion
@@ -229,9 +250,10 @@ public class xpShop extends JavaPlugin {
                             } else {
                                 return false;
                             }
-                        } else {
+                        } else if (ActionxpShop.equalsIgnoreCase("version")) {
+                            PlayerLogger(player, "Version: " + getDescription().getVersion(), "");
+                        } else
                             Help.help(sender, args);
-                        }
                         break;
                     case 2:
                         ActionxpShop = args[0];
@@ -411,7 +433,6 @@ public class xpShop extends JavaPlugin {
         }
         return false;
     }
-
 
     public static void Logger(String msg, String TYPE) {
         if (TYPE.equalsIgnoreCase("Warning") || TYPE.equalsIgnoreCase("Error")) {
