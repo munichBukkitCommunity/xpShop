@@ -1,11 +1,5 @@
 package me.ibhh.xpShop;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.net.URL;
-import java.net.URLConnection;
-import java.util.logging.Level;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
@@ -33,6 +27,8 @@ public class xpShop extends JavaPlugin {
     private PanelControl panel;
     public ConfigHandler config;
     public xpShopListener ListenerShop;
+    private Update upd;
+    public boolean blacklisted;
 
     /**
      * Called by Bukkit on stopping the server
@@ -48,12 +44,13 @@ public class xpShop extends JavaPlugin {
         panel = null;
         config = null;
         ListenerShop = null;
-        try{
-        finalize();
-        } catch (Throwable ew){
+        try {
+            finalize();
+        } catch (Throwable ew) {
             Logger("cant finalize!", "Error");
         }
         forceUpdate();
+        blacklistUpdate();
         Logger("disabled!", "");
     }
 
@@ -65,12 +62,12 @@ public class xpShop extends JavaPlugin {
      */
     public boolean autoUpdate(String url, String path, String name, String type) {
         try {
-            Update.autoDownload(url, path, "xpShop.jar", type);
+            Update.autoDownload(url, path, name, type);
             return true;
         } catch (Exception e) {
             Logger(e.getMessage(), "Error");
             try {
-                Update.autoDownload(url, path + "xpShop\\", "xpShop.jar", type);
+                Update.autoDownload(url, path + "xpShop\\", name, type);
                 return true;
             } catch (Exception ex) {
                 Logger(ex.getMessage(), "Error");
@@ -82,7 +79,7 @@ public class xpShop extends JavaPlugin {
     public void forceUpdate() {
         String URL = "http://ibhh.de:80/aktuelleversion.html";
         if ((UpdateAvailable(URL, Version) == true)) {
-            Logger("New version: " + getNewVersion(URL) + " found!", "Warning");
+            Logger("New version: " + Update.getNewVersion(URL) + " found!", "Warning");
             Logger("******************************************", "Warning");
             Logger("*********** Please update!!!! ************", "Warning");
             Logger("* http://ibhh.de/xpShop.jar *", "Warning");
@@ -90,7 +87,7 @@ public class xpShop extends JavaPlugin {
             if (getConfig().getBoolean("autodownload") == true) {
                 try {
                     String path = "plugins" + "\\";
-                    if(autoUpdate("http://ibhh.de/xpShop.jar", path, "xpShop.jar", "forceupdate")){
+                    if (autoUpdate("http://ibhh.de/xpShop.jar", path, "xpShop.jar", "forceupdate")) {
                         Logger("Downloaded new Version!", "Warning");
                         Logger("xpShop will be updated on the next restart!", "Warning");
                     } else {
@@ -102,6 +99,25 @@ public class xpShop extends JavaPlugin {
                 }
             } else {
                 Logger("Please type [xpShop download] to download manual! ", "Warning");
+            }
+        }
+    }
+
+    public void blacklistUpdate() {
+        if (upd.getBlacklisted("http://ibhh.de/BlacklistxpShop.html") == true) {
+            blacklisted = true;
+            Logger("Your version is blacklisted because of bugs, after restart an bugfix will be installed!", "Warning");
+            try {
+                String path = "plugins" + "\\";
+                if (autoUpdate("http://ibhh.de/xpShop.jar", path, "xpShop.jar", "forceupdate")) {
+                    Logger("Downloaded new Version!", "Warning");
+                    Logger("xpShop will be updated on the next restart!", "Warning");
+                } else {
+                    Logger(" Cant download new Version!", "Warning");
+                }
+            } catch (Exception e) {
+                Logger("Error on donwloading new Version!", "Error");
+                e.printStackTrace();
             }
         }
     }
@@ -122,35 +138,6 @@ public class xpShop extends JavaPlugin {
     }
 
     /**
-     * Checks version with a http-connection
-     *
-     * @param
-     * @return float: latest recommend build.
-     */
-    public float getNewVersion(String url) {
-        float rt2 = 0;
-        String zeile;
-        try {
-            URL myConnection = new URL(url);
-            URLConnection connectMe = myConnection.openConnection();
-
-            InputStreamReader lineReader = new InputStreamReader(connectMe.getInputStream());
-            BufferedReader br = new BufferedReader(new BufferedReader(lineReader));
-            zeile = br.readLine();
-            rt2 = Float.parseFloat(zeile);
-        } catch (IOException ioe) {
-            ioe.printStackTrace();
-            Logger("Exception: IOException!", "Error");
-            return -1;
-        } catch (Exception e) {
-            e.printStackTrace();
-            Logger("Exception: Exception!", "");
-            return 0;
-        }
-        return rt2;
-    }
-
-    /**
      * Compares Version to newVersion
      *
      * @param url from newVersion file + currentVersion
@@ -158,7 +145,7 @@ public class xpShop extends JavaPlugin {
      */
     public boolean UpdateAvailable(String url, float currVersion) {
         boolean a = false;
-        if (getNewVersion(url) > currVersion) {
+        if (Update.getNewVersion(url) > currVersion) {
             a = true;
         }
         return a;
@@ -179,35 +166,46 @@ public class xpShop extends JavaPlugin {
      */
     @Override
     public void onEnable() {
+        aktuelleVersion();
+        upd = new Update(this);
+        if (upd.getBlacklisted("http://ibhh.de/BlacklistxpShop.html") == true) {
+            blacklisted = true;
+        }
+        ListenerShop = new xpShopListener(this);
+
         config = new ConfigHandler(this);
         config.loadConfigonStart();
         config.reload();
-        aktuelleVersion();
-        ListenerShop = new xpShopListener(this);
-        if (getConfig().getBoolean("firstRun")) {
-            try {
-                openGUI();
-            } catch (Exception e) {
-                Logger("You cant use the gui, notice that.", "Error");
-                getConfig().set("firstRun", false);
-                saveConfig();
-                reloadConfig();
-                config.reload();
+        if (!blacklisted) {
+            if (getConfig().getBoolean("firstRun")) {
+                try {
+                    openGUI();
+                } catch (Exception e) {
+                    Logger("You cant use the gui, notice that.", "Error");
+                    getConfig().set("firstRun", false);
+                    saveConfig();
+                    reloadConfig();
+                    config.reload();
+                }
             }
+
+            Permission = new PermissionsHandler(this);
+            Help = new Help(this);
+            Geldsystem = new iConomyHandler(this);
+            String URL = "http://ibhh.de:80/aktuelleversion.html";
+            if ((UpdateAvailable(URL, Version) == true)) {
+                Logger("New version: " + upd.getNewVersion(URL) + " found!", "Warning");
+                Logger("******************************************", "Warning");
+                Logger("*********** Please update!!!! ************", "Warning");
+                Logger("* http://ibhh.de/xpShop.jar *", "Warning");
+                Logger("******************************************", "Warning");
+                Logger("xpShop will be updated on the next restart!", "Warning");
+                Logger("Version: " + Version + " successfully enabled!", "");
+            }
+        } else {
+            Logger("xpShop version " + Version + " is blacklisted because of bugs, after restart an bugfix will be installed!", "Warning");
+            Logger("All funktions deactivated to prevent the server!", "Warning");
         }
-        Permission = new PermissionsHandler(this);
-        Help = new Help(this);
-        Geldsystem = new iConomyHandler(this);
-        String URL = "http://ibhh.de:80/aktuelleversion.html";
-        if ((UpdateAvailable(URL, Version) == true)) {
-            Logger("New version: " + getNewVersion(URL) + " found!", "Warning");
-            Logger("******************************************", "Warning");
-            Logger("*********** Please update!!!! ************", "Warning");
-            Logger("* http://ibhh.de/xpShop.jar *", "Warning");
-            Logger("******************************************", "Warning");
-            Logger("xpShop will be updated on the next restart!", "Warning");
-        }
-        Logger("Version: " + Version + " successfully enabled!", "");
     }
 
     /**
@@ -230,208 +228,236 @@ public class xpShop extends JavaPlugin {
      */
     @Override
     public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
-        if (sender instanceof Player) {
-            Player player = (Player) sender;
-            if (cmd.getName().equalsIgnoreCase("xpShop")) {
-                switch (args.length) {
-                    case 1:
-                        ActionxpShop = args[0];
-                        if (ActionxpShop.equalsIgnoreCase("infoxp")) {
-                            if (Permission.checkpermissions(player, "xpShop.infoxp.own")) {
-                                infoxp(sender, args);
-                                return true;
-                            } else {
-                                return false;
-                            }
-                        } else if (ActionxpShop.equalsIgnoreCase("infolevel")) {
-                            if (Permission.checkpermissions(player, "xpShop.infolevel.own")) {
-                                infolevel(sender, args);
-                                return true;
-                            } else {
-                                return false;
-                            }
-                        } else if (ActionxpShop.equalsIgnoreCase("version")) {
-                            PlayerLogger(player, "Version: " + getDescription().getVersion(), "");
-                        } else
-                            Help.help(sender, args);
-                        break;
-                    case 2:
-                        ActionxpShop = args[0];
-                        if (ActionxpShop.equals("selllevel")) {
-                            if (Permission.checkpermissions(player, "xpShop.selllevel")) {
-                                if (Tools.isInteger(args[1])) {
-                                    selllevel = Integer.parseInt(args[1]);
-                                    selllevel(player, this.selllevel, true);
-                                    return true;
-                                }
-                                PlayerLogger(player, config.commanderrornoint, "Error");
-                                return false;
-                            }
-                        } else if (ActionxpShop.equals("buylevel")) {
-                            if (Permission.checkpermissions(player, "xpShop.buylevel")) {
-                                if (Tools.isInteger(args[1])) {
-                                    buylevel = Integer.parseInt(args[1]);
-                                    buylevel(player, this.buylevel, true);
-                                    return true;
-                                }
-                                PlayerLogger(player, config.commanderrornoint, "Error");
-                                return false;
-                            }
-                        } else if (ActionxpShop.equals("sell")) {
-                            if (Permission.checkpermissions(player, "xpShop.sell")) {
-                                if (Tools.isInteger(args[1])) {
-                                    sell = Integer.parseInt(args[1]);
-                                    sell(player, this.sell, true, "sell");
-                                    return true;
-                                }
-                                PlayerLogger(player, config.commanderrornoint, "Error");
-                                return false;
-                            }
-                        } else if (ActionxpShop.equals("buy")) {
-                            if (Permission.checkpermissions(player, "xpShop.buy")) {
-                                if (Tools.isInteger(args[1])) {
-                                    buy = Integer.parseInt(args[1]);
-                                    buy(player, this.buy, true, "buy");
-                                    return true;
-                                }
-                                return false;
-                            }
-                        } else if (ActionxpShop.equalsIgnoreCase("infoxp")) {
-                            if (Permission.checkpermissions(player, "xpShop.infoxp.other")) {
-                                if (!Tools.isInteger(args[1])) {
+        if (!blacklisted) {
+            if (sender instanceof Player) {
+                Player player = (Player) sender;
+                if (cmd.getName().equalsIgnoreCase("xpShop")) {
+                    switch (args.length) {
+                        case 1:
+                            ActionxpShop = args[0];
+                            if (ActionxpShop.equalsIgnoreCase("infoxp")) {
+                                if (Permission.checkpermissions(player, "xpShop.infoxp.own")) {
                                     infoxp(sender, args);
                                     return true;
+                                } else {
+                                    return false;
                                 }
-                                PlayerLogger(player, config.commanderrornoint, "Error");
-                                return false;
-                            }
-                        } else if (ActionxpShop.equalsIgnoreCase("infolevel")) {
-                            if (Permission.checkpermissions(player, "xpShop.infolevel.other")) {
-                                if (!Tools.isInteger(args[1])) {
+                            } else if (ActionxpShop.equalsIgnoreCase("infolevel")) {
+                                if (Permission.checkpermissions(player, "xpShop.infolevel.own")) {
                                     infolevel(sender, args);
                                     return true;
+                                } else {
+                                    return false;
                                 }
-                                PlayerLogger(player, config.commanderrornoint, "Error");
-                                return false;
+                            } else if (ActionxpShop.equalsIgnoreCase("version")) {
+                                PlayerLogger(player, "Version: " + getDescription().getVersion(), "");
+                            } else {
+                                Help.help(sender, args);
                             }
-                        } else if (ActionxpShop.equalsIgnoreCase("help")) {
-                            if (Permission.checkpermissions(player, "xpShop.help")) {
-                                if (!Tools.isInteger(args[1])) {
-                                    Help.help(player, args);
-                                    return true;
+                            break;
+                        case 2:
+                            ActionxpShop = args[0];
+                            if (ActionxpShop.equals("selllevel")) {
+                                if (Permission.checkpermissions(player, "xpShop.selllevel")) {
+                                    if (Tools.isInteger(args[1])) {
+                                        selllevel = Integer.parseInt(args[1]);
+                                        selllevel(player, this.selllevel, true);
+                                        return true;
+                                    }
+                                    PlayerLogger(player, config.commanderrornoint, "Error");
+                                    return false;
                                 }
-                                PlayerLogger(player, config.commanderrornoint, "Error");
-                                return false;
-                            }
-                        } else {
-                            Help.help(sender, args);
-                        }
-                        break;
-                    case 3:
-                        ActionxpShop = args[0];
-                        if (ActionxpShop.equalsIgnoreCase("info")) {
-                            if (Permission.checkpermissions(player, "xpShop.info")) {
-                                if ((!Tools.isInteger(args[1])) && (Tools.isInteger(args[2]))) {
-                                    info(player, args);
-                                    return true;
+                            } else if (ActionxpShop.equals("buylevel")) {
+                                if (Permission.checkpermissions(player, "xpShop.buylevel")) {
+                                    if (Tools.isInteger(args[1])) {
+                                        buylevel = Integer.parseInt(args[1]);
+                                        buylevel(player, this.buylevel, true);
+                                        return true;
+                                    }
+                                    PlayerLogger(player, config.commanderrornoint, "Error");
+                                    return false;
                                 }
-                                PlayerLogger(player, config.commanderrornoint, "Error");
-                                return false;
-                            }
-                        } else if (ActionxpShop.equalsIgnoreCase("send")) {
-                            if (Permission.checkpermissions(player, "xpShop.send")) {
-                                if ((!Tools.isInteger(args[1])) && (Tools.isInteger(args[2]))) {
-                                    int xp = Integer.parseInt(args[2]);
-                                    sendxp(sender, xp, args[1], args);
-                                    return true;
+                            } else if (ActionxpShop.equals("sell")) {
+                                if (Permission.checkpermissions(player, "xpShop.sell")) {
+                                    if (Tools.isInteger(args[1])) {
+                                        sell = Integer.parseInt(args[1]);
+                                        sell(player, this.sell, true, "sell");
+                                        return true;
+                                    }
+                                    PlayerLogger(player, config.commanderrornoint, "Error");
+                                    return false;
                                 }
-                                PlayerLogger(player, config.commanderrornoint, "Error");
-                                return false;
+                            } else if (ActionxpShop.equals("buy")) {
+                                if (Permission.checkpermissions(player, "xpShop.buy")) {
+                                    if (Tools.isInteger(args[1])) {
+                                        buy = Integer.parseInt(args[1]);
+                                        buy(player, this.buy, true, "buy");
+                                        return true;
+                                    }
+                                    return false;
+                                }
+                            } else if (ActionxpShop.equalsIgnoreCase("infoxp")) {
+                                if (Permission.checkpermissions(player, "xpShop.infoxp.other")) {
+                                    if (!Tools.isInteger(args[1])) {
+                                        infoxp(sender, args);
+                                        return true;
+                                    }
+                                    PlayerLogger(player, config.commanderrornoint, "Error");
+                                    return false;
+                                }
+                            } else if (ActionxpShop.equalsIgnoreCase("infolevel")) {
+                                if (Permission.checkpermissions(player, "xpShop.infolevel.other")) {
+                                    if (!Tools.isInteger(args[1])) {
+                                        infolevel(sender, args);
+                                        return true;
+                                    }
+                                    PlayerLogger(player, config.commanderrornoint, "Error");
+                                    return false;
+                                }
+                            } else if (ActionxpShop.equalsIgnoreCase("help")) {
+                                if (Permission.checkpermissions(player, "xpShop.help")) {
+                                    if (!Tools.isInteger(args[1])) {
+                                        Help.help(player, args);
+                                        return true;
+                                    }
+                                    PlayerLogger(player, config.commanderrornoint, "Error");
+                                    return false;
+                                }
+                            } else {
+                                Help.help(sender, args);
                             }
-                        } else {
-                            Help.help(sender, args);
-                        }
-                        break;
-                    default:
-                        Help.help(player, args);
-                        return false;
+                            break;
+                        case 3:
+                            ActionxpShop = args[0];
+                            if (ActionxpShop.equalsIgnoreCase("info")) {
+                                if (Permission.checkpermissions(player, "xpShop.info")) {
+                                    if ((!Tools.isInteger(args[1])) && (Tools.isInteger(args[2]))) {
+                                        info(player, args);
+                                        return true;
+                                    }
+                                    PlayerLogger(player, config.commanderrornoint, "Error");
+                                    return false;
+                                }
+                            } else if (ActionxpShop.equalsIgnoreCase("send")) {
+                                if (Permission.checkpermissions(player, "xpShop.send")) {
+                                    if ((!Tools.isInteger(args[1])) && (Tools.isInteger(args[2]))) {
+                                        int xp = Integer.parseInt(args[2]);
+                                        sendxp(sender, xp, args[1], args);
+                                        return true;
+                                    }
+                                    PlayerLogger(player, config.commanderrornoint, "Error");
+                                    return false;
+                                }
+                            } else {
+                                Help.help(sender, args);
+                            }
+                            break;
+                        default:
+                            Help.help(player, args);
+                            return false;
+                    }
                 }
-            }
-        } else if (cmd.getName().equalsIgnoreCase("xpShop")) {
-            if (args.length == 1) {
-                if (args[0].equalsIgnoreCase("download")) {
-                    String path = "plugins" + "\\";
-                    autoUpdate("http://ibhh.de/xpShop.jar", path, "xpShop.jar", "forceupdate");
-                    Logger("Downloaded new Version!", "Warning");
-                    Logger("xpShop will be updated on the next restart!", "Warning");
-                    return true;
-                } else if (args[0].equalsIgnoreCase("gui")) {
-                    openGUI();
-                    return true;
-                } else if (args[0].equalsIgnoreCase("reload")) {
-                    onReload();
-                    return true;
-                } else if (args[0].equalsIgnoreCase("debug")) {
-                    getConfig().set("debug", !getConfig().getBoolean("debug"));
-                    Logger("debug set to: " + getConfig().getBoolean("debug"), "");
-                    saveConfig();
-                    if (config.debug) {
-                        Logger("Config saved!", "Debug");
+                } else if (cmd.getName().equalsIgnoreCase("xpShop")) {
+                    if (args.length == 1) {
+                        if (args[0].equalsIgnoreCase("download")) {
+                            String path = "plugins" + "\\";
+                            autoUpdate("http://ibhh.de/xpShop.jar", path, "xpShop.jar", "forceupdate");
+                            Logger("Downloaded new Version!", "Warning");
+                            Logger("xpShop will be updated on the next restart!", "Warning");
+                            return true;
+                        } else if (args[0].equalsIgnoreCase("gui")) {
+                            openGUI();
+                            return true;
+                        } else if (args[0].equalsIgnoreCase("reload")) {
+                            onReload();
+                            return true;
+                        } else if (args[0].equalsIgnoreCase("debug")) {
+                            getConfig().set("debug", !getConfig().getBoolean("debug"));
+                            Logger("debug set to: " + getConfig().getBoolean("debug"), "");
+                            saveConfig();
+                            if (config.debug) {
+                                Logger("Config saved!", "Debug");
+                            }
+                            reloadConfig();
+                            if (config.debug) {
+                                Logger("Config reloaded!", "Debug");
+                            }
+                            if (config.debug) {
+                                Logger("debug reloaded!", "Debug");
+                            }
+                            config.reload();
+                            if (config.debug) {
+                                Logger("Config reloaded!", "Debug");
+                            }
+                            return true;
+                        } else if (args[0].equalsIgnoreCase("autodownload")) {
+                            getConfig().set("autodownload", !getConfig().getBoolean("autodownload"));
+                            Logger("autodownload set to: " + getConfig().getBoolean("autodownload"), "");
+                            saveConfig();
+                            if (config.debug) {
+                                Logger("Config saved!", "Debug");
+                            }
+                            reloadConfig();
+                            if (config.debug) {
+                                Logger("Config reloaded!", "Debug");
+                            }
+                            if (config.debug) {
+                                Logger("debug reloaded!", "Debug");
+                            }
+                            config.reload();
+                            if (config.debug) {
+                                Logger("Config reloaded!", "Debug");
+                            }
+                            return true;
+                        } else if (args[0].equalsIgnoreCase("firstRun")) {
+                            getConfig().set("firstRun", !getConfig().getBoolean("firstRun"));
+                            Logger("firstRun set to: " + getConfig().getBoolean("firstRun"), "");
+                            saveConfig();
+                            if (config.debug) {
+                                Logger("Config saved!", "Debug");
+                            }
+                            reloadConfig();
+                            if (config.debug) {
+                                Logger("Config reloaded!", "Debug");
+                            }
+                            if (config.debug) {
+                                Logger("debug reloaded!", "Debug");
+                            }
+                            config.reload();
+                            if (config.debug) {
+                                Logger("Config reloaded!", "Debug");
+                            }
+                            return true;
+                        }
                     }
-                    reloadConfig();
-                    if (config.debug) {
-                        Logger("Config reloaded!", "Debug");
-                    }
-                    if (config.debug) {
-                        Logger("debug reloaded!", "Debug");
-                    }
-                    config.reload();
-                    if (config.debug) {
-                        Logger("Config reloaded!", "Debug");
-                    }
-                    return true;
-                } else if (args[0].equalsIgnoreCase("autodownload")) {
-                    getConfig().set("autodownload", !getConfig().getBoolean("autodownload"));
-                    Logger("autodownload set to: " + getConfig().getBoolean("autodownload"), "");
-                    saveConfig();
-                    if (config.debug) {
-                        Logger("Config saved!", "Debug");
-                    }
-                    reloadConfig();
-                    if (config.debug) {
-                        Logger("Config reloaded!", "Debug");
-                    }
-                    if (config.debug) {
-                        Logger("debug reloaded!", "Debug");
-                    }
-                    config.reload();
-                    if (config.debug) {
-                        Logger("Config reloaded!", "Debug");
-                    }
-                    return true;
-                } else if (args[0].equalsIgnoreCase("firstRun")) {
-                    getConfig().set("firstRun", !getConfig().getBoolean("firstRun"));
-                    Logger("firstRun set to: " + getConfig().getBoolean("firstRun"), "");
-                    saveConfig();
-                    if (config.debug) {
-                        Logger("Config saved!", "Debug");
-                    }
-                    reloadConfig();
-                    if (config.debug) {
-                        Logger("Config reloaded!", "Debug");
-                    }
-                    if (config.debug) {
-                        Logger("debug reloaded!", "Debug");
-                    }
-                    config.reload();
-                    if (config.debug) {
-                        Logger("Config reloaded!", "Debug");
-                    }
-                    return true;
                 }
-            }
+            return false;
+        } else {
+            blacklistLogger(sender);
+            return true;
         }
-        return false;
+    }
+
+    public static void blacklistLogger(Player sender) {
+        if (sender instanceof Player && sender != null) {
+            Player player = (Player) sender;
+            PlayerLogger(player, "Your xpShop version is blacklisted because of bugs, after restart an bugfix will be installed!", "Warning");
+            PlayerLogger(player, "All funktions deactivated to prevent the server!", "Warning");
+        } else {
+            Logger("Your xpShop version is blacklisted because of bugs, after restart an bugfix will be installed!", "Warning");
+            Logger("All funktions deactivated to prevent the server!", "Warning");
+        }
+    }
+
+    public static void blacklistLogger(CommandSender sender) {
+        if (sender instanceof Player && sender != null) {
+            Player player = (Player) sender;
+            PlayerLogger(player, "Your xpShop version is blacklisted because of bugs, after restart an bugfix will be installed!", "Warning");
+            PlayerLogger(player, "All funktions deactivated to prevent the server!", "Warning");
+        } else {
+            Logger("Your xpShop version is blacklisted because of bugs, after restart an bugfix will be installed!", "Warning");
+            Logger("All funktions deactivated to prevent the server!", "Warning");
+        }
     }
 
     public static void Logger(String msg, String TYPE) {
