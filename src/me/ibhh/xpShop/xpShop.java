@@ -683,6 +683,12 @@ public class xpShop extends JavaPlugin {
     public int sell(CommandSender sender, int sellamount, boolean moneyactive, String von) {
 
         Player player = (Player) sender;
+        if (sellamount <= 0) {
+            if (!von.equals("sendxp")) {
+                PlayerLogger(player, "Invalid Amount!", "Error");
+            }
+            return 0;
+        }
         try {
             SubstractedXP = 0;
             double TOTAL = getTOTALXP(player);
@@ -723,6 +729,10 @@ public class xpShop extends JavaPlugin {
     public void buylevel(CommandSender sender, int levelamontbuy, boolean moneyactive) {
         Player player = (Player) sender;
         int level = player.getLevel();
+        if (levelamontbuy <= 0) {
+                PlayerLogger(player, "Invalid Amount!", "Error");
+            return;
+        }
         double money1 = config.moneytoxp;
         double xpNeededForLevel = getLevelXP(levelamontbuy + level);
         double xpAktuell = getTOTALXP(player);
@@ -754,6 +764,10 @@ public class xpShop extends JavaPlugin {
      */
     public void selllevel(CommandSender sender, int levelamountsell, boolean moneyactive) {
         Player player = (Player) sender;
+        if (levelamountsell <= 0) {
+                PlayerLogger(player, "Invalid Amount!", "Error");
+            return;
+        }
         if (player.getLevel() + player.getExp() <= 0.20) {
             PlayerLogger(player, config.commanderrornotenoughxp, "Error");
         } else {

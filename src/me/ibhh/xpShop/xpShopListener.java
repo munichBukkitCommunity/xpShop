@@ -258,8 +258,9 @@ public class xpShopListener implements Listener {
         } else {
             Sign s = (Sign) event.getBlock().getState();
             String[] line = s.getLines();
-            if(plugin.config.debug)
+            if (plugin.config.debug) {
                 xpShop.Logger("Line 0: " + line[0], "Debug");
+            }
             if (line[0].equalsIgnoreCase("[xpShop]")) {
                 if (!plugin.blacklisted) {
                     if (this.blockIsValid(line, "break", p)) {
@@ -459,12 +460,14 @@ public class xpShopListener implements Listener {
                         xpShop.Logger("None of them is smaller than 0: " + temp[0] + " und " + temp[1], "Debug");
                     }
                     if (Tools.isInteger(lines[2])) {
-                        if (plugin.config.debug) {
-                            xpShop.Logger("Line 2 is int", "Debug");
-                        }
-                        a = true;
-                        if (plugin.config.debug) {
-                            xpShop.Logger("block is valid!", "Debug");
+                        if (Integer.parseInt(lines[2]) > 0) {
+                            if (plugin.config.debug) {
+                                xpShop.Logger("Line 2 is int", "Debug");
+                            }
+                            a = true;
+                            if (plugin.config.debug) {
+                                xpShop.Logger("block is valid!", "Debug");
+                            }
                         }
                     }
                 } else {

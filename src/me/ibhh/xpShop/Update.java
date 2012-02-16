@@ -67,6 +67,7 @@ class Update implements Serializable {
                 rt = Float.parseFloat(Zeile);
                 if (rt == plugin.Version) {
                     a = true;
+                    break;
                 }
             }
             return a;
