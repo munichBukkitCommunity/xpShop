@@ -24,7 +24,7 @@ class Update implements Serializable {
      * @param
      * @return float: latest recommend build.
      */
-    public static float getNewVersion(String url) {
+    public float getNewVersion(String url) {
         float rt2 = 0;
         String zeile;
         try {
@@ -37,11 +37,11 @@ class Update implements Serializable {
             rt2 = Float.parseFloat(zeile);
         } catch (IOException ioe) {
             ioe.printStackTrace();
-            xpShop.Logger("Exception: IOException!", "Error");
+            plugin.Logger("Exception: IOException!", "Error");
             return -1;
         } catch (Exception e) {
             e.printStackTrace();
-            xpShop.Logger("Exception: Exception!", "");
+            plugin.Logger("Exception: Exception!", "");
             return 0;
         }
         return rt2;
@@ -53,8 +53,7 @@ class Update implements Serializable {
      * @param
      * @return float: latest recommend build.
      */
-    public boolean getBlacklisted(String url) {
-        boolean a = false;
+    public String[] getBlacklisted(String url) {
         try {
             URL myConnection = new URL(url);
             URLConnection connectMe = myConnection.openConnection();
@@ -62,24 +61,21 @@ class Update implements Serializable {
             InputStreamReader lineReader = new InputStreamReader(connectMe.getInputStream());
             BufferedReader br = new BufferedReader(new BufferedReader(lineReader));
             String Zeile;
-            float rt;
+            String[] rt;
             for (i = 0; ((Zeile = br.readLine()) != null) && i < 101; i++) {
-                rt = Float.parseFloat(Zeile);
-                if (rt == plugin.Version) {
-                    a = true;
-                    break;
+                rt = Zeile.split(":");
+                if (rt[0].equalsIgnoreCase(Float.toString(plugin.Version))) {
+                    return rt;
                 }
             }
-            return a;
         } catch (IOException ioe) {
             ioe.printStackTrace();
-            xpShop.Logger("Exception: IOException!", "Error");
-            return false;
+            plugin.Logger("Exception: IOException!", "Error");
         } catch (Exception e) {
             e.printStackTrace();
-            xpShop.Logger("Exception: Exception!", "");
-            return false;
+            plugin.Logger("Exception: Exception!", "");
         }
+        return null;
     }
 
     public static String readAll(Reader in) throws IOException {
@@ -99,7 +95,7 @@ class Update implements Serializable {
         }
     }
 
-    public static void autoDownload(String url, String path, String name, String type) throws Exception {
+    public void autoDownload(String url, String path, String name, String type) throws Exception {
         File dir = new File(path);
         if (!dir.exists()) {
             dir.mkdir();
@@ -122,7 +118,7 @@ class Update implements Serializable {
                 buffout.flush();
                 buffout.close();
                 buffin.close();
-                xpShop.Logger("New " + name + " downloaded, Look up under " + path, "Warning");
+                plugin.Logger("New " + name + " downloaded, Look up under " + path, "Warning");
             } finally {
             }
             return;
@@ -142,7 +138,7 @@ class Update implements Serializable {
                 buffout.flush();
                 buffout.close();
                 buffin.close();
-                xpShop.Logger("New " + name + " downloaded, Look up under " + path, "Warning");
+                plugin.Logger("New " + name + " downloaded, Look up under " + path, "Warning");
             } finally {
             }
         }

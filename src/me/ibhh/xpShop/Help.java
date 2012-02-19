@@ -27,126 +27,130 @@ public class Help {
      */
     public void help(CommandSender sender, String[] args) {
         Player player = (Player) sender;
+        if (!plugin.Blacklistcode.startsWith("1", 7)) {
         if (args.length == 0 || args.length >= 3) {
-            xpShop.PlayerLogger(player, "/xpShop infoxp <player>","");
-            xpShop.PlayerLogger(player, "/xpShop infolevel <player>","");
-            xpShop.PlayerLogger(player, "/xpShop info <action> <amount>","");
-            xpShop.PlayerLogger(player, "/xpShop sell <amount>","");
-            xpShop.PlayerLogger(player, "/xpShop buy <money>","");
-            xpShop.PlayerLogger(player, "/xpShop buylevel <amount>","");
-            xpShop.PlayerLogger(player, "/xpShop selllevel <amount>","");
-            xpShop.PlayerLogger(player, "/xpShop send <player> <amount>","");
+            plugin.PlayerLogger(player, "/xpShop infoxp <player>","");
+            plugin.PlayerLogger(player, "/xpShop infolevel <player>","");
+            plugin.PlayerLogger(player, "/xpShop info <action> <amount>","");
+            plugin.PlayerLogger(player, "/xpShop sell <amount>","");
+            plugin.PlayerLogger(player, "/xpShop buy <money>","");
+            plugin.PlayerLogger(player, "/xpShop buylevel <amount>","");
+            plugin.PlayerLogger(player, "/xpShop selllevel <amount>","");
+            plugin.PlayerLogger(player, "/xpShop send <player> <amount>","");
         } else if (args.length == 2) {
             if (!(args[1].equals("buy") || args[1].equals("sell") || args[1].equals("selllevel") || args[1].equals("buylevel") || args[1].equals("send") || args[1].equals("info") || args[0].equals("infoxp") || args[0].equals("infolevel"))) {
-                xpShop.PlayerLogger(player, "Cant find command!", "Error");
+                plugin.PlayerLogger(player, "Cant find command!", "Error");
             } else if (args[1].equals("buy")) {
                 if (!Permission.checkpermissions(player, "xpShop.buy")) {
-                    xpShop.PlayerLogger(player, plugin.config.permissionserror, "Error");
+                    plugin.PlayerLogger(player, plugin.config.permissionserror, "Error");
                 }
-                xpShop.PlayerLogger(player, "/xpShop buy <xp>","");
-                xpShop.PlayerLogger(player, plugin.config.helpbuy,"");
+                plugin.PlayerLogger(player, "/xpShop buy <xp>","");
+                plugin.PlayerLogger(player, plugin.config.helpbuy,"");
             } else if (args[1].equals("buylevel")) {
                 if (!Permission.checkpermissions(player, "xpShop.buylevel")) {
-                    xpShop.PlayerLogger(player, plugin.config.permissionserror, "Error");
+                    plugin.PlayerLogger(player, plugin.config.permissionserror, "Error");
                 }
-                xpShop.PlayerLogger(player, "/xpShop buylevel <amount>","");
-                xpShop.PlayerLogger(player, plugin.config.helpbuylevel,"");
+                plugin.PlayerLogger(player, "/xpShop buylevel <amount>","");
+                plugin.PlayerLogger(player, plugin.config.helpbuylevel,"");
             } else if (args[1].equals("sell")) {
                 if (!Permission.checkpermissions(player, "xpShop.sell")) {
-                    xpShop.PlayerLogger(player, plugin.config.permissionserror, "Error");
+                    plugin.PlayerLogger(player, plugin.config.permissionserror, "Error");
                 }
-                xpShop.PlayerLogger(player, "/xpShop sell <amount>","");
-                xpShop.PlayerLogger(player, plugin.config.helpsell,"");
+                plugin.PlayerLogger(player, "/xpShop sell <amount>","");
+                plugin.PlayerLogger(player, plugin.config.helpsell,"");
             } else if (args[1].equals("selllevel")) {
                 if (!Permission.checkpermissions(player, "xpShop.selllevel")) {
-                    xpShop.PlayerLogger(player, plugin.config.permissionserror, "Error");
+                    plugin.PlayerLogger(player, plugin.config.permissionserror, "Error");
                 }
-                xpShop.PlayerLogger(player, "/xpShop selllevel <amount>","");
-                xpShop.PlayerLogger(player, plugin.config.helpsell,"");
+                plugin.PlayerLogger(player, "/xpShop selllevel <amount>","");
+                plugin.PlayerLogger(player, plugin.config.helpsell,"");
             } else if (args[1].equals("info")) {
                 if (!Permission.checkpermissions(player, "xpShop.info")) {
-                    xpShop.PlayerLogger(player, plugin.config.permissionserror, "Error");
+                    plugin.PlayerLogger(player, plugin.config.permissionserror, "Error");
                 }
-                xpShop.PlayerLogger(player, "/xpShop info <action> <amount>","");
-                xpShop.PlayerLogger(player, plugin.config.helpinfo,"");
+                plugin.PlayerLogger(player, "/xpShop info <action> <amount>","");
+                plugin.PlayerLogger(player, plugin.config.helpinfo,"");
             } else if (args[1].equals("send")) {
                 if (!Permission.checkpermissions(player, "xpShop.send")) {
-                    xpShop.PlayerLogger(player, plugin.config.permissionserror, "Error");
+                    plugin.PlayerLogger(player, plugin.config.permissionserror, "Error");
                 }
-                xpShop.PlayerLogger(player, "/xpShop send <player> <amount>","");
-                xpShop.PlayerLogger(player, plugin.config.helpsend,"");
+                plugin.PlayerLogger(player, "/xpShop send <player> <amount>","");
+                plugin.PlayerLogger(player, plugin.config.helpsend,"");
             } else if (args[1].equals("infoxp")) {
                 if (!Permission.checkpermissions(player, "xpShop.infoxp")) {
-                    xpShop.PlayerLogger(player, plugin.config.permissionserror, "Error");
+                    plugin.PlayerLogger(player, plugin.config.permissionserror, "Error");
                 }
-                xpShop.PlayerLogger(player, "/xpShop infoxp <player>","");
-                xpShop.PlayerLogger(player, plugin.config.helpinfoxp,"");
+                plugin.PlayerLogger(player, "/xpShop infoxp <player>","");
+                plugin.PlayerLogger(player, plugin.config.helpinfoxp,"");
             } else if (args[1].equals("infolevel")) {
                 if (!Permission.checkpermissions(player, "xpShop.infoxp")) {
-                    xpShop.PlayerLogger(player, plugin.config.permissionserror, "Error");
+                    plugin.PlayerLogger(player, plugin.config.permissionserror, "Error");
                 }
-                xpShop.PlayerLogger(player, "/xpShop infolevel <player>","");
-                xpShop.PlayerLogger(player, plugin.config.helpinfolevel,"");
+                plugin.PlayerLogger(player, "/xpShop infolevel <player>","");
+                plugin.PlayerLogger(player, plugin.config.helpinfolevel,"");
             }
         } else {
             if (!(args[0].equals("buy") || args[0].equals("sell") || args[0].equals("selllevel") || args[0].equals("buylevel") || args[0].equals("send") || args[0].equals("info") || args[0].equals("infoxp") || args[0].equals("infolevel"))) {
-                xpShop.PlayerLogger(player, "/xpShop infoxp <player>","");
-                xpShop.PlayerLogger(player, "/xpShop infolevel <player>","");
-                xpShop.PlayerLogger(player, "/xpShop info <action> <amount>","");
-                xpShop.PlayerLogger(player, "/xpShop sell <amount>","");
-                xpShop.PlayerLogger(player, "/xpShop buy <money>","");
-                xpShop.PlayerLogger(player, "/xpShop buylevel <amount>","");
-                xpShop.PlayerLogger(player, "/xpShop selllevel <amount>","");
-                xpShop.PlayerLogger(player, "/xpShop send <player> <amount>","");
+                plugin.PlayerLogger(player, "/xpShop infoxp <player>","");
+                plugin.PlayerLogger(player, "/xpShop infolevel <player>","");
+                plugin.PlayerLogger(player, "/xpShop info <action> <amount>","");
+                plugin.PlayerLogger(player, "/xpShop sell <amount>","");
+                plugin.PlayerLogger(player, "/xpShop buy <money>","");
+                plugin.PlayerLogger(player, "/xpShop buylevel <amount>","");
+                plugin.PlayerLogger(player, "/xpShop selllevel <amount>","");
+                plugin.PlayerLogger(player, "/xpShop send <player> <amount>","");
             } else if (args[0].equals("buy")) {
                 if (!Permission.checkpermissions(player, "xpShop.buy")) {
-                    xpShop.PlayerLogger(player, plugin.config.permissionserror, "Error");
+                    plugin.PlayerLogger(player, plugin.config.permissionserror, "Error");
                 }
-                xpShop.PlayerLogger(player, "/xpShop buy <money>","");
-                xpShop.PlayerLogger(player, plugin.config.helpbuy,"");
+                plugin.PlayerLogger(player, "/xpShop buy <money>","");
+                plugin.PlayerLogger(player, plugin.config.helpbuy,"");
             } else if (args[0].equals("buylevel")) {
                 if (!Permission.checkpermissions(player, "xpShop.buylevel")) {
-                    xpShop.PlayerLogger(player, plugin.config.permissionserror, "Error");
+                    plugin.PlayerLogger(player, plugin.config.permissionserror, "Error");
                 }
-                xpShop.PlayerLogger(player, "/xpShop buy <money>","");
-                xpShop.PlayerLogger(player, plugin.config.helpbuylevel,"");
+                plugin.PlayerLogger(player, "/xpShop buy <money>","");
+                plugin.PlayerLogger(player, plugin.config.helpbuylevel,"");
             } else if (args[0].equals("sell")) {
                 if (!Permission.checkpermissions(player, "xpShop.sell")) {
-                    xpShop.PlayerLogger(player, plugin.config.permissionserror, "Error");
+                    plugin.PlayerLogger(player, plugin.config.permissionserror, "Error");
                 }
-                xpShop.PlayerLogger(player, "/xpShop sell <amount>","");
-                xpShop.PlayerLogger(player, plugin.config.helpsell,"");
+                plugin.PlayerLogger(player, "/xpShop sell <amount>","");
+                plugin.PlayerLogger(player, plugin.config.helpsell,"");
             } else if (args[0].equals("selllevel")) {
                 if (!Permission.checkpermissions(player, "xpShop.selllevel")) {
-                    xpShop.PlayerLogger(player, plugin.config.permissionserror, "Error");
+                    plugin.PlayerLogger(player, plugin.config.permissionserror, "Error");
                 }
-                xpShop.PlayerLogger(player, "/xpShop selllevel <amount>","");
-                xpShop.PlayerLogger(player, plugin.config.helpselllevel,"");
+                plugin.PlayerLogger(player, "/xpShop selllevel <amount>","");
+                plugin.PlayerLogger(player, plugin.config.helpselllevel,"");
             } else if (args[0].equals("info")) {
                 if (!Permission.checkpermissions(player, "xpShop.info")) {
-                    xpShop.PlayerLogger(player, plugin.config.permissionserror, "Error");
+                    plugin.PlayerLogger(player, plugin.config.permissionserror, "Error");
                 }
-                xpShop.PlayerLogger(player, "/xpShop info <action> <amount>","");
-                xpShop.PlayerLogger(player, plugin.config.helpinfo,"");
+                plugin.PlayerLogger(player, "/xpShop info <action> <amount>","");
+                plugin.PlayerLogger(player, plugin.config.helpinfo,"");
             } else if (args[0].equals("send")) {
                 if (!Permission.checkpermissions(player, "xpShop.send")) {
-                    xpShop.PlayerLogger(player, plugin.config.permissionserror, "Error");
+                    plugin.PlayerLogger(player, plugin.config.permissionserror, "Error");
                 }
-                xpShop.PlayerLogger(player, "/xpShop send <player> <amount>","");
-                xpShop.PlayerLogger(player, plugin.config.helpsend,"");
+                plugin.PlayerLogger(player, "/xpShop send <player> <amount>","");
+                plugin.PlayerLogger(player, plugin.config.helpsend,"");
             } else if (args[0].equals("infoxp")) {
                 if (!Permission.checkpermissions(player, "xpShop.infoxp")) {
-                    xpShop.PlayerLogger(player, plugin.config.permissionserror, "Error");
+                    plugin.PlayerLogger(player, plugin.config.permissionserror, "Error");
                 }
-                xpShop.PlayerLogger(player, "/xpShop infoxp <player>","");
-                xpShop.PlayerLogger(player, plugin.config.helpinfoxp,"");
+                plugin.PlayerLogger(player, "/xpShop infoxp <player>","");
+                plugin.PlayerLogger(player, plugin.config.helpinfoxp,"");
             } else if (args[0].equals("infolevel")) {
                 if (!Permission.checkpermissions(player, "xpShop.infoxp")) {
-                    xpShop.PlayerLogger(player, plugin.config.permissionserror, "Error");
+                    plugin.PlayerLogger(player, plugin.config.permissionserror, "Error");
                 }
-                xpShop.PlayerLogger(player, "/xpShop infolevel <player>","");
-                xpShop.PlayerLogger(player, plugin.config.helpinfolevel,"");
+                plugin.PlayerLogger(player, "/xpShop infolevel <player>","");
+                plugin.PlayerLogger(player, plugin.config.helpinfolevel,"");
             }
+        }
+        } else {
+            plugin.blacklistLogger(sender);
         }
     }
 }

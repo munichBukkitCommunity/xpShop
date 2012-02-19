@@ -106,7 +106,7 @@ public class PanelControl extends JFrame {
 
     public JPanel getPanel(int panelindex) {
         if (auc.config.debug) {
-            xpShop.Logger("" + panelindex, "Debug");
+            auc.Logger("" + panelindex, "Debug");
         }
         if (panelindex == 1) {
             JPanel panel = new JPanel();
