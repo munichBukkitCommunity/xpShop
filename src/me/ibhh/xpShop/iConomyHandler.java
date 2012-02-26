@@ -22,6 +22,7 @@ public class iConomyHandler {
             iConomyversion = 2;
             plugin.Logger("hooked into Vault", "");
         }
+        iConomyversion();
     }
 
     private static boolean packageExists(String[] packages) {
@@ -51,6 +52,7 @@ public class iConomyHandler {
     }
 
     public int iConomyversion() {
+        if(iConomyversion == 0){
         try {
             if (packageExists(new String[]{"net.milkbowl.vault.economy.Economy"})) {
                 iConomyversion = 2;
@@ -80,15 +82,16 @@ public class iConomyHandler {
             iConomyversion = 0;
         }
         return iConomyversion;
+        } else {
+            return 2;
+        }
     }
 
     public Double getBalance156(Player player) {
         String name = player.getName();
         if (iConomyversion == 5) {
             try {
-                if (hasAccount5(name)) {
                     this.balance5 = getAccount5(name).getHoldings();
-                }
             } catch (Exception E) {
                 plugin.Logger("No Account! Please report it to an admin!", "Error");
                 plugin.PlayerLogger(player, "No Account! Please report it to an admin!", "Error");
@@ -107,6 +110,7 @@ public class iConomyHandler {
                 this.balance5 = null;
                 return this.balance;
             }
+            balance = balance5.balance();
             return this.balance;
         }
         if (iConomyversion == 6) {
@@ -116,7 +120,7 @@ public class iConomyHandler {
                 plugin.Logger("No Account! Please report it to an admin!", "Error");
                 plugin.PlayerLogger(player, "No Account! Please report it to an admin!", "Error");
                 e.printStackTrace();
-                this.balance5 = null;
+                balance = null;
                 return this.balance;
             }
         }
@@ -128,7 +132,7 @@ public class iConomyHandler {
                 plugin.Logger("No Account! Please report it to an admin!", "Error");
                 plugin.PlayerLogger(player, "No Account! Please report it to an admin!", "Error");
                 e.printStackTrace();
-                this.balance5 = null;
+                this.balance = null;
                 return this.balance;
             }
         }
@@ -142,10 +146,6 @@ public class iConomyHandler {
 
     private com.iConomy.system.Account getAccount5(String name) {
         return iConomy.getAccount(name);
-    }
-
-    private boolean hasAccount5(String name) {
-        return iConomy.hasAccount(name);
     }
 
     public void substractmoney156(double amountsubstract, Player player) {

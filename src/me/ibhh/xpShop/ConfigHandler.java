@@ -4,6 +4,8 @@
  */
 package me.ibhh.xpShop;
 
+import org.bukkit.entity.Player;
+
 /**
  *
  * @author Simon
@@ -54,8 +56,10 @@ public class ConfigHandler {
             Shoperrornotenoughxpconsumer,
             Shoperrorcantbuyhere,
             Shoperrorcantsellhere,
-            playernotonline;
-    public boolean autodownload, debug, firstRun;
+            playernotonline,
+            playerwasntonline,
+            onlyonlineplayer;
+    public boolean autodownload, debug, firstRun, onlysendxptoonlineplayers;
     public double moneytoxp, xptomoney;
 
     public ConfigHandler(xpShop pl) {
@@ -264,15 +268,36 @@ public class ConfigHandler {
         xptomoney = plugin.getConfig().getDouble("xptomoney");
     }
 
+    public boolean getPlayerConfig(Player player, Player sender){
+        if(debug){
+                plugin.Logger("Player is online: " + player.isOnline(), "Debug");
+                plugin.Logger("Playeronlinemode: " + onlysendxptoonlineplayers, "Debug");
+        }
+        if(player.isOnline()){
+            return true;
+        } else if(!player.isOnline() && onlysendxptoonlineplayers) {
+            plugin.PlayerLogger(sender, onlyonlineplayer, "Error");
+            return false;
+        } else if(!player.isOnline() && !onlysendxptoonlineplayers){
+            return true;
+        } else {
+            plugin.PlayerLogger(sender, onlyonlineplayer, "Error");
+            return false;
+        }
+    }
+    
     public void loadBooleans() {
         debug = plugin.getConfig().getBoolean("debug");
         autodownload = plugin.getConfig().getBoolean("autodownload");
         firstRun = plugin.getConfig().getBoolean("firstRun");
+        onlysendxptoonlineplayers = plugin.getConfig().getBoolean("onlysendxptoonlineplayers");
     }
 
     public void loadStrings() {
         language = plugin.getConfig().getString("language");
         playernotonline = plugin.getConfig().getString("playernotonline." + language);
+        playerwasntonline = plugin.getConfig().getString("playerwasntonline." + language);
+        onlyonlineplayer = plugin.getConfig().getString("onlyonlineplayer." + language);
         Shoperrornotenoughmoneyconsumer = plugin.getConfig().getString("Shop.error.notenoughmoneyconsumer." + language);
         Shoperrornotenoughmoneyseller = plugin.getConfig().getString("Shop.error.notenoughmoneyseller." + language);
         Shoperrorcantbuyhere = plugin.getConfig().getString("Shop.error.cantbuyhere." + language);

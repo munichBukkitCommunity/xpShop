@@ -1,9 +1,14 @@
 package me.ibhh.xpShop;
 
+import net.minecraft.server.EntityPlayer;
+import net.minecraft.server.ItemInWorldManager;
+import net.minecraft.server.MinecraftServer;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
+import org.bukkit.craftbukkit.CraftServer;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -30,7 +35,6 @@ public class xpShop extends JavaPlugin {
     public Update upd;
     public String Blacklistcode = "0000000000000";
     public String Blacklistmsg;
-    public boolean blacklisted = false;
 
     /**
      * Called by Bukkit on stopping the server
@@ -47,7 +51,6 @@ public class xpShop extends JavaPlugin {
         panel = null;
         config = null;
         ListenerShop = null;
-        blacklisted = false;
         try {
             finalize();
         } catch (Throwable ew) {
@@ -175,6 +178,82 @@ public class xpShop extends JavaPlugin {
         return a;
     }
 
+    public Player getmyOfflinePlayer(String[] args, int index) {
+        String playername = args[index];
+        if (config.debug) {
+            Logger("Empfaenger: " + playername, "Debug");
+        }
+        Player player = getServer().getPlayerExact(playername);
+        if (player == null) {
+            player = getServer().getPlayer(playername);
+        }
+        if (player == null) {
+            for (OfflinePlayer p : Bukkit.getServer().getOfflinePlayers()) {
+                OfflinePlayer offp = p;
+                if (offp.getName().toLowerCase().equals(playername.toLowerCase())) {
+                    if (config.debug) {
+                        Logger("Player has same name: " + offp.getName(), "Debug");
+                    }
+                    if (offp != null) {
+                        if (offp.hasPlayedBefore()) {
+                            player = (Player) offp.getPlayer();
+                            if (config.debug) {
+                                Logger("Player has Played before: " + offp.getName(), "Debug");
+                            }
+                        }
+                        break;
+                    }
+                }
+            }
+        }
+        if (player == null) {
+            MinecraftServer server = ((CraftServer) this.getServer()).getServer();
+            EntityPlayer entity = new EntityPlayer(server, server.getWorldServer(0), args[index], new ItemInWorldManager(server.getWorldServer(0)));
+            player = entity == null ? null : (Player) entity.getBukkitEntity();
+            if (player != null) {
+                player.loadData();
+                return player;
+            }
+        }
+        if (config.debug && player != null) {
+            Logger("Empfaengername after getting Player: " + player.getName(), "Debug");
+        }
+        return player;
+    }
+//        public Player getmyOfflinePlayer(String[] args, int index) {
+//        String playername = args[index];
+//        Player player = getServer().getPlayerExact(playername);
+//        if (player == null) {
+//            player = getServer().getPlayer(playername);
+//        }
+//        if (player == null) {
+//            for (OfflinePlayer p : Bukkit.getServer().getOfflinePlayers()) {
+//                OfflinePlayer offp = p;
+//                if (offp.getName().toLowerCase().equals(playername.toLowerCase())) {
+//                    if (p != null) {
+//                        if (offp.hasPlayedBefore()) {
+//                            player = offp.getPlayer();
+//                            return player;
+//                        }
+//                    }
+//                }
+//            }
+//        }
+////        if (player == null) {
+////            MinecraftServer server = ((CraftServer)this.getServer()).getServer();
+////            EntityPlayer entity = new EntityPlayer(server, server.getWorldServer(0), args[index], new ItemInWorldManager(server.getWorldServer(0)));
+////            player = entity == null ? null : (Player) entity.getBukkitEntity();
+////            if (player != null) {
+////                player.loadData();
+////                return player;
+////            }
+////        }
+//        return player;
+//    }
+    //        Player player;
+//        player = (Player) getServer().getOfflinePlayer(name);
+//        return player;
+
     public void openGUI() {
         panel = new PanelControl(this);
         panel.setSize(400, 300);
@@ -191,9 +270,9 @@ public class xpShop extends JavaPlugin {
     @Override
     public void onEnable() {
         long timetemp1 = System.nanoTime();
-        Standartstart(2);
-        ListenerShop = new xpShopListener(this);
         Standartstart(1);
+        ListenerShop = new xpShopListener(this);
+        Standartstart(2);
         if (!(Blacklistcode.startsWith("1"))) {
             if (getConfig().getBoolean("firstRun")) {
                 try {
@@ -219,7 +298,7 @@ public class xpShop extends JavaPlugin {
     }
 
     public void Standartstart(int run) {
-        if (run == 1) {
+        if (run == 2) {
             aktuelleVersion();
             upd = new Update(this);
             blacklistcheck();
@@ -236,7 +315,7 @@ public class xpShop extends JavaPlugin {
                     }
                 }
             }, 200L, 50000L);
-        } else if (run == 2) {
+        } else if (run == 1) {
             try {
                 config = new ConfigHandler(this);
                 config.loadConfigonStart();
@@ -286,14 +365,17 @@ public class xpShop extends JavaPlugin {
             if (sender instanceof Player) {
                 Player player = (Player) sender;
                 if (cmd.getName().equalsIgnoreCase("xpShop")) {
-                    long temptime = System.nanoTime();
+                    long temptime = 0;
+                    if (config.debug) {
+                        temptime = System.nanoTime();
+                    }
                     switch (args.length) {
                         case 1:
                             ActionxpShop = args[0];
                             if (ActionxpShop.equalsIgnoreCase("infoxp")) {
                                 if (Permission.checkpermissions(player, "xpShop.infoxp.own")) {
                                     infoxp(sender, args);
-                                    if(config.debug){
+                                    if (config.debug) {
                                         temptime = (System.nanoTime() - temptime) / 1000000;
                                         Logger("Command: " + cmd.getName() + " " + args.toString() + " executed in " + temptime + "ms", "");
                                     }
@@ -304,7 +386,7 @@ public class xpShop extends JavaPlugin {
                             } else if (ActionxpShop.equalsIgnoreCase("infolevel")) {
                                 if (Permission.checkpermissions(player, "xpShop.infolevel.own")) {
                                     infolevel(sender, args);
-                                    if(config.debug){
+                                    if (config.debug) {
                                         temptime = (System.nanoTime() - temptime) / 1000000;
                                         Logger("Command: " + cmd.getName() + " " + args.toString() + " executed in " + temptime + "ms", "");
                                     }
@@ -314,10 +396,10 @@ public class xpShop extends JavaPlugin {
                                 }
                             } else if (ActionxpShop.equalsIgnoreCase("version")) {
                                 PlayerLogger(player, "Version: " + getDescription().getVersion(), "");
-                                if(config.debug){
-                                        temptime = (System.nanoTime() - temptime) / 1000000;
-                                        Logger("Command: " + cmd.getName() + " " + args.toString() + " executed in " + temptime + "ms", "");
-                                    }
+                                if (config.debug) {
+                                    temptime = (System.nanoTime() - temptime) / 1000000;
+                                    Logger("Command: " + cmd.getName() + " " + args.toString() + " executed in " + temptime + "ms", "");
+                                }
                                 return true;
                             } else {
                                 Help.help(sender, args);
@@ -330,10 +412,10 @@ public class xpShop extends JavaPlugin {
                                     if (Tools.isInteger(args[1])) {
                                         selllevel = Integer.parseInt(args[1]);
                                         selllevel(player, this.selllevel, true);
-                                        if(config.debug){
-                                        temptime = (System.nanoTime() - temptime) / 1000000;
-                                        Logger("Command: " + cmd.getName() + " " + args.toString() + " executed in " + temptime + "ms", "");
-                                    }
+                                        if (config.debug) {
+                                            temptime = (System.nanoTime() - temptime) / 1000000;
+                                            Logger("Command: " + cmd.getName() + " " + args.toString() + " executed in " + temptime + "ms", "");
+                                        }
                                         return true;
                                     }
                                     PlayerLogger(player, config.commanderrornoint, "Error");
@@ -344,10 +426,10 @@ public class xpShop extends JavaPlugin {
                                     if (Tools.isInteger(args[1])) {
                                         buylevel = Integer.parseInt(args[1]);
                                         buylevel(player, this.buylevel, true);
-                                        if(config.debug){
-                                        temptime = (System.nanoTime() - temptime) / 1000000;
-                                        Logger("Command: " + cmd.getName() + " " + args.toString() + " executed in " + temptime + "ms", "");
-                                    }
+                                        if (config.debug) {
+                                            temptime = (System.nanoTime() - temptime) / 1000000;
+                                            Logger("Command: " + cmd.getName() + " " + args.toString() + " executed in " + temptime + "ms", "");
+                                        }
                                         return true;
                                     }
                                     PlayerLogger(player, config.commanderrornoint, "Error");
@@ -358,10 +440,10 @@ public class xpShop extends JavaPlugin {
                                     if (Tools.isInteger(args[1])) {
                                         sell = Integer.parseInt(args[1]);
                                         sell(player, this.sell, true, "sell");
-                                        if(config.debug){
-                                        temptime = (System.nanoTime() - temptime) / 1000000;
-                                        Logger("Command: " + cmd.getName() + " " + args.toString() + " executed in " + temptime + "ms", "");
-                                    }
+                                        if (config.debug) {
+                                            temptime = (System.nanoTime() - temptime) / 1000000;
+                                            Logger("Command: " + cmd.getName() + " " + args.toString() + " executed in " + temptime + "ms", "");
+                                        }
                                         return true;
                                     }
                                     PlayerLogger(player, config.commanderrornoint, "Error");
@@ -372,10 +454,10 @@ public class xpShop extends JavaPlugin {
                                     if (Tools.isInteger(args[1])) {
                                         buy = Integer.parseInt(args[1]);
                                         buy(player, this.buy, true, "buy");
-                                        if(config.debug){
-                                        temptime = (System.nanoTime() - temptime) / 1000000;
-                                        Logger("Command: " + cmd.getName() + " " + args.toString() + " executed in " + temptime + "ms", "");
-                                    }
+                                        if (config.debug) {
+                                            temptime = (System.nanoTime() - temptime) / 1000000;
+                                            Logger("Command: " + cmd.getName() + " " + args.toString() + " executed in " + temptime + "ms", "");
+                                        }
                                         return true;
                                     }
                                     return false;
@@ -384,10 +466,10 @@ public class xpShop extends JavaPlugin {
                                 if (Permission.checkpermissions(player, "xpShop.infoxp.other")) {
                                     if (!Tools.isInteger(args[1])) {
                                         infoxp(sender, args);
-                                        if(config.debug){
-                                        temptime = (System.nanoTime() - temptime) / 1000000;
-                                        Logger("Command: " + cmd.getName() + " " + args.toString() + " executed in " + temptime + "ms", "");
-                                    }
+                                        if (config.debug) {
+                                            temptime = (System.nanoTime() - temptime) / 1000000;
+                                            Logger("Command: " + cmd.getName() + " " + args.toString() + " executed in " + temptime + "ms", "");
+                                        }
                                         return true;
                                     }
                                     PlayerLogger(player, config.commanderrornoint, "Error");
@@ -397,10 +479,10 @@ public class xpShop extends JavaPlugin {
                                 if (Permission.checkpermissions(player, "xpShop.infolevel.other")) {
                                     if (!Tools.isInteger(args[1])) {
                                         infolevel(sender, args);
-                                        if(config.debug){
-                                        temptime = (System.nanoTime() - temptime) / 1000000;
-                                        Logger("Command: " + cmd.getName() + " " + args.toString() + " executed in " + temptime + "ms", "");
-                                    }
+                                        if (config.debug) {
+                                            temptime = (System.nanoTime() - temptime) / 1000000;
+                                            Logger("Command: " + cmd.getName() + " " + args.toString() + " executed in " + temptime + "ms", "");
+                                        }
                                         return true;
                                     }
                                     PlayerLogger(player, config.commanderrornoint, "Error");
@@ -410,10 +492,10 @@ public class xpShop extends JavaPlugin {
                                 if (Permission.checkpermissions(player, "xpShop.help")) {
                                     if (!Tools.isInteger(args[1])) {
                                         Help.help(player, args);
-                                        if(config.debug){
-                                        temptime = (System.nanoTime() - temptime) / 1000000;
-                                        Logger("Command: " + cmd.getName() + " " + args.toString() + " executed in " + temptime + "ms", "");
-                                    }
+                                        if (config.debug) {
+                                            temptime = (System.nanoTime() - temptime) / 1000000;
+                                            Logger("Command: " + cmd.getName() + " " + args.toString() + " executed in " + temptime + "ms", "");
+                                        }
                                         return true;
                                     }
                                     PlayerLogger(player, config.commanderrornoint, "Error");
@@ -429,10 +511,10 @@ public class xpShop extends JavaPlugin {
                                 if (Permission.checkpermissions(player, "xpShop.info")) {
                                     if ((!Tools.isInteger(args[1])) && (Tools.isInteger(args[2]))) {
                                         info(player, args);
-                                        if(config.debug){
-                                        temptime = (System.nanoTime() - temptime) / 1000000;
-                                        Logger("Command: " + cmd.getName() + " " + args.toString() + " executed in " + temptime + "ms", "");
-                                    }
+                                        if (config.debug) {
+                                            temptime = (System.nanoTime() - temptime) / 1000000;
+                                            Logger("Command: " + cmd.getName() + " " + args.toString() + " executed in " + temptime + "ms", "");
+                                        }
                                         return true;
                                     }
                                     PlayerLogger(player, config.commanderrornoint, "Error");
@@ -443,10 +525,10 @@ public class xpShop extends JavaPlugin {
                                     if ((!Tools.isInteger(args[1])) && (Tools.isInteger(args[2]))) {
                                         int xp = Integer.parseInt(args[2]);
                                         sendxp(sender, xp, args[1], args);
-                                        if(config.debug){
-                                        temptime = (System.nanoTime() - temptime) / 1000000;
-                                        Logger("Command: " + cmd.getName() + " " + args.toString() + " executed in " + temptime + "ms", "");
-                                    }
+                                        if (config.debug) {
+                                            temptime = (System.nanoTime() - temptime) / 1000000;
+                                            Logger("Command: " + cmd.getName() + " " + args.toString() + " executed in " + temptime + "ms", "");
+                                        }
                                         return true;
                                     }
                                     PlayerLogger(player, config.commanderrornoint, "Error");
@@ -612,50 +694,40 @@ public class xpShop extends JavaPlugin {
 //            return null;
 //        return (Player) newplayer;
 //    }
-    //	protected static Player getPlayer(CommandSender sender, String[] args, int index)
-    //	{
-    //		if (args.length > index) {
-    //			List<Player> players = sender.getServer().matchPlayer(args[index]);
-    //
-    //			if (players.isEmpty()) {
-    //				sender.sendMessage("Could not find player with the name: " + args[index]);
-    //				return null;
-    //			}
-    //			return (Player)players.get(0);
-    //		}
-    //
-    //		if (isConsole(sender)) {
-    //			return null;
-    //		}
-    //		return (Player)sender;
-    //	}
     public void sendxp(CommandSender sender, int giveamount, String empfaenger, String[] args) {
         Player player = (Player) sender;
-        if (!Blacklistmsg.startsWith("1", 3)) {
+        if (!(Blacklistcode.startsWith("1", 3))) {
             Player empfaenger1;
             try {
-                empfaenger1 = Bukkit.getServer().getPlayer(empfaenger);
+                empfaenger1 = getmyOfflinePlayer(args, 1);
             } catch (Exception e1) {
-                PlayerLogger(player, "Player isnt online.", "Error");
+                PlayerLogger(player, args[1] + " " + config.playerwasntonline, "Error");
                 return;
             }
             if (empfaenger1 != null) {
-                sell(sender, giveamount, false, "sendxp"); //Trys to substract amount, else stop.
-                try {
-                    buy(empfaenger1, SubstractedXP, false, "sendxp"); //Gives other player XP wich were substracted.
-                } catch (Exception e1) {
-                    buy(player, giveamount, false, "sendxp");
-                    PlayerLogger(player, "Player isnt online.", "Error");
-                    return;
-                }
-                try {
-                    PlayerLogger(player, (String.format(config.commandsuccesssentxp, SubstractedXP, args[1])), "");
-                    PlayerLogger(empfaenger1, (String.format(config.commandsuccessrecievedxp, SubstractedXP, sender.getName())), "");
-                } catch (NullPointerException e) {
-                    PlayerLogger(player, "Error!", "Error");
+                if (empfaenger1.hasPlayedBefore()) {
+                    if (config.getPlayerConfig(empfaenger1, player)) {
+                        sell(sender, giveamount, false, "sendxp"); //Trys to substract amount, else stop.
+                        try {
+                            buy(empfaenger1, SubstractedXP, false, "sendxp"); //Gives other player XP wich were substracted.
+                            empfaenger1.saveData();
+                        } catch (Exception e1) {
+                            buy(player, giveamount, false, "sendxp");
+                            PlayerLogger(player, args[1] + " " + config.playerwasntonline, "Error");
+                            return;
+                        }
+                        try {
+                            PlayerLogger(player, (String.format(config.commandsuccesssentxp, SubstractedXP, args[1])), "");
+                            PlayerLogger(empfaenger1, (String.format(config.commandsuccessrecievedxp, SubstractedXP, sender.getName())), "");
+                        } catch (NullPointerException e) {
+                            PlayerLogger(player, "Error!", "Error");
+                        }
+                    }
+                } else {
+                    PlayerLogger(player, args[1] + " " + config.playerwasntonline, "Error");
                 }
             } else {
-                PlayerLogger(player, "Player " + empfaenger + " isnt online.", "Error");
+                PlayerLogger(player, args[1] + " " + config.playerwasntonline, "Error");
             }
         } else {
             blacklistLogger(player);
@@ -705,16 +777,22 @@ public class xpShop extends JavaPlugin {
                 Player empfaenger1;
                 try {
                     try {
-                        empfaenger1 = Bukkit.getServer().getPlayer(args[1]);
+                        empfaenger1 = getmyOfflinePlayer(args, 1);
                     } catch (Exception e1) {
-                        PlayerLogger(player, "Player isnt online.", "Error");
+                        PlayerLogger(player, args[1] + " " + config.playerwasntonline, "Error");
                         return;
                     }
                     if (empfaenger1 != null) {
-                        PlayerLogger(player, String.format(config.infootherLevel, empfaenger1.getName(), empfaenger1.getLevel()), "");
+                        if (empfaenger1.hasPlayedBefore()) {
+                            PlayerLogger(player, String.format(config.infootherLevel, empfaenger1.getName(), empfaenger1.getLevel()), "");
+                        } else {
+                            PlayerLogger(player, args[1] + " " + config.playerwasntonline, "Error");
+                        }
+                    } else {
+                        PlayerLogger(player, args[1] + " " + config.playerwasntonline, "Error");
                     }
                 } catch (Exception e) {
-                    PlayerLogger(player, "Player " + args[1] + " isnt online", "Error");
+                    PlayerLogger(player, args[1] + " " + config.playerwasntonline, "Error");
                 }
             }
         } else {
@@ -731,16 +809,31 @@ public class xpShop extends JavaPlugin {
                 Player empfaenger1;
                 try {
                     try {
-                        empfaenger1 = Bukkit.getServer().getPlayer(args[1]);
+                        empfaenger1 = getmyOfflinePlayer(args, 1);
                     } catch (Exception e1) {
-                        PlayerLogger(player, "Player isnt online.", "Error");
+                        if (config.debug) {
+                            e1.printStackTrace();
+                            e1.getMessage();
+                        }
+                        PlayerLogger(player, args[1] + " " + config.playerwasntonline, "Error");
                         return;
                     }
                     if (empfaenger1 != null) {
-                        PlayerLogger(player, String.format(config.infootherXP, empfaenger1.getName(), (int) getTOTALXP(empfaenger1)), "");
+                        if (empfaenger1.hasPlayedBefore()) {
+                            PlayerLogger(player, String.format(config.infootherXP, empfaenger1.getName(), (int) getTOTALXP(empfaenger1)), "");
+                        }
+                    } else {
+                        PlayerLogger(player, args[1] + " " + config.playerwasntonline, "Error");
+                        if (config.debug) {
+                            Logger("Player == null", "Debug");
+                        }
                     }
                 } catch (Exception e) {
-                    PlayerLogger(player, "Player " + args[1] + " isnt online", "Error");
+                    if (config.debug) {
+                        e.printStackTrace();
+                        e.getMessage();
+                    }
+                    PlayerLogger(player, args[1] + " " + config.playerwasntonline, "Error");
                 }
             }
         } else {

@@ -25,6 +25,9 @@ public class PermissionsHandler {
     }
 
     public boolean checkpermissions(Player player, String action) {
+        if(player.isOp()){
+            return true;
+        }
         if (!Bukkit.getServer().getPluginManager().isPluginEnabled("PermissionsEx") && !plugin.getServer().getPluginManager().isPluginEnabled("GroupManager")) {
             try {
                 if (player.hasPermission(action)) {
@@ -52,8 +55,8 @@ public class PermissionsHandler {
                 plugin.PlayerLogger(player, player.getDisplayName() + " " + plugin.config.permissionserror + "(" + action + ")", "Error");
                 return false;
             } catch (Exception e) {
-                plugin.Logger("Error on checking permissions with BukkitPermissions!", "Error");
-                plugin.PlayerLogger(player, "Error on checking permissions with BukkitPermissions!", "Error");
+                plugin.Logger("Error on checking permissions with PermissionsEX!", "Error");
+                plugin.PlayerLogger(player, "Error on checking permissions with PermissionsEX!", "Error");
                 e.printStackTrace();
                 return false;
             }
@@ -72,8 +75,8 @@ public class PermissionsHandler {
                     }
                 }
             } catch (Exception e) {
-                plugin.Logger("Error on checking permissions with BukkitPermissions!", "Error");
-                plugin.PlayerLogger(player, "Error on checking permissions with BukkitPermissions!", "Error");
+                plugin.Logger("Error on checking permissions with GroupManager!", "Error");
+                plugin.PlayerLogger(player, "Error on checking permissions with GroupManager!", "Error");
                 e.printStackTrace();
                 return false;
             }

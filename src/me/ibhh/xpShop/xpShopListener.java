@@ -1,6 +1,5 @@
 package me.ibhh.xpShop;
 
-import org.bukkit.Bukkit;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.Sign;
@@ -297,24 +296,24 @@ public class xpShopListener implements Listener {
                 if (line[0].equalsIgnoreCase("[xpShop]")) {
                     if (!plugin.Blacklistcode.startsWith("1", 11)) {
                         if (this.blockIsValid(line, "Interact", p)) {
-                            if (!plugin.blacklisted) {
-                                if (this.Permissions.checkpermissions(p, "xpShop.use")) {
-                                    if (line[1].equalsIgnoreCase("AdminShop")) {
-                                        double price = getPrice(s, p, true);
-                                        if (price > 0) {
-                                            if ((plugin.Geldsystem.getBalance156(p) - price) >= 0) {
-                                                plugin.Geldsystem.substractmoney156(price, p);
-                                                plugin.UpdateXP(p, (Integer.parseInt(s.getLine(2))), "Sign");
-                                                plugin.PlayerLogger(p, String.format(plugin.config.Shopsuccessbuy, s.getLine(2), "Admin", split[0]), "");
-                                            } else {
-                                                plugin.PlayerLogger(p, plugin.config.Shoperrornotenoughmoneyconsumer, "Error");
-                                            }
+                            if (this.Permissions.checkpermissions(p, "xpShop.use")) {
+                                if (line[1].equalsIgnoreCase("AdminShop")) {
+                                    double price = getPrice(s, p, true);
+                                    if (price > 0) {
+                                        if ((plugin.Geldsystem.getBalance156(p) - price) >= 0) {
+                                            plugin.Geldsystem.substractmoney156(price, p);
+                                            plugin.UpdateXP(p, (Integer.parseInt(s.getLine(2))), "Sign");
+                                            plugin.PlayerLogger(p, String.format(plugin.config.Shopsuccessbuy, s.getLine(2), "Admin", split[0]), "");
                                         } else {
-                                            plugin.PlayerLogger(p, plugin.config.Shoperrorcantbuyhere, "Error");
+                                            plugin.PlayerLogger(p, plugin.config.Shoperrornotenoughmoneyconsumer, "Error");
                                         }
                                     } else {
-                                        Player empfaenger = Bukkit.getServer().getPlayer(s.getLine(1));
-                                        if (empfaenger != null) {
+                                        plugin.PlayerLogger(p, plugin.config.Shoperrorcantbuyhere, "Error");
+                                    }
+                                } else {
+                                    Player empfaenger = plugin.getmyOfflinePlayer(line, 1);
+                                    if (empfaenger != null) {
+                                        if (plugin.config.getPlayerConfig(empfaenger, p)) {
                                             if (plugin.getTOTALXP(empfaenger) >= Integer.parseInt(line[2])) {
                                                 if (getPrice(s, p, true) > 0) {
                                                     double price = getPrice(s, p, true);
@@ -324,6 +323,7 @@ public class xpShopListener implements Listener {
                                                         plugin.PlayerLogger(p, String.format(plugin.config.Shopsuccessbuy, s.getLine(2), s.getLine(1), split[0]), "");
                                                         plugin.UpdateXP(empfaenger, -(Integer.parseInt(s.getLine(2))), "Sign");
                                                         plugin.Geldsystem.addmoney156(price, empfaenger);
+                                                        empfaenger.saveData();
                                                         plugin.PlayerLogger(empfaenger, String.format(plugin.config.Shopsuccesssellerbuy, s.getLine(2), p.getDisplayName(), split[0]), "");
                                                     } else {
                                                         plugin.PlayerLogger(p, plugin.config.Shoperrornotenoughmoneyconsumer, "Error");
@@ -334,14 +334,11 @@ public class xpShopListener implements Listener {
                                             } else {
                                                 plugin.PlayerLogger(p, plugin.config.Shoperrornotenoughxpseller, "Error");
                                             }
-                                        } else {
-                                            plugin.PlayerLogger(p, line[1] + " " + plugin.config.playernotonline, "Error");
                                         }
+                                    } else {
+                                        plugin.PlayerLogger(p, line[1] + " " + plugin.config.playerwasntonline, "Error");
                                     }
                                 }
-                            } else {
-                                plugin.blacklistLogger(p);
-                                event.setCancelled(true);
                             }
                         }
                     } else {
@@ -357,51 +354,49 @@ public class xpShopListener implements Listener {
                 if (line[0].equalsIgnoreCase("[xpShop]")) {
                     if (!plugin.Blacklistcode.startsWith("1", 11)) {
                         if (this.blockIsValid(line, "Interact", p)) {
-                            if (!plugin.blacklisted) {
-                                if (this.Permissions.checkpermissions(p, "xpShop.use")) {
-                                    if (line[1].equalsIgnoreCase("AdminShop")) {
+                            if (this.Permissions.checkpermissions(p, "xpShop.use")) {
+                                if (line[1].equalsIgnoreCase("AdminShop")) {
+                                    if (plugin.getTOTALXP(p) >= Integer.parseInt(line[2])) {
+                                        if (getPrice(s, p, false) > 0) {
+                                            double price = getPrice(s, p, false);
+                                            plugin.Geldsystem.addmoney156(price, p);
+                                            plugin.UpdateXP(p, -(Integer.parseInt(s.getLine(2))), "Sign");
+                                            plugin.PlayerLogger(p, String.format(plugin.config.Shopsuccesssell, s.getLine(2), "Admin", split[1]), "");
+                                        } else {
+                                            plugin.PlayerLogger(p, plugin.config.Shoperrorcantsellhere, "Error");
+                                        }
+                                    } else {
+                                        plugin.PlayerLogger(p, plugin.config.Shoperrornotenoughxpconsumer, "Error");
+                                    }
+                                } else {
+                                    Player empfaenger = plugin.getmyOfflinePlayer(line, 1);
+                                    if (empfaenger != null) {
+                                        if(plugin.config.getPlayerConfig(empfaenger, p)){
                                         if (plugin.getTOTALXP(p) >= Integer.parseInt(line[2])) {
                                             if (getPrice(s, p, false) > 0) {
                                                 double price = getPrice(s, p, false);
-                                                plugin.Geldsystem.addmoney156(price, p);
-                                                plugin.UpdateXP(p, -(Integer.parseInt(s.getLine(2))), "Sign");
-                                                plugin.PlayerLogger(p, String.format(plugin.config.Shopsuccesssell, s.getLine(2), "Admin", split[1]), "");
+                                                if ((plugin.Geldsystem.getBalance156(empfaenger) - price) >= 0) {
+                                                    plugin.Geldsystem.substractmoney156(price, empfaenger);
+                                                    plugin.UpdateXP(empfaenger, (Integer.parseInt(s.getLine(2))), "Sign");
+                                                    plugin.PlayerLogger(empfaenger, String.format(plugin.config.Shopsuccesssellerselled, s.getLine(2), p.getDisplayName(), split[1]), "");
+                                                    plugin.Geldsystem.addmoney156(price, p);
+                                                    plugin.UpdateXP(p, -(Integer.parseInt(s.getLine(2))), "Sign");
+                                                    empfaenger.saveData();
+                                                    plugin.PlayerLogger(p, String.format(plugin.config.Shopsuccesssell, s.getLine(2), s.getLine(1), split[1]), "");
+                                                } else {
+                                                    plugin.PlayerLogger(p, plugin.config.Shoperrornotenoughmoneyconsumer, "Error");
+                                                }
                                             } else {
                                                 plugin.PlayerLogger(p, plugin.config.Shoperrorcantsellhere, "Error");
                                             }
                                         } else {
                                             plugin.PlayerLogger(p, plugin.config.Shoperrornotenoughxpconsumer, "Error");
                                         }
-                                    } else {
-                                        Player empfaenger = Bukkit.getServer().getPlayer(line[1]);
-                                        if (empfaenger != null) {
-                                            if (plugin.getTOTALXP(p) >= Integer.parseInt(line[2])) {
-                                                if (getPrice(s, p, false) > 0) {
-                                                    double price = getPrice(s, p, false);
-                                                    if ((plugin.Geldsystem.getBalance156(empfaenger) - price) >= 0) {
-                                                        plugin.Geldsystem.substractmoney156(price, empfaenger);
-                                                        plugin.UpdateXP(empfaenger, (Integer.parseInt(s.getLine(2))), "Sign");
-                                                        plugin.PlayerLogger(empfaenger, String.format(plugin.config.Shopsuccesssellerselled, s.getLine(2), p.getDisplayName(), split[1]), "");
-                                                        plugin.Geldsystem.addmoney156(price, p);
-                                                        plugin.UpdateXP(p, -(Integer.parseInt(s.getLine(2))), "Sign");
-                                                        plugin.PlayerLogger(p, String.format(plugin.config.Shopsuccesssell, s.getLine(2), s.getLine(1), split[1]), "");
-                                                    } else {
-                                                        plugin.PlayerLogger(p, plugin.config.Shoperrornotenoughmoneyconsumer, "Error");
-                                                    }
-                                                } else {
-                                                    plugin.PlayerLogger(p, plugin.config.Shoperrorcantsellhere, "Error");
-                                                }
-                                            } else {
-                                                plugin.PlayerLogger(p, plugin.config.Shoperrornotenoughxpconsumer, "Error");
-                                            }
-                                        } else {
-                                            plugin.PlayerLogger(p, line[1] + " " + plugin.config.playernotonline, "Error");
                                         }
+                                    } else {
+                                        plugin.PlayerLogger(p, line[1] + " " + plugin.config.playerwasntonline, "Error");
                                     }
                                 }
-                            } else {
-                                plugin.blacklistLogger(p);
-                                event.setCancelled(true);
                             }
                         }
                     } else {
@@ -444,43 +439,46 @@ public class xpShopListener implements Listener {
                 plugin.Logger("Contains no : ", "Debug");
             }
         }
-        if (Tools.isFloat(temp[0]) && Tools.isFloat(temp[1])) {
-            if (plugin.config.debug) {
-                plugin.Logger("Buy and sell amount are ints: " + temp[0] + " und " + temp[1], "Debug");
-            }
-            if (Float.parseFloat(temp[0]) > 0 || Float.parseFloat(temp[1]) > 0) {
+        try {
+            if (Tools.isFloat(temp[0]) && Tools.isFloat(temp[1])) {
                 if (plugin.config.debug) {
-                    plugin.Logger("One of them is greater than 0: " + temp[0] + " und " + temp[1], "Debug");
+                    plugin.Logger("Buy and sell amount are ints: " + temp[0] + " und " + temp[1], "Debug");
                 }
-                if (!(Float.parseFloat(temp[0]) < 0) && !(Float.parseFloat(temp[1]) < 0)) {
+                if (Float.parseFloat(temp[0]) > 0 || Float.parseFloat(temp[1]) > 0) {
                     if (plugin.config.debug) {
-                        plugin.Logger("None of them is smaller than 0: " + temp[0] + " und " + temp[1], "Debug");
+                        plugin.Logger("One of them is greater than 0: " + temp[0] + " und " + temp[1], "Debug");
                     }
-                    if (Tools.isInteger(lines[2])) {
-                        if (Integer.parseInt(lines[2]) > 0) {
-                            if (plugin.config.debug) {
-                                plugin.Logger("Line 2 is int", "Debug");
+                    if (!(Float.parseFloat(temp[0]) < 0) && !(Float.parseFloat(temp[1]) < 0)) {
+                        if (plugin.config.debug) {
+                            plugin.Logger("None of them is smaller than 0: " + temp[0] + " und " + temp[1], "Debug");
+                        }
+                        if (Tools.isInteger(lines[2])) {
+                            if (Integer.parseInt(lines[2]) > 0) {
+                                if (plugin.config.debug) {
+                                    plugin.Logger("Line 2 is int", "Debug");
+                                }
+                                a = true;
+                                if (plugin.config.debug) {
+                                    plugin.Logger("block is valid!", "Debug");
+                                }
                             }
-                            a = true;
-                            if (plugin.config.debug) {
-                                plugin.Logger("block is valid!", "Debug");
-                            }
+                        }
+                    } else {
+                        if (plugin.config.debug) {
+                            plugin.Logger("One of them is smaller than 0: " + temp[0] + " und " + temp[1], "Debug");
                         }
                     }
                 } else {
                     if (plugin.config.debug) {
-                        plugin.Logger("One of them is smaller than 0: " + temp[0] + " und " + temp[1], "Debug");
+                        plugin.Logger("None of them is greater than 0: " + temp[0] + " und " + temp[1], "Debug");
                     }
                 }
             } else {
                 if (plugin.config.debug) {
-                    plugin.Logger("None of them is greater than 0: " + temp[0] + " und " + temp[1], "Debug");
+                    plugin.Logger("!Tools.isFloat(temp[0]) || !Tools.isFloat(temp[1])", "Debug");
                 }
             }
-        } else {
-            if (plugin.config.debug) {
-                plugin.Logger("!Tools.isFloat(temp[0]) || !Tools.isFloat(temp[1])", "Debug");
-            }
+        } catch (Exception ew) {
         }
 
         return a;

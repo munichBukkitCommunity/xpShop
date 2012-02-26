@@ -23,7 +23,7 @@ public class Tools
 		}
 		return false;
 	}
-	public String[] stringtoArray( String s, String sep ) {
+	public static String[] stringtoArray( String s, String sep ) {
 		// convert a String s to an Array, the elements
 		// are delimited by sep
 		// NOTE : for old JDK only (<1.4).

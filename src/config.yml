@@ -4,6 +4,7 @@ debug: false
 firstRun: true
 moneytoxp: 1.00
 xptomoney: 1.00
+onlysendxptoonlineplayers: false
 buydeactivated: false
 selldeactivated: false
 senddeactivated: false
@@ -153,5 +154,11 @@ Shop:
       de: Du kannst hier nicht kaufen!
       en: You cant buy here!
 playernotonline:
-  de: ist nicht online!
-  en: isnt online!
+  de: war noch nicht hier!
+  en: wasnt online before!
+playerwasntonline:
+  de: war noch nicht hier!
+  en: wasnt online before!
+onlyonlineplayer:
+  de: es ist nur das managen von XP von Onlineplayern ist erlaubt.
+  en: only managing of XP of online players allowed.
