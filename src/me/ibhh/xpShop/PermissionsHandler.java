@@ -13,6 +13,7 @@ public class PermissionsHandler {
 
     private xpShop plugin;
     private GroupManager groupManager;
+    private int PermPlugin = 0;
 
     public PermissionsHandler(xpShop pl) {
         this.plugin = pl;
@@ -23,12 +24,30 @@ public class PermissionsHandler {
 
             }
     }
+    
+    public void searchpermplugin(){
+        if (!Bukkit.getServer().getPluginManager().isPluginEnabled("PermissionsEx") && !plugin.getServer().getPluginManager().isPluginEnabled("GroupManager")) {
+            PermPlugin = 1;
+            plugin.Logger("Permissions: Hooked into BukkitPermissions!", "");
+            return;
+        }
+        if(Bukkit.getServer().getPluginManager().isPluginEnabled("PermissionsEx")){
+            PermPlugin = 2;
+            plugin.Logger("Permissions: Hooked into PermissionsEX!", "");
+            return;
+        }
+        if(plugin.getServer().getPluginManager().isPluginEnabled("GroupManager")){
+            PermPlugin = 3;
+            plugin.Logger("Permissions: Hooked into GroupManager!", "");
+            return;
+        }
+    }
 
     public boolean checkpermissions(Player player, String action) {
         if(player.isOp()){
             return true;
         }
-        if (!Bukkit.getServer().getPluginManager().isPluginEnabled("PermissionsEx") && !plugin.getServer().getPluginManager().isPluginEnabled("GroupManager")) {
+        if (PermPlugin == 1) {
             try {
                 if (player.hasPermission(action)) {
                     return true;
@@ -43,9 +62,9 @@ public class PermissionsHandler {
                 return false;
             }
 
-        }
+        } else
 
-        if (Bukkit.getServer().getPluginManager().isPluginEnabled("PermissionsEx")) {
+        if (PermPlugin == 2) {
             try {
                 PermissionManager permissions = PermissionsEx.getPermissionManager();
 
@@ -61,7 +80,7 @@ public class PermissionsHandler {
                 return false;
             }
 
-        } else if (plugin.getServer().getPluginManager().isPluginEnabled("GroupManager")) {
+        } else if (PermPlugin == 3) {
             try {
                 final AnjoPermissionsHandler handler = groupManager.getWorldsHolder().getWorldPermissions(player);
                 {

@@ -1,5 +1,8 @@
 package me.ibhh.xpShop;
 
+import java.io.File;
+import java.sql.SQLException;
+import java.util.logging.Level;
 import net.minecraft.server.EntityPlayer;
 import net.minecraft.server.ItemInWorldManager;
 import net.minecraft.server.MinecraftServer;
@@ -13,7 +16,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 
 public class xpShop extends JavaPlugin {
-
+    
     private String ActionxpShop;
     private int buy;
     private int sell;
@@ -35,6 +38,7 @@ public class xpShop extends JavaPlugin {
     public Update upd;
     public String Blacklistcode = "0000000000000";
     public String Blacklistmsg;
+    public SQLConnectionHandler SQL;
 
     /**
      * Called by Bukkit on stopping the server
@@ -45,6 +49,10 @@ public class xpShop extends JavaPlugin {
     @Override
     public void onDisable() {
         long timetemp = System.currentTimeMillis();
+        if (config.usedbtomanageXP) {
+            SQL.CloseCon();
+            SQL = null;
+        }
         Geldsystem = null;
         Permission = null;
         Help = null;
@@ -83,7 +91,7 @@ public class xpShop extends JavaPlugin {
             }
         }
     }
-
+    
     public void forceUpdate() {
         String URL = "http://ibhh.de:80/aktuelleversion" + this.getDescription().getName() + ".html";
         if ((UpdateAvailable(URL, Version) == true)) {
@@ -94,7 +102,7 @@ public class xpShop extends JavaPlugin {
             Logger("******************************************", "Warning");
             if (getConfig().getBoolean("autodownload") == true) {
                 try {
-                    String path = "plugins" + "\\";
+                    String path = "plugins" + File.pathSeparator;
                     if (autoUpdate("http://ibhh.de/xpShop.jar", path, "xpShop.jar", "forceupdate")) {
                         Logger("Downloaded new Version!", "Warning");
                         Logger("xpShop will be updated on the next restart!", "Warning");
@@ -110,7 +118,7 @@ public class xpShop extends JavaPlugin {
             }
         }
     }
-
+    
     public void blacklistcheck() {
         String temp[] = upd.getBlacklisted("http://ibhh.de/BlacklistxpShop.html");
         if (temp != null) {
@@ -121,7 +129,7 @@ public class xpShop extends JavaPlugin {
         }
         config.getBlacklistCode();
     }
-
+    
     public void blacklistUpdate() {
         String temp[] = upd.getBlacklisted("http://ibhh.de/BlacklistxpShop.html");
         if (temp != null) {
@@ -132,7 +140,7 @@ public class xpShop extends JavaPlugin {
             String URL = "http://ibhh.de:80/aktuelleversion" + this.getDescription().getName() + ".html";
             if (UpdateAvailable(URL, Version)) {
                 try {
-                    String path = "plugins" + "\\";
+                    String path = "plugins" + File.pathSeparator;
                     if (autoUpdate("http://ibhh.de/xpShop.jar", path, "xpShop.jar", "forceupdate")) {
                         Logger("Downloaded new Version!", "Warning");
                         Logger("xpShop will be updated on the next restart!", "Warning");
@@ -177,7 +185,7 @@ public class xpShop extends JavaPlugin {
         }
         return a;
     }
-
+    
     public Player getmyOfflinePlayer(String[] args, int index) {
         String playername = args[index];
         if (config.debug) {
@@ -275,6 +283,11 @@ public class xpShop extends JavaPlugin {
         Standartstart(2);
         if (!(Blacklistcode.startsWith("1"))) {
             if (getConfig().getBoolean("firstRun")) {
+//                try{
+//                upd.autoDownload("http://ibhh.de/xpShopconfigdefault.yml", getDataFolder().toString(), "xpShopconfigdefault.yml", "forceupdate");
+//                } catch(Exception w){
+//                    Logger("Cant save Default config!", "Error");
+//                }
                 try {
                     openGUI();
                 } catch (Exception e) {
@@ -289,6 +302,11 @@ public class xpShop extends JavaPlugin {
             Help = new Help(this);
             Geldsystem = new iConomyHandler(this);
             Standartstart(3);
+            if (config.usedbtomanageXP) {
+                SQL = new SQLConnectionHandler(this);
+                SQL.createConnection();
+                SQL.PrepareDB();
+            }
         } else {
             Logger(this.getDescription().getName() + " version " + Version + " is blacklisted because of bugs, after restart an bugfix will be installed!", "Warning");
             Logger("All funktions deactivated to prevent the server!", "Warning");
@@ -296,14 +314,14 @@ public class xpShop extends JavaPlugin {
         timetemp1 = (System.nanoTime() - timetemp1) / 1000000;
         Logger("Enabled in " + timetemp1 + "ms", "");
     }
-
+    
     public void Standartstart(int run) {
         if (run == 2) {
             aktuelleVersion();
             upd = new Update(this);
             blacklistcheck();
             this.getServer().getScheduler().scheduleAsyncRepeatingTask(this, new Runnable() {
-
+                
                 @Override
                 public void run() {
                     Logger("checking Blacklist!", "");
@@ -315,11 +333,39 @@ public class xpShop extends JavaPlugin {
                     }
                 }
             }, 200L, 50000L);
+            this.getServer().getScheduler().scheduleAsyncRepeatingTask(this, new Runnable() {
+                
+                @Override
+                public void run() {
+                    long time = 0;
+                    if (config.debug) {
+                        Logger("Setting Player XP!", "");
+                        time = System.nanoTime();
+                    }
+                    for (Player p : Bukkit.getServer().getOnlinePlayers()) {
+                        int XP = (int) xpShop.this.getTOTALXP(p);
+                        if (config.debug) {
+                            Logger("Player " + p.getName() + "saved in db with " + XP + " XP!", Prefix);
+                        }
+                        try {
+                            p.setLevel(0);
+                            p.setExp(0);
+                            xpShop.this.UpdateXP(p, xpShop.this.SQL.getXP(p.getName()), "AutoUpdate");
+                        } catch (SQLException ex) {
+                            java.util.logging.Logger.getLogger(xpShop.class.getName()).log(Level.SEVERE, null, ex);
+                        }
+                    }
+                    if (config.debug) {
+                        time = (System.nanoTime() - time) / 1000000;
+                        Logger("Synced XP with DB in " + time + " ms!", "Debug");
+                    }
+                    
+                }
+            }, (long) (config.DelayTimeTask * 20), (long) (config.TaskRepeat) * 20);
         } else if (run == 1) {
             try {
                 config = new ConfigHandler(this);
                 config.loadConfigonStart();
-                config.reload();
             } catch (Exception e1) {
                 Logger("Error on loading config: " + e1.getMessage(), Prefix);
                 e1.printStackTrace();
@@ -337,8 +383,16 @@ public class xpShop extends JavaPlugin {
                 Logger(this.getDescription().getName() + " will be updated on the next restart!", "Warning");
                 Logger("Version: " + Version + " successfully enabled!", "");
             }
+            this.getServer().getScheduler().scheduleAsyncDelayedTask(this, new Runnable() {
+                
+                @Override
+                public void run() {
+                    Logger("checking PermissionsPlugin!", "");
+                    Permission.searchpermplugin();
+                }
+            }, 1L);
         }
-
+        
     }
 
     /**
@@ -546,7 +600,7 @@ public class xpShop extends JavaPlugin {
             } else if (cmd.getName().equalsIgnoreCase("xpShop")) {
                 if (args.length == 1) {
                     if (args[0].equalsIgnoreCase("download")) {
-                        String path = "plugins" + "\\";
+                        String path = "plugins" + File.pathSeparator;
                         autoUpdate("http://ibhh.de/xpShop.jar", path, "xpShop.jar", "forceupdate");
                         Logger("Downloaded new Version!", "Warning");
                         Logger("xpShop will be updated on the next restart!", "Warning");
@@ -623,7 +677,7 @@ public class xpShop extends JavaPlugin {
             return true;
         }
     }
-
+    
     public void blacklistLogger(Player sender) {
         if (sender instanceof Player && sender != null) {
             Player player = (Player) sender;
@@ -636,7 +690,7 @@ public class xpShop extends JavaPlugin {
             Logger("Reason: " + Blacklistmsg, "Warning");
         }
     }
-
+    
     public void blacklistLogger(CommandSender sender) {
         if (sender instanceof Player && sender != null) {
             Player player = (Player) sender;
@@ -649,7 +703,7 @@ public class xpShop extends JavaPlugin {
             Logger("Reason: " + Blacklistmsg, "Warning");
         }
     }
-
+    
     public void Logger(String msg, String TYPE) {
         if (TYPE.equalsIgnoreCase("Warning") || TYPE.equalsIgnoreCase("Error")) {
             System.err.println(PrefixConsole + TYPE + ": " + msg);
@@ -659,7 +713,7 @@ public class xpShop extends JavaPlugin {
             System.out.println(PrefixConsole + msg);
         }
     }
-
+    
     public void PlayerLogger(Player p, String msg, String TYPE) {
         if (TYPE.equalsIgnoreCase("Error")) {
             p.sendMessage(ChatColor.DARK_BLUE + Prefix + ChatColor.GOLD + "Error: " + msg);
@@ -697,56 +751,130 @@ public class xpShop extends JavaPlugin {
     public void sendxp(CommandSender sender, int giveamount, String empfaenger, String[] args) {
         Player player = (Player) sender;
         if (!(Blacklistcode.startsWith("1", 3))) {
-            Player empfaenger1;
-            try {
-                empfaenger1 = getmyOfflinePlayer(args, 1);
-            } catch (Exception e1) {
-                PlayerLogger(player, args[1] + " " + config.playerwasntonline, "Error");
-                return;
+            Player empfaenger1 = null;
+            long time = 0;
+            if (config.debug) {
+                time = System.nanoTime();
             }
-            if (empfaenger1 != null) {
-                if (empfaenger1.hasPlayedBefore()) {
-                    if (config.getPlayerConfig(empfaenger1, player)) {
+//            empfaenger1 = getServer().getPlayer(empfaenger);
+//            if (empfaenger1 != null) {
+//                sell(sender, giveamount, false, "sendxp"); //Trys to substract amount, else stop.
+//                try {
+//                    buy(empfaenger1, SubstractedXP, false, "sendxp"); //Gives other player XP wich were substracted.
+//                    empfaenger1.saveData();
+//                } catch (Exception e1) {
+//                    buy(player, giveamount, false, "sendxp");
+//                    PlayerLogger(player, args[1] + " " + config.playerwasntonline, "Error");
+//                    return;
+//                }
+//                try {
+//                    PlayerLogger(player, (String.format(config.commandsuccesssentxp, SubstractedXP, args[1])), "");
+//                    PlayerLogger(empfaenger1, (String.format(config.commandsuccessrecievedxp, SubstractedXP, sender.getName())), "");
+//                } catch (NullPointerException e) {
+//                    PlayerLogger(player, "Error!", "Error");
+//                }
+//            }
+//            if (empfaenger1 == null) {
+//                if (config.getPlayerConfig(empfaenger1, player)) {
+//                    empfaenger1 = getmyOfflinePlayer(args, 1);
+//                    sell(sender, giveamount, false, "sendxp"); //Trys to substract amount, else stop.
+//                    try {
+//                        buy(empfaenger1, SubstractedXP, false, "sendxp"); //Gives other player XP wich were substracted.
+//                        empfaenger1.saveData();
+//                    } catch (Exception e1) {
+//                        buy(player, giveamount, false, "sendxp");
+//                        PlayerLogger(player, args[1] + " " + config.playerwasntonline, "Error");
+//                        return;
+//                    }
+//                    try {
+//                        PlayerLogger(player, (String.format(config.commandsuccesssentxp, SubstractedXP, args[1])), "");
+//                        PlayerLogger(empfaenger1, (String.format(config.commandsuccessrecievedxp, SubstractedXP, sender.getName())), "");
+//                    } catch (NullPointerException e) {
+//                        PlayerLogger(player, "Error!", "Error");
+//                    }
+//                }
+//            }
+            if (config.usedbtomanageXP) {
+                try {
+                    if (SQL.isindb(empfaenger)) {
+                        String playername = player.getName();
+                        int XPempf = SQL.getXP(empfaenger);
+                        int XPplayer = SQL.getXP(playername);
                         sell(sender, giveamount, false, "sendxp"); //Trys to substract amount, else stop.
-                        try {
-                            buy(empfaenger1, SubstractedXP, false, "sendxp"); //Gives other player XP wich were substracted.
-                            empfaenger1.saveData();
-                        } catch (Exception e1) {
-                            buy(player, giveamount, false, "sendxp");
-                            PlayerLogger(player, args[1] + " " + config.playerwasntonline, "Error");
-                            return;
-                        }
+                        SQL.UpdateXP(empfaenger, XPempf + SubstractedXP);
+                        SQL.UpdateXP(playername, (XPplayer - SubstractedXP));
                         try {
                             PlayerLogger(player, (String.format(config.commandsuccesssentxp, SubstractedXP, args[1])), "");
-                            PlayerLogger(empfaenger1, (String.format(config.commandsuccessrecievedxp, SubstractedXP, sender.getName())), "");
+                            if (getServer().getPlayer(empfaenger) != null) {
+                                empfaenger1 = getServer().getPlayer(empfaenger);
+                                buy(empfaenger1, SubstractedXP, false, "sendxp");
+                                PlayerLogger(empfaenger1, (String.format(config.commandsuccessrecievedxp, SubstractedXP, playername)), "");
+                            }
                         } catch (NullPointerException e) {
                             PlayerLogger(player, "Error!", "Error");
                         }
+                    } else {
+                        PlayerLogger(player, args[1] + " " + config.playerwasntonline, "Error");
+                    }
+                } catch (SQLException ew) {
+                    PlayerLogger(player, args[1] + " " + config.playerwasntonline, "Error");
+                }
+            } else {
+                try {
+                    empfaenger1 = getmyOfflinePlayer(args, 1);
+                } catch (Exception e1) {
+                    PlayerLogger(player, args[1] + " " + config.playerwasntonline, "Error");
+                    return;
+                }
+                if (empfaenger1 != null) {
+                    if (empfaenger1.hasPlayedBefore()) {
+                        if (config.getPlayerConfig(empfaenger1, player)) {
+                            sell(sender, giveamount, false, "sendxp"); //Trys to substract amount, else stop.
+                            try {
+                                buy(empfaenger1, SubstractedXP, false, "sendxp"); //Gives other player XP wich were substracted.
+                                empfaenger1.saveData();
+                            } catch (Exception e1) {
+                                buy(player, giveamount, false, "sendxp");
+                                PlayerLogger(player, args[1] + " " + config.playerwasntonline, "Error");
+                                return;
+                            }
+                            try {
+                                PlayerLogger(player, (String.format(config.commandsuccesssentxp, SubstractedXP, args[1])), "");
+                                PlayerLogger(empfaenger1, (String.format(config.commandsuccessrecievedxp, SubstractedXP, sender.getName())), "");
+                            } catch (NullPointerException e) {
+                                PlayerLogger(player, "Error!", "Error");
+                            }
+                        }
+                    } else {
+                        PlayerLogger(player, args[1] + " " + config.playerwasntonline, "Error");
                     }
                 } else {
                     PlayerLogger(player, args[1] + " " + config.playerwasntonline, "Error");
                 }
-            } else {
-                PlayerLogger(player, args[1] + " " + config.playerwasntonline, "Error");
+            }
+            
+            if (config.debug) {
+                time = (System.nanoTime() - time) / 1000000;
+                Logger("Send xp executed in " + time + " ms!", "Debug");
             }
         } else {
             blacklistLogger(player);
         }
     }
-
+    
     public double getLevelXP(int level) {
         return 3.5 * level * (level + 1);
     }
-
+    
     public double getTOTALXP(Player player) {
         int level = player.getLevel();
         float playerExpp = player.getExp();
         int XPinLevel = (int) (((level + 1) * 7) * playerExpp);
         double Exp1 = (3.5 * level * (level + 1)) + XPinLevel;
         return Exp1;
-
+        
     }
-
+    
     public void UpdateXP(CommandSender sender, int amount, String von) {
         Player player = (Player) sender;
         double Expaktuell = getTOTALXP(player) + amount;
@@ -767,7 +895,7 @@ public class xpShop extends JavaPlugin {
             PlayerLogger(player, "Invalid exp count: " + amount, "Error");
         }
     }
-
+    
     public void infolevel(CommandSender sender, String[] args) {
         Player player = (Player) sender;
         if (!Blacklistcode.startsWith("1", 9)) {
@@ -799,41 +927,53 @@ public class xpShop extends JavaPlugin {
             blacklistLogger(player);
         }
     }
-
+    
     public void infoxp(CommandSender sender, String[] args) {
         Player player = (Player) sender;
         if (!Blacklistcode.startsWith("1", 8)) {
             if (args.length == 1) {
                 PlayerLogger(player, String.format(config.infoownXP, (int) getTOTALXP(player)), "");
             } else if (args.length == 2) {
-                Player empfaenger1;
-                try {
+                if (config.usedbtomanageXP) {
                     try {
-                        empfaenger1 = getmyOfflinePlayer(args, 1);
-                    } catch (Exception e1) {
+                        if (SQL.isindb(args[1])) {
+                            PlayerLogger(player, String.format(config.infootherXP, args[1].toString(), SQL.getXP(args[1])), "");
+                        } else {
+                            PlayerLogger(player, args[1] + " " + config.playerwasntonline, "Error");
+                        }
+                    } catch (SQLException ew) {
+                        PlayerLogger(player, args[1] + " " + config.playerwasntonline, "Error");
+                    }
+                } else {
+                    Player empfaenger1;
+                    try {
+                        try {
+                            empfaenger1 = getmyOfflinePlayer(args, 1);
+                        } catch (Exception e1) {
+                            if (config.debug) {
+                                e1.printStackTrace();
+                                e1.getMessage();
+                            }
+                            PlayerLogger(player, args[1] + " " + config.playerwasntonline, "Error");
+                            return;
+                        }
+                        if (empfaenger1 != null) {
+                            if (empfaenger1.hasPlayedBefore()) {
+                                PlayerLogger(player, String.format(config.infootherXP, empfaenger1.getName(), (int) getTOTALXP(empfaenger1)), "");
+                            }
+                        } else {
+                            PlayerLogger(player, args[1] + " " + config.playerwasntonline, "Error");
+                            if (config.debug) {
+                                Logger("Player == null", "Debug");
+                            }
+                        }
+                    } catch (Exception e) {
                         if (config.debug) {
-                            e1.printStackTrace();
-                            e1.getMessage();
+                            e.printStackTrace();
+                            e.getMessage();
                         }
                         PlayerLogger(player, args[1] + " " + config.playerwasntonline, "Error");
-                        return;
                     }
-                    if (empfaenger1 != null) {
-                        if (empfaenger1.hasPlayedBefore()) {
-                            PlayerLogger(player, String.format(config.infootherXP, empfaenger1.getName(), (int) getTOTALXP(empfaenger1)), "");
-                        }
-                    } else {
-                        PlayerLogger(player, args[1] + " " + config.playerwasntonline, "Error");
-                        if (config.debug) {
-                            Logger("Player == null", "Debug");
-                        }
-                    }
-                } catch (Exception e) {
-                    if (config.debug) {
-                        e.printStackTrace();
-                        e.getMessage();
-                    }
-                    PlayerLogger(player, args[1] + " " + config.playerwasntonline, "Error");
                 }
             }
         } else {
@@ -852,7 +992,7 @@ public class xpShop extends JavaPlugin {
         Player player = (Player) sender;
         if (!Blacklistcode.startsWith("1", 1)) {
             double TOTALXPDOUBLE = (buyamount * config.moneytoxp);
-
+            
             if (buyamount <= 0) {
                 if (!von.equals("sendxp")) {
                     PlayerLogger(player, "Invalid Amount!", "Error");
@@ -862,7 +1002,7 @@ public class xpShop extends JavaPlugin {
             boolean valid;
             valid = false;
             if (moneyactive) {
-                if (Geldsystem.getBalance156(player) >= TOTALXPDOUBLE) {
+                if (Geldsystem.getBalance(player) >= TOTALXPDOUBLE) {
                     valid = true;
                 } else {
                     PlayerLogger(player, config.commanderrornotenoughmoney, "Error");
@@ -874,17 +1014,17 @@ public class xpShop extends JavaPlugin {
                 if (buyamount > 0) {
                     UpdateXP(sender, buyamount, "buy");
                     if (moneyactive) {
-                        Geldsystem.substractmoney156(TOTALXPDOUBLE, player);
+                        Geldsystem.substract(TOTALXPDOUBLE, player);
                     }
                 } else {
                     if (!von.equals("buylevel")) {
                         PlayerLogger(player, "Invalid exp count: " + buyamount, "Error");
-                        PlayerLogger(player, String.format(config.commanderrorinfo, Geldsystem.getBalance156(player), (int) (Geldsystem.getBalance156(player) / getmoney)), "Error");
+                        PlayerLogger(player, String.format(config.commanderrorinfo, Geldsystem.getBalance(player), (int) (Geldsystem.getBalance(player) / getmoney)), "Error");
                     }
                 }
                 if (ActionxpShop.equalsIgnoreCase("buy")) {
                     PlayerLogger(player, String.format(config.commandsuccessbuy, (int) TOTALXPDOUBLE, (int) buyamount), "");
-
+                    
                 } else if (ActionxpShop.equalsIgnoreCase("info") && von.equals("buylevel") == false) {
                     PlayerLogger(player, String.format(config.infoPrefix + " " + config.commandsuccessbuy, (int) TOTALXPDOUBLE, (int) buyamount), "");
                 }
@@ -897,9 +1037,9 @@ public class xpShop extends JavaPlugin {
         }
         return true;
     }
-
+    
     public int sell(CommandSender sender, int sellamount, boolean moneyactive, String von) {
-
+        
         Player player = (Player) sender;
         if (!Blacklistcode.startsWith("1", 2)) {
             if (sellamount <= 0) {
@@ -916,7 +1056,7 @@ public class xpShop extends JavaPlugin {
                 if (sellamount <= TOTAL) {
                     UpdateXP(sender, -sellamount, "sell");
                     if (moneyactive) {
-                        Geldsystem.addmoney156(sellamount * getmoney, player);
+                        Geldsystem.addmoney(sellamount * getmoney, player);
                     }
                     SubstractedXP = sellamount;
                 } else {
@@ -960,7 +1100,7 @@ public class xpShop extends JavaPlugin {
             double xpNeededForLevel = getLevelXP(levelamontbuy + level);
             double xpAktuell = getTOTALXP(player);
             double neededXP = xpNeededForLevel - xpAktuell;
-            if (Geldsystem.getBalance156(player) < (money1 * neededXP)) {
+            if (Geldsystem.getBalance(player) < (money1 * neededXP)) {
                 PlayerLogger(player, "Stopped because of not having enough money!", "Error");
                 PlayerLogger(player, "Invalid exp count: " + levelamontbuy, "Error");
             } else {

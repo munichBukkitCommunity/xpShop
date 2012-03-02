@@ -1,27 +1,58 @@
+#Here is the configfile of xpShop:
+#Read the comments please!
+#This choose the language.
 language: en
+#Disable this if you dont want that the plugin updates itself.
 autodownload: true
+#Enable this if you want debug info of a command or if you have an error and want to post it to the Developer (ibhh)
 debug: false
+#This neednt be edited (does the plugin by itself)
 firstRun: true
+#This is the money you have to pay for one XP.
 moneytoxp: 1.00
+#This is the money you get if you sell one XP.
 xptomoney: 1.00
+#Enable this if you have problems with sending XP to player which are offline.
 onlysendxptoonlineplayers: false
+usedbtomanageXP: false
+TaskRepeat: 800
+DelayTimeTask: 200
+SQL: false
+dbPath: localhost:3306/xpShop
+dbUser: nulll
+dbPassword: nulll
+#If a bug is in the plugin: here you can disable parts of the plugin.
+#This deactivate the buy command.
 buydeactivated: false
+#This deactivate the sell command.
 selldeactivated: false
+#This deactivate the send command.
 senddeactivated: false
+#This deactivate the buylevel command.
 buyleveldeactivated: false
+#This deactivate the selllevel command.
 sellleveldeactivated: false
+#This deactivate the info command.
 infodeactivated: false
+#This deactivate the help.
 helpdeactivated: false
+#This deactivate the infoxp command.
 infoxpdeactivated: false
+#This deactivate the infolevel command.
 infoleveldeactivated: false
+#This deactivate xpShop sign creating.
 Signscreatedeactivated: false
+#This deactivate the using of xpShops.
 Signsusedeactivated: false
+#This deactivate the destroing of xpShops.
 Signsdestroydeactivated: false
+#This is the language config: edit these if you add an new language, or you want other sentences, but never delete parts beginning with "%"!
 command:
   error:
     info:
       de: Du kannst maximal %1$d XP in %2$d Geld umwandeln.
       en: You can change maximal %1$d XP into %2$d money.
+      #Optionallanguage: text %1$d text %2$d text.
     buyinfo:
       de: Du kannst maximal %1$d Geld in %2$d XP umwandeln.
       en: You can change maximal %1$d money into %2$d XP.

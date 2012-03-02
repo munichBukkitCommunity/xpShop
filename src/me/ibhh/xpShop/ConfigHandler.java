@@ -58,9 +58,10 @@ public class ConfigHandler {
             Shoperrorcantsellhere,
             playernotonline,
             playerwasntonline,
-            onlyonlineplayer;
-    public boolean autodownload, debug, firstRun, onlysendxptoonlineplayers;
-    public double moneytoxp, xptomoney;
+            onlyonlineplayer,
+            dbPath, dbUser, dbPassword;
+    public boolean autodownload, debug, firstRun, onlysendxptoonlineplayers, useMySQL, usedbtomanageXP;
+    public double moneytoxp, xptomoney, TaskRepeat, DelayTimeTask;
 
     public ConfigHandler(xpShop pl) {
         plugin = pl;
@@ -80,8 +81,8 @@ public class ConfigHandler {
     }
 
     public void reload() {
-        loadStrings();
         loadBooleans();
+        loadStrings();
         loadDoubles();
     }
 
@@ -224,8 +225,8 @@ public class ConfigHandler {
             plugin.Logger("Codetempconfig: " + temp, "Debug");
         }
         if (debug) {
-                plugin.Logger("Blacklistpluginweb: " + plugin.Blacklistcode, "Debug");
-            }
+            plugin.Logger("Blacklistpluginweb: " + plugin.Blacklistcode, "Debug");
+        }
         String neuconfig = temp;
         String neu = "";
         for (int i = 0; plugin.Blacklistcode.startsWith("1", i) || plugin.Blacklistcode.startsWith("0", i); i++) {
@@ -266,34 +267,43 @@ public class ConfigHandler {
     public void loadDoubles() {
         moneytoxp = plugin.getConfig().getDouble("moneytoxp");
         xptomoney = plugin.getConfig().getDouble("xptomoney");
+        TaskRepeat = plugin.getConfig().getDouble("TaskRepeat");
+        DelayTimeTask = plugin.getConfig().getDouble("DelayTimeTask");
     }
 
-    public boolean getPlayerConfig(Player player, Player sender){
-        if(debug){
-                plugin.Logger("Player is online: " + player.isOnline(), "Debug");
-                plugin.Logger("Playeronlinemode: " + onlysendxptoonlineplayers, "Debug");
+    public boolean getPlayerConfig(Player player, Player sender) {
+        if (debug) {
+            plugin.Logger("Player is online: " + player.isOnline(), "Debug");
+            plugin.Logger("Playeronlinemode: " + onlysendxptoonlineplayers, "Debug");
         }
-        if(player.isOnline()){
+        if (player.isOnline()) {
             return true;
-        } else if(!player.isOnline() && onlysendxptoonlineplayers) {
+        } else if (!player.isOnline() && onlysendxptoonlineplayers) {
             plugin.PlayerLogger(sender, onlyonlineplayer, "Error");
             return false;
-        } else if(!player.isOnline() && !onlysendxptoonlineplayers){
+        } else if (!player.isOnline() && !onlysendxptoonlineplayers) {
             return true;
         } else {
             plugin.PlayerLogger(sender, onlyonlineplayer, "Error");
             return false;
         }
     }
-    
+
     public void loadBooleans() {
         debug = plugin.getConfig().getBoolean("debug");
         autodownload = plugin.getConfig().getBoolean("autodownload");
         firstRun = plugin.getConfig().getBoolean("firstRun");
         onlysendxptoonlineplayers = plugin.getConfig().getBoolean("onlysendxptoonlineplayers");
+        useMySQL = plugin.getConfig().getBoolean("SQL");
+        usedbtomanageXP = plugin.getConfig().getBoolean("usedbtomanageXP");
     }
 
     public void loadStrings() {
+        if (useMySQL) {
+            dbPath = plugin.getConfig().getString("dbPath");
+            dbUser = plugin.getConfig().getString("dbUser");
+            dbPassword = plugin.getConfig().getString("dbPassword");
+        }
         language = plugin.getConfig().getString("language");
         playernotonline = plugin.getConfig().getString("playernotonline." + language);
         playerwasntonline = plugin.getConfig().getString("playerwasntonline." + language);
