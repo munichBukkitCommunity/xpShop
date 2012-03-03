@@ -15,8 +15,8 @@ xptomoney: 1.00
 #Enable this if you have problems with sending XP to player which are offline.
 onlysendxptoonlineplayers: false
 usedbtomanageXP: false
-TaskRepeat: 800
-DelayTimeTask: 200
+TaskRepeat: 30
+DelayTimeTask: 30
 SQL: false
 dbPath: localhost:3306/xpShop
 dbUser: nulll

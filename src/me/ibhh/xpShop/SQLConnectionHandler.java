@@ -5,7 +5,6 @@ package me.ibhh.xpShop;
  */
 import java.io.File;
 import java.sql.*;
-import org.bukkit.plugin.Plugin;
 
 /**
  * @author Simon

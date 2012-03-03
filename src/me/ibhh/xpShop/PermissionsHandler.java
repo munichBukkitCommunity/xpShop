@@ -19,32 +19,41 @@ public class PermissionsHandler {
         this.plugin = pl;
         final PluginManager pluginManager = plugin.getServer().getPluginManager();
         final Plugin GMplugin = pluginManager.getPlugin("GroupManager");
-            if (GMplugin != null && GMplugin.isEnabled()) {
-                groupManager = (GroupManager) GMplugin;
+        if (GMplugin != null && GMplugin.isEnabled()) {
+            groupManager = (GroupManager) GMplugin;
 
-            }
+        }
+        plugin.getServer().getScheduler().scheduleAsyncDelayedTask(plugin, new Runnable() {
+
+                @Override
+                public void run() {
+                    plugin.Logger("checking PermissionsPlugin!", "");
+                    searchpermplugin();
+                }
+            }, 1L);
     }
-    
-    public void searchpermplugin(){
+
+    public void searchpermplugin() {
         if (!Bukkit.getServer().getPluginManager().isPluginEnabled("PermissionsEx") && !plugin.getServer().getPluginManager().isPluginEnabled("GroupManager")) {
             PermPlugin = 1;
             plugin.Logger("Permissions: Hooked into BukkitPermissions!", "");
             return;
-        }
-        if(Bukkit.getServer().getPluginManager().isPluginEnabled("PermissionsEx")){
+        } else if (Bukkit.getServer().getPluginManager().isPluginEnabled("PermissionsEx")) {
             PermPlugin = 2;
             plugin.Logger("Permissions: Hooked into PermissionsEX!", "");
             return;
-        }
-        if(plugin.getServer().getPluginManager().isPluginEnabled("GroupManager")){
+        } else if (plugin.getServer().getPluginManager().isPluginEnabled("GroupManager")) {
             PermPlugin = 3;
             plugin.Logger("Permissions: Hooked into GroupManager!", "");
             return;
+        } else {
+            PermPlugin = 0;
+            plugin.Logger("Permissions: cant find a compatible PermissionsPlugin!", "");
         }
     }
 
     public boolean checkpermissions(Player player, String action) {
-        if(player.isOp()){
+        if (player.isOp()) {
             return true;
         }
         if (PermPlugin == 1) {
@@ -62,9 +71,7 @@ public class PermissionsHandler {
                 return false;
             }
 
-        } else
-
-        if (PermPlugin == 2) {
+        } else if (PermPlugin == 2) {
             try {
                 PermissionManager permissions = PermissionsEx.getPermissionManager();
 
@@ -99,8 +106,12 @@ public class PermissionsHandler {
                 e.printStackTrace();
                 return false;
             }
+        } else {
+            plugin.PlayerLogger(player, plugin.config.permissionsnotfound, "Error");
+            searchpermplugin();
+            System.out.println("PermissionsEx plugin are not found.");
+            return false;
         }
-        System.out.println("PermissionsEx plugin are not found.");
         return false;
     }
 }
