@@ -1,5 +1,6 @@
 package me.ibhh.xpShop;
 
+import de.bananaco.bpermissions.api.util.CalculableType;
 import org.anjocaido.groupmanager.GroupManager;
 import org.anjocaido.groupmanager.permissions.AnjoPermissionsHandler;
 import org.bukkit.Bukkit;
@@ -15,8 +16,11 @@ public class PermissionsHandler {
     private GroupManager groupManager;
     private int PermPlugin = 0;
 
-    public PermissionsHandler(xpShop pl) {
+    public PermissionsHandler(xpShop pl, String von) {
         this.plugin = pl;
+        if(plugin.config.debug){
+            plugin.Logger("New permissions handler by: " + von, "Debug");
+        }
         final PluginManager pluginManager = plugin.getServer().getPluginManager();
         final Plugin GMplugin = pluginManager.getPlugin("GroupManager");
         if (GMplugin != null && GMplugin.isEnabled()) {
@@ -34,21 +38,18 @@ public class PermissionsHandler {
     }
 
     public void searchpermplugin() {
-        if (!Bukkit.getServer().getPluginManager().isPluginEnabled("PermissionsEx") && !plugin.getServer().getPluginManager().isPluginEnabled("GroupManager")) {
-            PermPlugin = 1;
-            plugin.Logger("Permissions: Hooked into BukkitPermissions!", "");
-            return;
-        } else if (Bukkit.getServer().getPluginManager().isPluginEnabled("PermissionsEx")) {
+        if (Bukkit.getServer().getPluginManager().isPluginEnabled("PermissionsEx")) {
             PermPlugin = 2;
             plugin.Logger("Permissions: Hooked into PermissionsEX!", "");
-            return;
         } else if (plugin.getServer().getPluginManager().isPluginEnabled("GroupManager")) {
             PermPlugin = 3;
             plugin.Logger("Permissions: Hooked into GroupManager!", "");
-            return;
+        } else if(Bukkit.getServer().getPluginManager().isPluginEnabled("bPermissions")){
+            PermPlugin = 4;
+            plugin.Logger("Permissions: Hooked into bPermissions!", "");
         } else {
-            PermPlugin = 0;
-            plugin.Logger("Permissions: cant find a compatible PermissionsPlugin!", "");
+            PermPlugin = 1;
+            plugin.Logger("Permissions: Hooked into BukkitPermissions!", "");
         }
     }
 
@@ -106,9 +107,23 @@ public class PermissionsHandler {
                 e.printStackTrace();
                 return false;
             }
+        } else if(PermPlugin == 4){
+            try{
+                if(de.bananaco.bpermissions.api.ApiLayer.hasPermission(player.getWorld().getName(), CalculableType.USER, player.getName() , action)){
+                    return true;
+                } else if(de.bananaco.bpermissions.api.ApiLayer.hasPermission(player.getWorld().getName(), CalculableType.GROUP, player.getName() , action)) {
+                    return true;
+                } else {
+                    return false;
+                }
+            } catch (Exception e){
+                plugin.Logger("Error on checking permissions with bPermissions!", "Error");
+                plugin.PlayerLogger(player, "Error on checking permissions with bPermissions!", "Error");
+                e.printStackTrace();
+                return false;
+            }
         } else {
             plugin.PlayerLogger(player, plugin.config.permissionsnotfound, "Error");
-            searchpermplugin();
             System.out.println("PermissionsEx plugin are not found.");
             return false;
         }

@@ -193,3 +193,18 @@ playerwasntonline:
 onlyonlineplayer:
   de: es ist nur das managen von XP von Onlineplayern ist erlaubt.
   en: only managing of XP of online players allowed.
+addedxp:
+  de: Du hast %1$d XP erhalten.
+  en: You have recieved %1$d XP.
+substractedxp:
+  de: Von Dir wurden %1$d XP gekauft.
+  en: From you were %1$d XP bought.
+Playerxpset:
+  de: XP von Player %1$s wurden auf %2$d XP gesetzt.
+  en: XP from Player %1$s were set to %2$d XP.
+Playerreset:
+  de: Players %1$s XPs wurden zurueckgesetzt.
+  en: Players %1$s XPs were reseted.
+dbnotused:
+  de: Du benutzt keine Datenbank!
+  en: You dont use a DB!

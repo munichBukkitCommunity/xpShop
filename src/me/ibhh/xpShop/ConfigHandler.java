@@ -59,7 +59,12 @@ public class ConfigHandler {
             playernotonline,
             playerwasntonline,
             onlyonlineplayer,
-            dbPath, dbUser, dbPassword;
+            dbPath, dbUser, dbPassword,
+            addedxp,
+            substractedxp,
+            Playerxpset,
+            Playerreset,
+            dbnotused;
     public boolean autodownload, debug, firstRun, onlysendxptoonlineplayers, useMySQL, usedbtomanageXP;
     public double moneytoxp, xptomoney, TaskRepeat, DelayTimeTask;
 
@@ -308,6 +313,11 @@ public class ConfigHandler {
         playernotonline = plugin.getConfig().getString("playernotonline." + language);
         playerwasntonline = plugin.getConfig().getString("playerwasntonline." + language);
         onlyonlineplayer = plugin.getConfig().getString("onlyonlineplayer." + language);
+        addedxp = plugin.getConfig().getString("addedxp." + language);
+        substractedxp = plugin.getConfig().getString("substractedxp." + language);
+        Playerreset = plugin.getConfig().getString("Playerreset." + language);
+        Playerxpset = plugin.getConfig().getString("Playerxpset." + language);
+        dbnotused = plugin.getConfig().getString("dbnotused." + language);
         Shoperrornotenoughmoneyconsumer = plugin.getConfig().getString("Shop.error.notenoughmoneyconsumer." + language);
         Shoperrornotenoughmoneyseller = plugin.getConfig().getString("Shop.error.notenoughmoneyseller." + language);
         Shoperrorcantbuyhere = plugin.getConfig().getString("Shop.error.cantbuyhere." + language);

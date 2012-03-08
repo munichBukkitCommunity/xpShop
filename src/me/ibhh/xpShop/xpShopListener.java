@@ -32,6 +32,7 @@ public class xpShopListener implements Listener {
             String playername;
             Player player = event.getPlayer();
             double XP = plugin.getTOTALXP(player);
+            double XPneu = XP;
             playername = player.getName();
             if (plugin.config.debug) {
                 plugin.Logger("Playername (joined): " + playername, "Debug");
@@ -41,21 +42,29 @@ public class xpShopListener implements Listener {
                     if (plugin.config.debug) {
                         plugin.Logger("Playername is in db: " + playername + "With " + XP + " XP! DB: " + plugin.SQL.getXP(playername), "Debug");
                     }
-                    XP = plugin.SQL.getXP(playername);
+                    XPneu = plugin.SQL.getXP(playername);
                 } else {
-                    XP = plugin.getTOTALXP(player);
-                    plugin.SQL.InsertAuction(playername, (int) XP);
+                    XPneu = plugin.getTOTALXP(player);
+                    plugin.SQL.InsertAuction(playername, (int) XPneu);
                     if (plugin.config.debug) {
                         plugin.Logger("Playername insert into db: " + playername + "With " + XP + " XP! DB: " + plugin.SQL.getXP(playername), "Debug");
                     }
+
                 }
             } catch (SQLException we) {
                 return;
             }
-            player.setLevel(0);
-            player.setExp(0);
-            plugin.UpdateXP(player, (int) XP, "Join");
-            player.saveData();
+            if (XP != XPneu) {
+                if (XP < XPneu) {
+                    plugin.PlayerLogger(player, String.format(plugin.config.addedxp, (int) XPneu - XP), "");
+                } else if (XPneu < XP) {
+                    plugin.PlayerLogger(player, String.format(plugin.config.substractedxp, (int) XP - XPneu), "");
+                }
+                player.setLevel(0);
+                player.setExp(0);
+                plugin.UpdateXP(player, (int) XP, "Join");
+                player.saveData();
+            }
         }
     }
 

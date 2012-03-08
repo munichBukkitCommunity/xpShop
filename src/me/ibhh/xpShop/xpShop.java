@@ -300,7 +300,7 @@ public class xpShop extends JavaPlugin {
             }
             Help = new Help(this);
             Geldsystem = new iConomyHandler(this);
-            Permission = new PermissionsHandler(this);
+            Permission = new PermissionsHandler(this, "xpShop");
             Standartstart(3);
             if (config.usedbtomanageXP) {
                 SQL = new SQLConnectionHandler(this);
@@ -343,17 +343,27 @@ public class xpShop extends JavaPlugin {
                             Logger("Setting Player XP!", "");
                             time = System.nanoTime();
                         }
+                        int XP = 0;
+                        int neu = 0;
                         for (Player p : Bukkit.getServer().getOnlinePlayers()) {
-                            int XP = (int) xpShop.this.getTOTALXP(p);
+                            XP = (int) xpShop.this.getTOTALXP(p);
+                            try {
+                                neu = xpShop.this.SQL.getXP(p.getName());
+                            } catch (SQLException ex) {
+                                java.util.logging.Logger.getLogger(xpShop.class.getName()).log(Level.SEVERE, null, ex);
+                            }
                             if (config.debug) {
                                 Logger("Player " + p.getName() + "saved in db with " + XP + " XP!", Prefix);
                             }
-                            try {
+                            if (XP != neu) {
                                 p.setLevel(0);
                                 p.setExp(0);
-                                xpShop.this.UpdateXP(p, xpShop.this.SQL.getXP(p.getName()), "AutoUpdate");
-                            } catch (SQLException ex) {
-                                java.util.logging.Logger.getLogger(xpShop.class.getName()).log(Level.SEVERE, null, ex);
+                                xpShop.this.UpdateXP(p, neu, "AutoUpdate");
+                                if (XP < neu) {
+                                    xpShop.this.PlayerLogger(p, String.format(config.addedxp, neu - XP), "");
+                                } else if (neu < XP) {
+                                    xpShop.this.PlayerLogger(p, String.format(config.substractedxp, XP - neu), "");
+                                }
                             }
                         }
                         if (config.debug) {
@@ -549,6 +559,17 @@ public class xpShop extends JavaPlugin {
                                     PlayerLogger(player, config.commanderrornoint, "Error");
                                     return false;
                                 }
+                            } else if (ActionxpShop.equalsIgnoreCase("resetplayer")) {
+                                if (config.usedbtomanageXP) {
+                                    if (Permission.checkpermissions(player, "xpShop.resetplayer")) {
+                                        SQL.UpdateXP(args[1], 0);
+                                        PlayerLogger(player, String.format(config.Playerreset, args[1]), "");
+                                        return true;
+                                    }
+                                } else {
+                                    PlayerLogger(player, config.dbnotused, "");
+                                    return false;
+                                }
                             } else {
                                 Help.help(sender, args);
                             }
@@ -582,10 +603,27 @@ public class xpShop extends JavaPlugin {
                                     PlayerLogger(player, config.commanderrornoint, "Error");
                                     return false;
                                 }
+                            } else if (ActionxpShop.equalsIgnoreCase("setXP")) {
+                                if (config.usedbtomanageXP) {
+                                    if (Permission.checkpermissions(player, "xpShop.setxp")) {
+                                        if (Tools.isInteger(args[2])) {
+                                            SQL.UpdateXP(args[1], Integer.parseInt(args[2]));
+                                            PlayerLogger(player, String.format(config.Playerxpset, args[1], Integer.parseInt(args[2])), "");
+                                            return true;
+                                        }
+                                    }
+                                } else {
+                                    PlayerLogger(player, config.dbnotused, "");
+                                }
+                                return false;
                             } else {
                                 Help.help(sender, args);
                             }
                             break;
+
+
+
+
                         default:
                             Help.help(player, args);
                             return false;
@@ -665,6 +703,7 @@ public class xpShop extends JavaPlugin {
                     }
                 }
             }
+
             return false;
         } else {
             blacklistLogger(sender);
@@ -1006,6 +1045,9 @@ public class xpShop extends JavaPlugin {
             }
             if (valid) {
                 if (buyamount > 0) {
+                    if (config.usedbtomanageXP) {
+                        SQL.UpdateXP(player.getName(), ((int) getTOTALXP(player) + buyamount));
+                    }
                     UpdateXP(sender, buyamount, "buy");
                     if (moneyactive) {
                         Geldsystem.substract(TOTALXPDOUBLE, player);
@@ -1048,6 +1090,9 @@ public class xpShop extends JavaPlugin {
                 int TOTALint = (int) TOTAL;
                 getmoney = config.xptomoney;
                 if (sellamount <= TOTAL) {
+                    if (config.usedbtomanageXP) {
+                        SQL.UpdateXP(player.getName(), ((int) TOTALint - sellamount));
+                    }
                     UpdateXP(sender, -sellamount, "sell");
                     if (moneyactive) {
                         Geldsystem.addmoney(sellamount * getmoney, player);
